@@ -1,0 +1,210 @@
+package org.vaulture.project.viewmodels
+
+import dev.gitlive.firebase.Firebase
+import dev.gitlive.firebase.auth.auth
+import dev.gitlive.firebase.firestore.Direction
+import dev.gitlive.firebase.firestore.Timestamp
+import dev.gitlive.firebase.firestore.firestore
+import dev.icerock.moko.mvvm.viewmodel.ViewModel
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
+import org.vaulture.project.data.models.CheckInEntry
+import org.vaulture.project.data.models.MentalState
+import org.vaulture.project.domain.CheckInResult
+import org.vaulture.project.domain.RiskEngine
+import org.vaulture.project.services.GeminiService
+import kotlin.time.Clock
+
+data class CheckInUiState(
+    val isLoadingQuestions: Boolean = true, // New state for initial load
+    val step: Int = 0,
+    val questions: List<String> = emptyList(), // Dynamic list
+    val answers: MutableList<Int> = mutableListOf(),
+    val textResponse: String = "",
+    val isAnalyzing: Boolean = false,
+    val result: CheckInResult? = null
+)
+
+class CheckInViewModel : ViewModel() {
+    private val _uiState = MutableStateFlow(CheckInUiState())
+    val uiState = _uiState.asStateFlow()
+    private val firestore = Firebase.firestore
+    private val auth = Firebase.auth
+    // This state will be observed by the UI
+    private val _latestResult = MutableStateFlow<CheckInResult?>(null)
+    val latestResult = _latestResult.asStateFlow()
+
+    private val geminiService = GeminiService()
+
+    private var checkInListenerJob: Job? = null
+
+    init {
+        viewModelScope.launch {
+            auth.authStateChanged.collect { user ->
+                if (user != null) {
+                    observeTodayResult()
+                    loadDailyQuestions()
+                } else {
+                    checkInListenerJob?.cancel()
+                    _latestResult.value = null
+                }
+            }
+        }
+    }
+
+    // Inside CheckInViewModel.kt
+    fun syncResult(result: CheckInResult) {
+        _uiState.update { it.copy(result = result) }
+    }
+
+    private fun observeTodayResult() {
+        val uid = auth.currentUser?.uid ?: return
+
+        checkInListenerJob?.cancel()
+        checkInListenerJob = viewModelScope.launch {
+            try {
+                // To make the app feel "instant" and persistent, we query for
+                // the most recent check-in, even if it was from yesterday.
+                firestore.collection("users").document(uid)
+                    .collection("checkIns")
+                    .orderBy("timestamp", Direction.DESCENDING)
+                    .limit(1)
+                    .snapshots()
+                    .collect { snapshot ->
+                        val document = snapshot.documents.firstOrNull()
+                        if (document != null) {
+                            try {
+                                val entry = document.data<CheckInEntry>()
+
+                                // Map the Data Enum to the Domain Enum safely
+                                val domainState = when(entry.state.name) {
+                                    "STABLE" -> org.vaulture.project.domain.MentalState.STABLE
+                                    "MILD_STRESS" -> org.vaulture.project.domain.MentalState.MILD_STRESS
+                                    "HIGH_STRESS" -> org.vaulture.project.domain.MentalState.HIGH_STRESS
+                                    "BURNOUT_RISK" -> org.vaulture.project.domain.MentalState.BURNOUT_RISK
+                                    else -> org.vaulture.project.domain.MentalState.STABLE
+                                }
+
+                                val domainResult = CheckInResult(
+                                    score = entry.score,
+                                    state = domainState,
+                                    aiInsight = entry.aiInsight,
+                                    timestamp = entry.timestamp.seconds * 1000
+                                )
+
+                                // Update BOTH flows. This ensures the Dashboard loads.
+                                _latestResult.value = domainResult
+                                _uiState.update { it.copy(result = domainResult) }
+
+                                println("✅ PERSISTENCE: Loaded result from ${entry.timestamp.seconds}")
+
+                            } catch (e: Exception) {
+                                println("❌ MAPPING ERROR: ${e.message}")
+                            }
+                        } else {
+                            _latestResult.value = null
+                            println("📡 DB STATUS: No previous check-ins found.")
+                        }
+                    }
+            } catch (e: Exception) {
+                println("❌ FIREBASE ERROR: ${e.message}")
+            }
+        }
+    }
+
+
+    // 1. Fetch AI Questions on init
+    private fun loadDailyQuestions() {
+        viewModelScope.launch {
+            _uiState.update { it.copy(isLoadingQuestions = true) }
+            val dynamicQuestions = geminiService.generateDailyQuestions()
+            _uiState.update {
+                it.copy(
+                    isLoadingQuestions = false,
+                    questions = dynamicQuestions
+                )
+            }
+        }
+    }
+
+    fun selectAnswer(score: Int) {
+        val currentAnswers = _uiState.value.answers.toMutableList()
+        currentAnswers.add(score)
+        _uiState.update { it.copy(answers = currentAnswers, step = it.step + 1) }
+    }
+
+    fun onTextChange(text: String) {
+        _uiState.update { it.copy(textResponse = text) }
+    }
+
+
+    fun submitCheckIn() {
+        val uid = auth.currentUser?.uid ?: return
+        _uiState.update { it.copy(isAnalyzing = true) }
+
+        viewModelScope.launch {
+            try {
+                // 1. Analyze with Gemini
+                val aiResult = geminiService.analyzeJournalEntry(_uiState.value.textResponse)
+
+                // 2. Calculate Risk
+                val (riskScore, mentalState) = RiskEngine.calculateRisk(
+                    answers = _uiState.value.answers,
+                    sentimentScore = aiResult.sentimentScore
+                )
+
+                // 3. Prepare Domain Result for immediate UI feedback
+                val finalResult = CheckInResult(
+                    score = riskScore,
+                    state = mentalState,
+                    aiInsight = aiResult.insight,
+                    timestamp = Clock.System.now().toEpochMilliseconds()
+                )
+
+                // 4. Map to Data Layer Entity for Firestore
+                val dataState = MentalState.valueOf(mentalState.name)
+                val newEntry = CheckInEntry(
+                    userId = uid,
+                    score = riskScore,
+                    state = dataState,
+                    aiInsight = aiResult.insight,
+                    sentimentScore = aiResult.sentimentScore,
+                    timestamp = Timestamp.now(),
+                    generalThoughts = _uiState.value.textResponse
+                )
+
+                // 5. Save to Firestore
+                firestore.collection("users").document(uid)
+                    .collection("checkIns")
+                    .add(newEntry)
+
+                // 6. CRITICAL: Update the UI state so HomeScreen knows to "Proceed"
+                _uiState.update {
+                    it.copy(
+                        isAnalyzing = false,
+                        result = finalResult // This triggers the AnimatedContent in HomeScreen
+                    )
+                }
+
+                // Optional: Clear the text so it's fresh for tomorrow
+                _uiState.update { it.copy(textResponse = "") }
+
+            } catch (e: Exception) {
+                _uiState.update { it.copy(isAnalyzing = false) }
+                println("Submission Error: ${e.message}")
+            }
+        }
+    }
+
+
+
+    // Allow user to refresh questions if they don't like them
+    fun refreshQuestions() {
+        loadDailyQuestions()
+    }
+}

@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "410223288840",
+    "project_id": "tija-a7b75",
+    "storage_bucket": "tija-a7b75.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:410223288840:android:34799bcad6f21a8bf9a7bd",
+        "android_client_info": {
+          "package_name": "org.vaulture.project"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "410223288840-ulfvi88ih9jq5q740991qgka07ga2rmr.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDFvaq81oLRVEf1wDyv588GgDskMunJlQM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "410223288840-ulfvi88ih9jq5q740991qgka07ga2rmr.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
