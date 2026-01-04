@@ -18,8 +18,9 @@ import dev.gitlive.firebase.auth.auth
 import dev.gitlive.firebase.firestore.firestore
 import dev.gitlive.firebase.initialize
 import kotlinx.coroutines.launch
-import org.vaulture.project.utils.AuthServiceImpl
-import org.vaulture.project.utils.signInWithGoogleIdToken
+import org.vaulture.project.presentation.navigation.AppNavigation
+import org.vaulture.project.presentation.utils.AuthServiceImpl
+import org.vaulture.project.presentation.utils.signInWithGoogleIdToken
 
 class MainActivity : ComponentActivity() {
 

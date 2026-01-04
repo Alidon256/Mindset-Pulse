@@ -8,10 +8,10 @@ import dev.gitlive.firebase.firestore.where
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
-import org.vaulture.project.data.models.User // Ensure this points to your User data class
-import org.vaulture.project.data.models.Chat
-import org.vaulture.project.data.models.ChatMessage
-import org.vaulture.project.data.models.ChatParticipant
+import org.vaulture.project.domain.model.User // Ensure this points to your User data class
+import org.vaulture.project.domain.model.Chat
+import org.vaulture.project.domain.model.ChatMessage
+import org.vaulture.project.domain.model.ChatParticipant
 import kotlin.time.Clock
 
 class ChatRepository {

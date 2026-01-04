@@ -1,7 +1,7 @@
 package org.vaulture.project.data.repos
 
-import org.vaulture.project.data.models.Channel
-import org.vaulture.project.data.models.RhythmTrack
+import org.vaulture.project.domain.model.Channel
+import org.vaulture.project.domain.model.RhythmTrack
 
 
 sealed class SearchableItem{

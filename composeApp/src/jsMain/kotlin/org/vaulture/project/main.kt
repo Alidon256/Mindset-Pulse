@@ -7,6 +7,7 @@ import dev.gitlive.firebase.FirebaseOptions
 import dev.gitlive.firebase.initialize
 import kotlinx.browser.document
 import org.jetbrains.skiko.wasm.onWasmReady
+import org.vaulture.project.presentation.navigation.AppNavigation
 
 @OptIn(ExperimentalComposeUiApi::class)
 fun main() {
