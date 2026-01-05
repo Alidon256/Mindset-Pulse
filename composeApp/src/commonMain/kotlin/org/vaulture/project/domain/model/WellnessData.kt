@@ -54,7 +54,9 @@ data class WellnessStats(
     val longestStreak: Int = 0,
     val lastActivityDate: String = "",
     val totalMinutes: Int = 0,
-    val sessionsToday: Int = 0, // 0-5 visual indicator
-    val resiliencePoints: Int = 0 // XP-style progression
+    val sessionsToday: Int = 0,
+    val resiliencePoints: Int = 0,
+    val totalCheckIns: Int = 0,
+    val consistency: Float = 0f
 )
 

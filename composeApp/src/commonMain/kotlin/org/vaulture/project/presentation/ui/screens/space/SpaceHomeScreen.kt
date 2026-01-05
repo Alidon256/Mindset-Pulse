@@ -31,7 +31,11 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.painterResource
+import org.vaulture.project.domain.model.WellnessStats
+import org.vaulture.project.presentation.ui.components.PulseBadgeCard
+import org.vaulture.project.presentation.ui.components.WellnessStatsRow
 import org.vaulture.project.presentation.viewmodels.SpaceViewModel
+import org.vaulture.project.presentation.viewmodels.WellnessViewModel
 import vaulture.composeapp.generated.resources.Res
 import vaulture.composeapp.generated.resources.mindset_pulse_nobg_logo
 
@@ -39,13 +43,16 @@ import vaulture.composeapp.generated.resources.mindset_pulse_nobg_logo
 @Composable
 fun SpacesHomeScreen(
     viewModel: SpaceViewModel,
-    selectedFilter: org.vaulture.project.presentation.ui.screens.space.SpaceFilter,
-    onFilterSelected: (org.vaulture.project.presentation.ui.screens.space.SpaceFilter) -> Unit,
+    selectedFilter: SpaceFilter,
+    onFilterSelected: (SpaceFilter) -> Unit,
     onSpaceClick: (spaceId: String) -> Unit,
     onCreateSpaceClick: () -> Unit,
     onAddStoryClick: () -> Unit,
-    onCommentClick: (storyId: String) -> Unit
+    onCommentClick: (storyId: String) -> Unit,
+    wellnessViewModel: WellnessViewModel
 ){
+    val statsState by wellnessViewModel.uiState.collectAsState()
+
     BoxWithConstraints(modifier = Modifier.fillMaxSize()){
         val isExpanded = maxWidth > 920.dp
 
@@ -55,17 +62,18 @@ fun SpacesHomeScreen(
             label = "ResponsiveSpacesLayout"
         ){ expanded ->
             if (expanded){
-                _root_ide_package_.org.vaulture.project.presentation.ui.screens.space.SpaceHomeScreenExpandable(
+                SpaceHomeScreenExpandable(
                     viewModel = viewModel,
                     selectedFilter = selectedFilter,
                     onFilterSelected = onFilterSelected,
                     onSpaceClick = onSpaceClick,
                     onCreateSpaceClick = onCreateSpaceClick,
                     onAddStoryClick = onAddStoryClick,
-                    onCommentClick = onCommentClick
+                    onCommentClick = onCommentClick,
+                    stats = statsState.stats
                 )
             }else {
-                _root_ide_package_.org.vaulture.project.presentation.ui.screens.space.SpacesHomeScreenCompat(
+                SpacesHomeScreenCompat(
                     viewModel = viewModel,
                     selectedFilter = selectedFilter,
                     onFilterSelected = onFilterSelected,
@@ -82,12 +90,13 @@ fun SpacesHomeScreen(
 @Composable
 fun SpaceHomeScreenExpandable(
     viewModel: SpaceViewModel,
-    selectedFilter: org.vaulture.project.presentation.ui.screens.space.SpaceFilter,
-    onFilterSelected: (org.vaulture.project.presentation.ui.screens.space.SpaceFilter) -> Unit,
+    selectedFilter: SpaceFilter,
+    onFilterSelected: (SpaceFilter) -> Unit,
     onSpaceClick: (spaceId: String) -> Unit,
     onCreateSpaceClick: () -> Unit,
     onAddStoryClick: () -> Unit,
-    onCommentClick: (String) -> Unit
+    onCommentClick: (String) -> Unit,
+    stats: WellnessStats
 ){
     var selectedRailItem by remember { mutableStateOf("Spaces") }
     var searchQuery by remember { mutableStateOf("") }
@@ -227,10 +236,10 @@ fun SpaceHomeScreenExpandable(
             )
 
             // Current Streak Component
-            _root_ide_package_.org.vaulture.project.presentation.ui.components.PulseBadgeCard(streak = 12)
+            PulseBadgeCard(streak = 12)
 
             // Dynamic Stats (Check-ins, Minutes, Consistency)
-            _root_ide_package_.org.vaulture.project.presentation.ui.components.WellnessStatsRow()
+           WellnessStatsRow(stats = stats )
 
             // AI Responsible Disclaimer (Crucial for competition ethics)
             Card(

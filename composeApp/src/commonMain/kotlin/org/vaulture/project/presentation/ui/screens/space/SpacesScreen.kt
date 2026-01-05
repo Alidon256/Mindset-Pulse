@@ -136,6 +136,7 @@ fun SpaceScreenExpandable(
     onSignOut: () -> Unit,
     authService: AuthService
 ){
+    val statsState by wellnessViewModel.uiState.collectAsState()
     var selectedRailItem by remember { mutableStateOf("Spaces") }
     var searchQuery by remember { mutableStateOf("") }
     var isSearchExpanded by remember { mutableStateOf(false) }
@@ -436,7 +437,7 @@ fun SpaceScreenExpandable(
 
             PulseBadgeCard(streak = 12)
 
-            WellnessStatsRow()
+            WellnessStatsRow(stats = statsState.stats)
 
             Card(
                 colors = CardDefaults.cardColors(

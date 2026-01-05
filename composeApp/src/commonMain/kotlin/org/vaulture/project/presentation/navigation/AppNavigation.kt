@@ -456,7 +456,8 @@ fun AppNavigation(
                             onCommentClick = { storyId ->
                                 selectedStoryIdForComments =
                                     storyId
-                            }
+                            },
+                            wellnessViewModel = wellnessViewModel
                         )
 
                     }
@@ -467,14 +468,19 @@ fun AppNavigation(
                             onSpaceCreated = { navController.popBackStack() },
                         )
                     }
+
                     composable<Routes.SPACE_DETAIL> { backStackEntry ->
                         val spaceId = backStackEntry.toRoute<Routes.SPACE_DETAIL>().spaceId
                         SpaceDetailScreen(
                             spaceId = spaceId,
                             onNavigateBack = { navController.popBackStack() },
-                            viewModel = spaceViewModel
+                            viewModel = spaceViewModel,
+                            onSpaceSelected = { newSpaceId -> navController.navigate(Routes.SPACE_DETAIL(spaceId = newSpaceId)) {
+                                popUpTo(navController.graph.id) { inclusive = true }
+                            } }
                         )
                     }
+
                     composable<Routes.ADD_STORY> {
                         val spaceViewModel = remember {
                             SpaceViewModel(

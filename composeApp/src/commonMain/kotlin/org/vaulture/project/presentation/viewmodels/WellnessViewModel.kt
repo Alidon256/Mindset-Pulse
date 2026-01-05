@@ -192,7 +192,7 @@ class WellnessViewModel : ViewModel() {
         }
     }
 
-    private fun loadStats(uid: String) {
+    /*private fun loadStats(uid: String) {
         statsListenerJob?.cancel()
         statsListenerJob = viewModelScope.launch {
             println("👂 [BREADCRUMB] LISTENER: Attaching to /stats/wellness")
@@ -209,7 +209,52 @@ class WellnessViewModel : ViewModel() {
                 println("❌ [DB_LISTENER] Error: ${e.message}")
             }
         }
+    }*/
+
+    private fun loadStats(uid: String) {
+        statsListenerJob?.cancel()
+        statsListenerJob = viewModelScope.launch {
+            println("👂 [BREADCRUMB] LISTENER: Attaching to /stats/wellness")
+            try {
+                // --- FIX STARTS HERE ---
+
+                // 1. Fetch the total number of check-ins for the user.
+                // This is a one-time aggregation that gives us a count.
+                val checkInsSnapshot = db.collection("users").document(uid)
+                    .collection("checkIns").get()
+                val totalCheckInsCount = checkInsSnapshot.documents.size
+
+                // 2. Listen for real-time updates on the main stats document.
+                db.collection("users").document(uid).collection("stats").document("wellness")
+                    .snapshots().collect { snap ->
+                        if (snap.exists) {
+                            val s = snap.data<WellnessStats>()
+
+                            // 3. Calculate Consistency and update the fetched stats object
+                            // Consistency = (days with activity) / (days since joining)
+                            // For simplicity here, we'll use a placeholder or simpler logic.
+                            // A simple consistency metric: (streak / (days since join)) - let's use streak for now.
+                            val consistencyValue = if (totalCheckInsCount > 0) (s.currentStreak.toFloat() / totalCheckInsCount).coerceAtMost(1.0f) else 0f
+
+                            val statsWithCalculations = s.copy(
+                                totalCheckIns = totalCheckInsCount,
+                                consistency = consistencyValue
+                            )
+
+                            println("📥 [DB_LISTENER] Incoming Data: Streak ${statsWithCalculations.currentStreak}, XP: ${statsWithCalculations.resiliencePoints}")
+                            _uiState.update { it.copy(stats = statsWithCalculations) }
+                        } else {
+                            // If no stats document exists, create a default one with the calculated check-in count
+                            _uiState.update { it.copy(stats = WellnessStats(totalCheckIns = totalCheckInsCount)) }
+                        }
+                    }
+                // --- FIX ENDS HERE ---
+            } catch (e: Exception) {
+                println("❌ [DB_LISTENER] Error: ${e.message}")
+            }
+        }
     }
+
 
     fun selectActivity(type: WellnessType) {
         println("👆 [LOG] UI_ACTION: Selected $type")

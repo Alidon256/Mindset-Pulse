@@ -456,7 +456,7 @@ private fun ProfileScreenExpanded(
 
             PulseBadgeCard(streak = 12)
 
-            WellnessStatsRow()
+            WellnessStatsRow(stats = stats)
 
             Card(
                 colors = CardDefaults.cardColors(

@@ -100,6 +100,9 @@ open class SpaceViewModel(
 
     private val userPhotoCache = mutableMapOf<String, String>()
 
+    // This will hold the ID of the space currently being viewed in the detail pane.
+    private val _activeSpaceId = MutableStateFlow<String?>(null)
+    val activeSpaceId = _activeSpaceId.asStateFlow()
 
     init {
         viewModelScope.launch {
@@ -380,6 +383,7 @@ open class SpaceViewModel(
     }
 
     fun loadSpaceDetails(spaceId: String) {
+        _activeSpaceId.value = spaceId
         viewModelScope.launch {
             try {
                 val doc = firestore.collection("spaces").document(spaceId).get()
@@ -451,6 +455,7 @@ open class SpaceViewModel(
     fun clearSpaceDetails() {
         chatListenerJob?.cancel()
         postsListenerJob?.cancel()
+        _activeSpaceId.value = null
         _currentSpace.value = null
         _spacePosts.value = emptyList()
         _spaceMessages.value = emptyList()

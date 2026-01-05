@@ -873,8 +873,6 @@ fun DashboardWebLayout(
 
         }
         VerticalDivider(thickness = 1.dp, color = MaterialTheme.colorScheme.outlineVariant)
-
-
         /*LazyColumn(
             modifier = Modifier.weight(0.4f).fillMaxHeight(),
             verticalArrangement = Arrangement.spacedBy(24.dp)
@@ -951,7 +949,7 @@ fun DashboardWebLayout(
 
             PulseBadgeCard(streak = 12)
 
-            WellnessStatsRow()
+            WellnessStatsRow(stats = wellnessState.stats)
 
             Card(
                 colors = CardDefaults.cardColors(
