@@ -30,6 +30,7 @@ import coil3.compose.AsyncImage
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 import org.vaulture.project.domain.model.RhythmTrack
+import org.vaulture.project.presentation.theme.PoppinsTypography
 import org.vaulture.project.presentation.utils.formatCount
 
 
@@ -40,7 +41,7 @@ fun RhythmItem(
     modifier: Modifier = Modifier,
     isSelected: Boolean = false
 ) {
-    // Log at the beginning of the Composable
+
     println("RENDERING Item ID: ${track.id}, Title: '${track.title}', Artist: '${track.artist}', Duration: '${track.duration}', Listeners: ${track.listenerCount}, Thumb: '${track.thumbnailUrl}'")
 
     val cardColor = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surface
@@ -50,7 +51,6 @@ fun RhythmItem(
     BoxWithConstraints(modifier = modifier) {
         val screenWidthDp = maxWidth
         val isTablet = screenWidthDp >= 600.dp
-       // val size = if (isTablet) 180.dp else 150.dp
         val size = if (isTablet) androidx.compose.ui.unit.DpSize(220.dp, 160.dp) else androidx.compose.ui.unit.DpSize(190.dp, 140.dp)
         val horizontalPadding = 8.dp
         val width = if (isTablet) 230.dp else 210.dp
@@ -87,7 +87,7 @@ fun RhythmItem(
                         println("Item ID ${track.id} - About to render Duration: '${track.duration}'")
                         Text(
                             text = track.duration,
-                            style = _root_ide_package_.org.vaulture.project.presentation.theme.PoppinsTypography().labelLarge.copy(
+                            style = PoppinsTypography().labelLarge.copy(
                                 fontSize = 12.sp,
                                 fontWeight = FontWeight.Medium,
                                 color = textColor
@@ -112,8 +112,8 @@ fun RhythmItem(
             ) {
                 println("Item ID ${track.id} - About to render Title: '${track.title}'")
                 Text(
-                    text = track.title.takeIf { it.isNotEmpty() } ?: "Untitled Video",
-                    style = _root_ide_package_.org.vaulture.project.presentation.theme.PoppinsTypography().bodyLarge.copy(
+                    text = track.title.takeIf { it.isNotEmpty() } ?: "Untitled Track",
+                    style = PoppinsTypography().bodyLarge.copy(
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Bold,
                         color = textColor
@@ -123,13 +123,13 @@ fun RhythmItem(
                 )
                 Spacer(modifier = Modifier.height(4.dp))
 
-                val artistText = track.artist.takeIf { it.isNotEmpty() } ?: "Unknown Channel"
+                val artistText = track.artist.takeIf { it.isNotEmpty() } ?: "Unknown Artist"
                 val listenerText = "${formatCount(track.listenerCount.toLong())} listeners"
                 val fullArtistListenerString = "$artistText • $listenerText"
                 println("Item ID ${track.id} - About to render Artist/Listeners: '$fullArtistListenerString' with color: $subTextColor")
                 Text(
                     text = fullArtistListenerString,
-                    style = _root_ide_package_.org.vaulture.project.presentation.theme.PoppinsTypography().bodySmall.copy(
+                    style = PoppinsTypography().bodySmall.copy(
                         fontSize = 14.sp,
                         color = subTextColor
                     ),
@@ -143,7 +143,7 @@ fun RhythmItem(
 @Composable
 @Preview
 fun RhythmItemPreview(){
-    _root_ide_package_.org.vaulture.project.presentation.ui.components.RhythmItem(
+    RhythmItem(
         track = RhythmTrack(
             id = "7353g",
             title = "Morning Aura",

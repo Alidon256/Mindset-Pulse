@@ -1,11 +1,5 @@
 package org.vaulture.project.presentation.viewmodels
 
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Bedtime
-import androidx.compose.material.icons.filled.SelfImprovement
-import androidx.compose.material.icons.filled.Spa
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dev.gitlive.firebase.Firebase
@@ -46,7 +40,7 @@ class WellnessViewModel : ViewModel() {
     private var statsListenerJob: Job? = null
 
     init {
-        println("🚀 [BREADCRUMB] WELLNESS_VM: Global Instance Active")
+        println("[BREADCRUMB] WELLNESS_VM: Global Instance Active")
         observeAuthAndLoadStats()
     }
 
@@ -54,10 +48,10 @@ class WellnessViewModel : ViewModel() {
         viewModelScope.launch {
             auth.authStateChanged.collect { user ->
                 if (user != null) {
-                    println("👤 [BREADCRUMB] AUTH: User detected (${user.uid}). Loading stats...")
+                    println("[BREADCRUMB] AUTH: User detected (${user.uid}). Loading stats...")
                     loadStats(user.uid)
                 } else {
-                    println("🚪 [BREADCRUMB] AUTH: Sign-out. Killing listeners.")
+                    println("[BREADCRUMB] AUTH: Sign-out. Killing listeners.")
                     statsListenerJob?.cancel()
                     _uiState.update { WellnessUiState() }
                 }
@@ -70,7 +64,7 @@ class WellnessViewModel : ViewModel() {
         val todayStr = now.toString()
         val yesterdayStr = now.minus(1, DateTimeUnit.DAY).toString()
 
-        println("📊 [LOG] CALC_STATS: Today: $todayStr | Last DB Date: ${current.lastActivityDate}")
+        println("[LOG] CALC_STATS: Today: $todayStr | Last DB Date: ${current.lastActivityDate}")
 
         val isNewDay = current.lastActivityDate != todayStr
 
@@ -93,7 +87,7 @@ class WellnessViewModel : ViewModel() {
             resiliencePoints = current.resiliencePoints + pointsEarned
         )
 
-        println("📊 [LOG] CALC_STATS: Final -> Streak: ${updated.currentStreak}, XP: ${updated.resiliencePoints}")
+        println("[LOG] CALC_STATS: Final -> Streak: ${updated.currentStreak}, XP: ${updated.resiliencePoints}")
         return updated
     }
 
@@ -102,7 +96,7 @@ class WellnessViewModel : ViewModel() {
         val totalSeconds = durationMinutes * 60
         val type = _uiState.value.currentActivity ?: WellnessType.BREATHING
 
-        println("⏱️ [BREADCRUMB] TIMER: Starting $type for $totalSeconds seconds")
+        println("[BREADCRUMB] TIMER: Starting $type for $totalSeconds seconds")
 
         _uiState.update { it.copy(
             phase = WellnessPhase.ACTIVE,
@@ -129,11 +123,11 @@ class WellnessViewModel : ViewModel() {
                 }
 
                 if (isActive && _uiState.value.timeLeftSeconds == 0) {
-                    println("🏁 [BREADCRUMB] TIMER: Reached zero. Triggering database sync...")
+                    println("[BREADCRUMB] TIMER: Reached zero. Triggering database sync...")
                     completeActivity()
                 }
             } catch (e: Exception) {
-                println("🛑 [LOG] TIMER: Coroutine interrupted: ${e.message}")
+                println("[LOG] TIMER: Coroutine interrupted: ${e.message}")
             }
         }
     }
@@ -143,11 +137,9 @@ class WellnessViewModel : ViewModel() {
         val type = _uiState.value.currentActivity ?: return
         val duration = _uiState.value.totalDurationSeconds
 
-        println("💾 [BREADCRUMB] SYNC: Starting Global Upload Sequence...")
+        println("[BREADCRUMB] SYNC: Starting Global Upload Sequence...")
         _uiState.update { it.copy(isTimerRunning = false, isCompleting = true) }
 
-        // We use viewModelScope but wrap in NonCancellable to ensure
-        // the data hits the DB even if the user switches screens.
         viewModelScope.launch {
             withContext(NonCancellable) {
                 try {
@@ -158,21 +150,21 @@ class WellnessViewModel : ViewModel() {
                         durationSeconds = duration,
                         timestamp = Timestamp.now()
                     )
-                    println("📡 [DB_STEP 1] Uploading WellnessRecord to 'wellnessRecords'...")
+                    println("[DB_STEP 1] Uploading WellnessRecord to 'wellnessRecords'...")
                     db.collection("users").document(uid).collection("wellnessRecords").add(record)
-                    println("✅ [DB_STEP 1] Record Uploaded Successfully.")
+                    println("DB_STEP 1] Record Uploaded Successfully.")
 
                     // STEP 2: ATOMIC STATS UPDATE
-                    println("📡 [DB_STEP 2] Fetching current stats from 'stats/wellness'...")
+                    println("[DB_STEP 2] Fetching current stats from 'stats/wellness'...")
                     val statsRef = db.collection("users").document(uid).collection("stats").document("wellness")
                     val snapshot = statsRef.get()
                     val currentStats = if (snapshot.exists) snapshot.data<WellnessStats>() else WellnessStats()
 
                     val updated = calculateUpdatedStats(currentStats, duration / 60)
 
-                    println("📡 [DB_STEP 3] Writing updated stats to Firestore...")
+                    println("[DB_STEP 3] Writing updated stats to Firestore...")
                     statsRef.set(updated)
-                    println("✅ [DB_STEP 3] Stats Uploaded Successfully.")
+                    println("[DB_STEP 3] Stats Uploaded Successfully.")
 
                     withContext(Dispatchers.Main) {
                         _uiState.update { it.copy(
@@ -181,10 +173,10 @@ class WellnessViewModel : ViewModel() {
                             isCompleting = false,
                             sessionSaved = true
                         )}
-                        println("🎉 [BREADCRUMB] SYNC: COMPLETE. Mindset Battery updated.")
+                        println("[BREADCRUMB] SYNC: COMPLETE. Mindset Battery updated.")
                     }
                 } catch (e: Exception) {
-                    println("❌ [BREADCRUMB] DB FATAL ERROR: ${e.message}")
+                    println("[BREADCRUMB] DB FATAL ERROR: ${e.message}")
                     e.printStackTrace()
                     _uiState.update { it.copy(isCompleting = false) }
                 }
@@ -192,32 +184,11 @@ class WellnessViewModel : ViewModel() {
         }
     }
 
-    /*private fun loadStats(uid: String) {
-        statsListenerJob?.cancel()
-        statsListenerJob = viewModelScope.launch {
-            println("👂 [BREADCRUMB] LISTENER: Attaching to /stats/wellness")
-            try {
-                db.collection("users").document(uid).collection("stats").document("wellness")
-                    .snapshots().collect { snap ->
-                        if (snap.exists) {
-                            val s = snap.data<WellnessStats>()
-                            println("📥 [DB_LISTENER] Incoming Data: Streak ${s.currentStreak}, XP: ${s.resiliencePoints}")
-                            _uiState.update { it.copy(stats = s) }
-                        }
-                    }
-            } catch (e: Exception) {
-                println("❌ [DB_LISTENER] Error: ${e.message}")
-            }
-        }
-    }*/
-
     private fun loadStats(uid: String) {
         statsListenerJob?.cancel()
         statsListenerJob = viewModelScope.launch {
-            println("👂 [BREADCRUMB] LISTENER: Attaching to /stats/wellness")
+            println("[BREADCRUMB] LISTENER: Attaching to /stats/wellness")
             try {
-                // --- FIX STARTS HERE ---
-
                 // 1. Fetch the total number of check-ins for the user.
                 // This is a one-time aggregation that gives us a count.
                 val checkInsSnapshot = db.collection("users").document(uid)
@@ -231,38 +202,34 @@ class WellnessViewModel : ViewModel() {
                             val s = snap.data<WellnessStats>()
 
                             // 3. Calculate Consistency and update the fetched stats object
-                            // Consistency = (days with activity) / (days since joining)
-                            // For simplicity here, we'll use a placeholder or simpler logic.
-                            // A simple consistency metric: (streak / (days since join)) - let's use streak for now.
-                            val consistencyValue = if (totalCheckInsCount > 0) (s.currentStreak.toFloat() / totalCheckInsCount).coerceAtMost(1.0f) else 0f
+                              val consistencyValue = if (totalCheckInsCount > 0) (s.currentStreak.toFloat() / totalCheckInsCount).coerceAtMost(1.0f) else 0f
 
                             val statsWithCalculations = s.copy(
                                 totalCheckIns = totalCheckInsCount,
                                 consistency = consistencyValue
                             )
 
-                            println("📥 [DB_LISTENER] Incoming Data: Streak ${statsWithCalculations.currentStreak}, XP: ${statsWithCalculations.resiliencePoints}")
+                            println("[DB_LISTENER] Incoming Data: Streak ${statsWithCalculations.currentStreak}, XP: ${statsWithCalculations.resiliencePoints}")
                             _uiState.update { it.copy(stats = statsWithCalculations) }
                         } else {
                             // If no stats document exists, create a default one with the calculated check-in count
                             _uiState.update { it.copy(stats = WellnessStats(totalCheckIns = totalCheckInsCount)) }
                         }
                     }
-                // --- FIX ENDS HERE ---
             } catch (e: Exception) {
-                println("❌ [DB_LISTENER] Error: ${e.message}")
+                println("[DB_LISTENER] Error: ${e.message}")
             }
         }
     }
 
 
     fun selectActivity(type: WellnessType) {
-        println("👆 [LOG] UI_ACTION: Selected $type")
+        println("[LOG] UI_ACTION: Selected $type")
         _uiState.update { it.copy(currentActivity = type, phase = WellnessPhase.SETUP) }
     }
 
     fun resetToSetup() {
-        println("🔄 [LOG] UI_ACTION: Resetting session state")
+        println("[LOG] UI_ACTION: Resetting session state")
         timerJob?.cancel()
         _uiState.update { it.copy(phase = WellnessPhase.SETUP, isTimerRunning = false, timeLeftSeconds = 0) }
     }

@@ -20,6 +20,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil3.compose.AsyncImage
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.vaulture.project.presentation.theme.AppTheme
@@ -27,11 +28,12 @@ import vaulture.composeapp.generated.resources.Res
 import vaulture.composeapp.generated.resources.bg_two
 
 @Composable
-// Updated: Rename parameters for clarity
+
 fun ConnectScreen(
-    onNavigateToLogin: () -> Unit
+    onNavigateToLogin: () -> Unit,
+    onNavigateToSignUp: () -> Unit
 ) {
-    _root_ide_package_.org.vaulture.project.presentation.theme.AppTheme {
+    AppTheme {
         Scaffold(
             containerColor = Color.White
         ) { paddingValues ->
@@ -44,25 +46,25 @@ fun ConnectScreen(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
 
-                // Top Section: Text
+
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(
                             top = 50.dp,
                             bottom = 20.dp
-                        ), // Adjusted top and added bottom padding
+                        ),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(
-                        text = "Travel Deeper",
+                        text = "Build Your Mindset",
                         fontSize = 28.sp,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.onBackground,
                         textAlign = TextAlign.Center
                     )
                     Text(
-                        text = "Connect with other travellers",
+                        text = "Connect with other like minded people",
                         fontSize = 16.sp,
                         color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f),
                         textAlign = TextAlign.Center,
@@ -70,27 +72,24 @@ fun ConnectScreen(
                     )
                 }
 
-                // Curved Image Section
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(500.dp) // Adjusted height, fine-tune this with the curve
+                        .height(500.dp)
                 ) {
-                    Image(
-                        painter = painterResource(Res.drawable.bg_two),
-                        contentDescription = "Hikers enjoying a scenic view",
+                    AsyncImage(
+                        model = "https://images.pexels.com/photos/3772612/pexels-photo-3772612.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
+                        contentDescription = "Nature",
                         modifier = Modifier
                             .fillMaxSize()
-                            .clip(_root_ide_package_.org.vaulture.project.presentation.ui.screens.onboarding.AsymmetricBottomCurveShapeImproved()) // Using improved shape
-                            .background(Color(0xFF1B5E20)), // Dark green from mockup
+                            .clip(AsymmetricBottomCurveShapeImproved())
+                            .background(MaterialTheme.colorScheme.primary),
                         contentScale = ContentScale.Crop
                     )
                 }
 
-                // Spacer to create significant distance before buttons
-                Spacer(modifier = Modifier.height(60.dp)) // Increased spacer
+                Spacer(modifier = Modifier.height(60.dp))
 
-                // Bottom Section with Buttons
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     modifier = Modifier
@@ -99,7 +98,6 @@ fun ConnectScreen(
                         .padding(bottom = 40.dp)
                 ) {
                     Button(
-                        // Updated: Use the navigation callback
                         onClick = onNavigateToLogin,
                         modifier = Modifier
                             .fillMaxWidth()
@@ -120,8 +118,7 @@ fun ConnectScreen(
                     Spacer(modifier = Modifier.height(16.dp))
 
                     OutlinedButton(
-                        // Updated: Use the navigation callback
-                        onClick = onNavigateToLogin,
+                        onClick = onNavigateToSignUp,
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(56.dp),
@@ -145,7 +142,6 @@ fun ConnectScreen(
     }
 }
 
-// Custom Shape for the Asymmetric Bottom Curve - Improved Version
 fun AsymmetricBottomCurveShapeImproved(): Shape {
     return GenericShape { size, _ ->
         val width = size.width
@@ -164,8 +160,9 @@ fun AsymmetricBottomCurveShapeImproved(): Shape {
 @Composable
 fun ConnectScreenPreview() {
     MaterialTheme {
-        // Updated: Provide an empty lambda for the preview
-        _root_ide_package_.org.vaulture.project.presentation.ui.screens.onboarding.ConnectScreen(
-            onNavigateToLogin = {})
+        ConnectScreen(
+            onNavigateToLogin = {},
+            onNavigateToSignUp = {}
+        )
     }
 }

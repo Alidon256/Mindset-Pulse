@@ -33,8 +33,6 @@ class RhythmViewModel(
 
     private val _uiState = MutableStateFlow(RhythmUiState())
     val uiState: StateFlow<RhythmUiState> = _uiState.asStateFlow()
-
-    // FIX: Added the missing searchSuggestions Flow
     private val _searchSuggestions = MutableStateFlow<List<RhythmTrack>>(emptyList())
     val searchSuggestions: StateFlow<List<RhythmTrack>> = _searchSuggestions.asStateFlow()
 
@@ -57,11 +55,9 @@ class RhythmViewModel(
         }
     }
 
-    // FIX: Added the missing updateSearchQuery function
     fun updateSearchQuery(query: String, context: SearchContext) {
         _uiState.update { it.copy(searchQuery = query) }
 
-        // Dynamic filtering for suggestions
         if (query.isBlank()) {
             _searchSuggestions.value = emptyList()
         } else {
@@ -73,31 +69,10 @@ class RhythmViewModel(
         }
     }
 
-    /*fun loadTrackById(trackId: String) {
-        // First, check if the track is already in our loaded list
-        val existingTrack = _uiState.value.tracks.find { it.id == trackId }
-        if (existingTrack != null) {
-            _uiState.update { it.copy(currentTrack = existingTrack) }
-        } else {
-            // Fallback: If navigating directly via URL/Deep-link, fetch from Firestore
-            viewModelScope.launch {
-                try {
-                    val doc = firestore.collection("tracks").document(trackId).get()
-                    val track = doc.data<RhythmTrack>().copy(id = doc.id)
-                    _uiState.update { it.copy(currentTrack = track) }
-                } catch (e: Exception) {
-                    println("❌ ERROR: Could not load track $trackId - ${e.message}")
-                }
-            }
-        }
-    }*/
-    // ... inside RhythmViewModel.kt ...
-
     fun loadTrackById(trackId: String) {
         val existingTrack = _uiState.value.tracks.find { it.id == trackId }
         if (existingTrack != null) {
             _uiState.update { it.copy(currentTrack = existingTrack) }
-            // FIX: If we navigate to a track that isn't the current one, play it
             if (audioPlayer.isPlaying.value == false || _uiState.value.currentTrack?.id != trackId) {
                 playTrack(existingTrack)
             }
@@ -107,9 +82,9 @@ class RhythmViewModel(
                     val doc = firestore.collection("tracks").document(trackId).get()
                     val track = doc.data<RhythmTrack>().copy(id = doc.id)
                     _uiState.update { it.copy(currentTrack = track) }
-                    playTrack(track) // Trigger playback after fetch
+                    playTrack(track)
                 } catch (e: Exception) {
-                    println("❌ ERROR: Could not load track $trackId - ${e.message}")
+                    println("ERROR: Could not load track $trackId - ${e.message}")
                 }
             }
         }
@@ -117,14 +92,13 @@ class RhythmViewModel(
 
     fun playTrack(track: RhythmTrack) {
         _uiState.update { it.copy(currentTrack = track) }
-        // USE previewUrl as the primary source if audioUrl is empty
         val url = if (track.previewUrl.isNotBlank()) track.previewUrl else track.previewUrl
 
         if (url.isNotBlank()) {
-            println("📡 RHYTHM: Attempting to play URL: $url")
+            println(" RHYTHM: Attempting to play URL: $url")
             audioPlayer.play(url, track.title, track.artist)
         } else {
-            println("⚠️ RHYTHM: No valid URL found for track ${track.title}")
+            println("RHYTHM: No valid URL found for track ${track.title}")
         }
     }
 
@@ -141,7 +115,7 @@ class RhythmViewModel(
                             doc.data<RhythmTrack>().copy(id = doc.id)
                         }
 
-                        println("📡 RHYTHM LOG: Received ${tracks.size} tracks from Firestore")
+                        println("RHYTHM LOG: Received ${tracks.size} tracks from Firestore")
 
                         _uiState.update { it.copy(
                             tracks = tracks,
@@ -150,17 +124,12 @@ class RhythmViewModel(
                         ) }
                     }
             } catch (e: Exception) {
-                println("❌ RHYTHM ERROR: ${e.message}")
+                println("RHYTHM ERROR: ${e.message}")
                 _uiState.update { it.copy(isTracksLoading = false, error = e.message) }
             }
         }
     }
 
-
-   /* fun playTrack(track: RhythmTrack) {
-        _uiState.update { it.copy(currentTrack = track) }
-        audioPlayer.play(track.previewUrl, track.title, track.artist)
-    }*/
     fun togglePlayback() {
         if (audioPlayer.isPlaying.value) audioPlayer.pause() else audioPlayer.resume()
     }

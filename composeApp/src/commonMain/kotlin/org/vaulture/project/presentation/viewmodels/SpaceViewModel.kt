@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dev.gitlive.firebase.auth.FirebaseAuth
 import dev.gitlive.firebase.firestore.Direction
+import dev.gitlive.firebase.firestore.FieldPath
 import dev.gitlive.firebase.firestore.FieldValue
 import dev.gitlive.firebase.firestore.FirebaseFirestore
 import dev.gitlive.firebase.firestore.Timestamp
@@ -35,6 +36,11 @@ data class SpaceUiState(
     val isLoading: Boolean = false,
     val error: String? = null
 )
+enum class ProfileFilter {
+    MY_POSTS,
+    LIKED,
+    BOOKMARKED
+}
 
 open class SpaceViewModel(
     private val firestore: FirebaseFirestore,
@@ -52,7 +58,6 @@ open class SpaceViewModel(
     private val _searchResults = MutableStateFlow<List<User>>(emptyList())
     val searchResults: StateFlow<List<User>> = _searchResults.asStateFlow()
 
-    // --- State for Memories Feed ---
     private val _feeds = MutableStateFlow<List<Story>>(emptyList())
     val feeds: StateFlow<List<Story>> = _feeds.asStateFlow()
 
@@ -62,7 +67,6 @@ open class SpaceViewModel(
     private val _error = MutableStateFlow<String?>(null)
     val error: StateFlow<String?> = _error.asStateFlow()
 
-    // --- State Properties for the "Spaces" Feature ---
     private val _spaces = MutableStateFlow<List<Space>>(emptyList())
     val spaces: StateFlow<List<Space>> = _spaces.asStateFlow()
     private val _isLoadingSpaces = MutableStateFlow(true)
@@ -94,15 +98,26 @@ open class SpaceViewModel(
     private val _filteredFeeds = MutableStateFlow<List<Story>>(emptyList())
     val filteredFeeds: StateFlow<List<Story>> = _filteredFeeds.asStateFlow()
 
-    // 1. Add a searching state to the ViewModel
     private val _isSearching = MutableStateFlow(false)
     val isSearching: StateFlow<Boolean> = _isSearching.asStateFlow()
 
     private val userPhotoCache = mutableMapOf<String, String>()
 
-    // This will hold the ID of the space currently being viewed in the detail pane.
     private val _activeSpaceId = MutableStateFlow<String?>(null)
     val activeSpaceId = _activeSpaceId.asStateFlow()
+
+    private val _userStories = MutableStateFlow<List<Story>>(emptyList())
+    val userStories: StateFlow<List<Story>> = _userStories.asStateFlow()
+
+    private val _userLikedStories = MutableStateFlow<List<Story>>(emptyList())
+    val userLikedStories: StateFlow<List<Story>> = _userLikedStories.asStateFlow()
+
+    private val _userBookmarkedStories = MutableStateFlow<List<Story>>(emptyList())
+    val userBookmarkedStories: StateFlow<List<Story>> = _userBookmarkedStories.asStateFlow()
+
+    private val _isLoadingProfileData = MutableStateFlow(false)
+    val isLoadingProfileData: StateFlow<Boolean> = _isLoadingProfileData.asStateFlow()
+
 
     init {
         viewModelScope.launch {
@@ -112,7 +127,6 @@ open class SpaceViewModel(
                     listenForFeeds()
                     fetchSpaces()
                 } else {
-                    // CRITICAL: Stop everything immediately on sign-out
                     feedsListenerJob?.cancel()
                     spacesListenerJob?.cancel()
                     _feeds.value = emptyList()
@@ -123,34 +137,58 @@ open class SpaceViewModel(
             }
         }
     }
+    fun loadProfileData(filter: ProfileFilter) {
+        val uid = auth.currentUser?.uid ?: return
+        _isLoadingProfileData.value = true
 
-/**
- * HYDRATION ENGINE:
- * Converts raw Member IDs into actual Profile Photo URLs.
- */
-    private suspend fun hydrateSpacePhotos(memberIds: List<String>): List<String> {
-        val topMemberIds = memberIds.take(5)
-        val photos = mutableListOf<String>()
-
-        topMemberIds.forEach { uid ->
-            if (userPhotoCache.containsKey(uid)) {
-                userPhotoCache[uid]?.let { photos.add(it) }
-            } else {
-                try {
-                    // Fetch the user document to get their photoUrl
-                    val userDoc = firestore.collection("users").document(uid).get()
-                    val photoUrl = userDoc.data<User>().photoUrl ?: ""
-                    if (photoUrl.isNotEmpty()) {
-                        userPhotoCache[uid] = photoUrl
-                        photos.add(photoUrl)
-                    }
-                } catch (e: Exception) {
-                    // Fallback for failed fetches
+        viewModelScope.launch {
+            try {
+                when (filter) {
+                    ProfileFilter.MY_POSTS -> fetchUserStories(uid)
+                    ProfileFilter.LIKED -> fetchLikedStories(uid)
+                    ProfileFilter.BOOKMARKED -> fetchBookmarkedStories(uid)
                 }
+            } catch (e: Exception) {
+                println(" Error loading profile data for filter '$filter': ${e.message}")
+            } finally {
+                _isLoadingProfileData.value = false
             }
         }
-        return photos
-   }
+    }
+    private suspend fun fetchUserStories(uid: String) {
+        val snapshot = firestore.collection("stories")
+            .where { "userId" equalTo uid }
+            .orderBy("timestamp", Direction.DESCENDING)
+            .get()
+        _userStories.value = snapshot.documents.mapNotNull { it.data<Story>() }
+    }
+
+    private suspend fun fetchLikedStories(uid: String) {
+        val snapshot = firestore.collection("stories")
+            .where { "likedBy" contains uid }
+            .orderBy("timestamp", Direction.DESCENDING)
+            .get()
+        _userLikedStories.value = snapshot.documents.mapNotNull { it.data<Story>() }
+    }
+    private suspend fun fetchBookmarkedStories(uid: String) {
+        val bookmarkDocs = firestore.collection("users").document(uid)
+            .collection("bookmarks").get().documents
+
+        val storyIds = bookmarkDocs.map { it.id }
+
+        if (storyIds.isNotEmpty()) {
+            val snapshot = firestore.collection("stories")
+                .where { FieldPath.documentId inArray storyIds }
+                .get()
+
+            _userBookmarkedStories.value = snapshot.documents
+                .mapNotNull { try { it.data<Story>() } catch (e: Exception) { null } }
+                .sortedByDescending { it.timestamp?.seconds }
+        } else {
+            _userBookmarkedStories.value = emptyList()
+        }
+    }
+
 
     private fun fetchSpaces() {
         spacesListenerJob?.cancel()
@@ -159,8 +197,6 @@ open class SpaceViewModel(
                 val spaceList = snapshot.documents.map { doc ->
                     val baseSpace = doc.data<Space>().copy(id = doc.id)
 
-                    // --- HYDRATION STEP ---
-                    // We fetch the photos for the first 5 members
                     val photos = mutableListOf<String>()
                     baseSpace.memberIds.take(5).forEach { memberId ->
                         val cached = userPhotoCache[memberId]
@@ -168,8 +204,7 @@ open class SpaceViewModel(
                             photos.add(cached)
                         } else {
                             try {
-                                // Look up the member's photo in the users collection
-                                val userDoc = firestore.collection("users").document(memberId).get()
+                                 val userDoc = firestore.collection("users").document(memberId).get()
                                 val photo = userDoc.data<User>().photoUrl ?: ""
                                 if (photo.isNotEmpty()) {
                                     userPhotoCache[memberId] = photo
@@ -187,10 +222,6 @@ open class SpaceViewModel(
         }
     }
 
-    /**
-     * Subscribes to the 'stories' collection.
-     * Includes extensive error logging to identify why parsing fails in the UI.
-     */
     private fun listenForFeeds() {
         feedsListenerJob?.cancel() // Clear existing
         feedsListenerJob = viewModelScope.launch {
@@ -233,7 +264,6 @@ open class SpaceViewModel(
             }
 
             onProgress("Preparing content...")
-            // Ensure unique ID prevents collisions
             val storyId =
                 "story_${currentUser.uid}_${Timestamp.now().seconds}_${(0..1000).random()}"
             var finalContentUrl: String? = null
@@ -258,7 +288,6 @@ open class SpaceViewModel(
 
                 onProgress("Saving details...")
 
-                // Using current server timestamp
                 val newStory = Story(
                     storyId = storyId,
                     userId = currentUser.uid,
@@ -273,9 +302,6 @@ open class SpaceViewModel(
                     timestamp = Timestamp.now()
                 )
 
-                // Using Story.toMap if your Story class has a companion object helper,
-                // otherwise passing the object directly usually works with the gitlive library
-                // assuming @Serializable is present on the data class.
                 firestore.collection("stories").document(storyId).set(newStory)
 
                 onProgress("Post created successfully!")
@@ -341,7 +367,7 @@ open class SpaceViewModel(
         storagePath: String
     ): String {
         val storageRef = storage.reference(storagePath)
-        storageRef.upload(fileBytes) // Attempting generic putData
+        storageRef.upload(fileBytes)
         return storageRef.getDownloadUrl()
     }
 
@@ -382,7 +408,7 @@ open class SpaceViewModel(
         }
     }
 
-    fun loadSpaceDetails(spaceId: String) {
+    /*fun loadSpaceDetails(spaceId: String) {
         _activeSpaceId.value = spaceId
         viewModelScope.launch {
             try {
@@ -394,48 +420,51 @@ open class SpaceViewModel(
                 _currentSpace.value = null
             }
         }
-    }
-
-    /*private fun loadSpacePosts(spaceId: String) {
-        viewModelScope.launch {
-            isLoadingPosts.value = true
-            try {
-                val snapshot = firestore.collection("spaces").document(spaceId)
-                    .collection("posts")
-                    .orderBy("timestamp", Direction.DESCENDING)
-                    .get()
-                _spacePosts.value = snapshot.documents.mapNotNull { it.data<Story>() }
-            } catch (e: Exception) {
-                println("Error loading posts: ${e.message}")
-                _spacePosts.value = emptyList()
-            } finally {
-                isLoadingPosts.value = false
-            }
-        }
     }*/
 
+    fun loadSpaceDetails(spaceId: String) {
+        // Step 1: Set the active ID immediately.
+        // This ensures the UI highlight updates instantly and STAYS.
+        _activeSpaceId.value = spaceId
+
+        // Step 2: Launch a coroutine to fetch the details for the new active space.
+        // This runs in the background without blocking the UI.
+        viewModelScope.launch {
+            isLoadingPosts.value = true // Show loading indicator for the detail pane
+            try {
+                // Fetch the specific space document.
+                val doc = firestore.collection("spaces").document(spaceId).get()
+                _currentSpace.value = doc.data()
+
+                // Now that the current space is set, load its specific content.
+                loadSpacePosts(spaceId)
+                listenForChatMessages(spaceId)
+
+            } catch (e: Exception) {
+                println("❌ Error loading space details for $spaceId: ${e.message}")
+                _currentSpace.value = null // Clear details if the fetch fails
+            }
+        }
+    }
+
     private fun loadSpacePosts(spaceId: String) {
-        // Cancel any previous listener to avoid multiple streams on the same screen.
         postsListenerJob?.cancel()
 
-        // Use .snapshots() to get a real-time Flow of updates.
         postsListenerJob = firestore.collection("spaces").document(spaceId)
             .collection("posts")
             .orderBy("timestamp", Direction.DESCENDING)
-            .snapshots() // This returns a Flow that emits new data whenever the collection changes
+            .snapshots()
             .onEach { snapshot ->
-                // This block runs every time a post is liked, commented on, or created.
                 val updatedPosts = snapshot.documents.mapNotNull { it.data<Story>() }
                 _spacePosts.value = updatedPosts
-                isLoadingPosts.value = false // Set loading to false on the first successful update
+                isLoadingPosts.value = false
             }
             .catch { e ->
-                // If the listener fails (e.g., permissions), log the error.
                 println("Error listening for space posts: ${e.message}")
                 _spacePosts.value = emptyList()
                 isLoadingPosts.value = false
             }
-            .launchIn(viewModelScope) // Launch the listener in the ViewModel's scope.
+            .launchIn(viewModelScope)
     }
 
     fun listenForChatMessages(spaceId: String) {
@@ -466,18 +495,17 @@ open class SpaceViewModel(
             val currentUser = auth.currentUser ?: return@launch
             val storyId = "post_${currentUser.uid}_${Timestamp.now().seconds}"
 
-            // Reconstruct the Story object properly for a text-only post in a space
             val newPost = Story(
                 storyId = storyId,
                 userId = currentUser.uid,
                 userName = currentUser.displayName ?: "Anonymous",
                 userProfileUrl = currentUser.photoURL,
                 textContent = content,
-                contentType = Story.ContentType.TEXT, // Assuming TEXT enum exists
+                contentType = Story.ContentType.TEXT,
                 contentUrl = null,
                 thumbnailUrl = null,
                 aspectRatio = 1.0f,
-                isFeed = false, // Space posts might not be in the main feed
+                isFeed = false,
                 timestamp = Timestamp.now()
             )
 
@@ -522,40 +550,29 @@ open class SpaceViewModel(
         }
     }
 
-    /**
-     * MEMBERSHIP ENGINE:
-     * Production-grade logic to join a safe space.
-     * Uses NonCancellable to ensure the database write completes even if
-     * the user navigates to the chat screen immediately.
-     */
     fun joinSpace(spaceId: String) {
-        // Log at the very first entry point to verify the UI call
         println("🖱️ [SpaceVM] joinSpace CALLED for ID: $spaceId")
 
         viewModelScope.launch {
-            // 1. Force the logic to run even if the UI scope is destroyed by navigation
             withContext(NonCancellable) {
                 try {
-                    // 2. Refresh Auth state inside the background thread
                     val user = auth.currentUser
 
                     if (user == null) {
-                        println("🛑 [SpaceVM] CRITICAL: Join attempted without Auth.")
+                        println("[SpaceVM] CRITICAL: Join attempted without Auth.")
                         return@withContext
                     }
 
-                    println("📡 [SpaceVM] DB_START: Attempting join for Space: $spaceId (User: ${user.uid})")
+                    println("[SpaceVM] DB_START: Attempting join for Space: $spaceId (User: ${user.uid})")
 
                     val spaceRef = firestore.collection("spaces").document(spaceId)
 
-                    // 3. ATOMIC ARRAY UNION: Standard production way to manage members
-                    // This prevents duplicates and ensures data integrity.
                     spaceRef.update("memberIds" to FieldValue.arrayUnion(user.uid))
 
-                    println("✅ [SpaceVM] DB_SUCCESS: User ${user.uid} is now a member of $spaceId")
+                    println("[SpaceVM] DB_SUCCESS: User ${user.uid} is now a member of $spaceId")
 
                 } catch (e: Exception) {
-                    println("❌ [SpaceVM] DB_FATAL: Join failed for $spaceId - ${e.message}")
+                    println("[SpaceVM] DB_FATAL: Join failed for $spaceId - ${e.message}")
                     e.printStackTrace()
                 }
             }
@@ -599,9 +616,6 @@ open class SpaceViewModel(
         }
     }
 
-    /**
-     * ADD COMMENT LOGIC
-     */
     fun addComment(storyId: String, text: String) {
         val user = auth.currentUser ?: return
         if (text.isBlank()) return
@@ -701,7 +715,6 @@ open class SpaceViewModel(
                 if (isBookmarked) {
                     // 1. Remove from global post list
                     postRef.update("bookmarkedBy" to story.bookmarkedBy.filter { it != uid })
-                    // 2. Remove from user's private collection
                     userRef.delete()
                 } else {
                     // 1. Add to global post list
@@ -725,10 +738,7 @@ open class SpaceViewModel(
                 snapshot.documents.map { it.data<Story.Comment>() }
             }
     }
-    /**
-     * TOGGLE BOOKMARK LOGIC
-     * Saves the story ID to the user's private collection and updates the story document.
-     */
+
     fun toggleBookmark(story: Story) {
         val uid = auth.currentUser?.uid ?: return
         val storyRef = firestore.collection("stories").document(story.storyId)

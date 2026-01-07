@@ -25,7 +25,7 @@ data class AnalyticsScreenUiState(
     val isLoadingGemini: Boolean = false,
     val error: String? = null,
     val summary: AnalyticsSummary? = null,
-    val geminiInsights: String? = null // The Markdown report
+    val geminiInsights: String? = null
 )
 
 class AnalyticsViewModel : ViewModel() {
@@ -56,7 +56,6 @@ class AnalyticsViewModel : ViewModel() {
             }
 
             try {
-                // 1. Fetch from Firestore (Limit 30 for monthly trends)
                 if (allCheckIns.isEmpty() || forceRefreshGemini) {
                     val querySnapshot = firestore.collection("users").document(user.uid)
                         .collection("checkIns")
@@ -72,11 +71,9 @@ class AnalyticsViewModel : ViewModel() {
                     return@launch
                 }
 
-                // 2. Process Deterministic Stats (Local Logic)
                 val localSummary = processCheckInsForAnalytics(allCheckIns)
                 _uiState.update { it.copy(isLoading = false, summary = localSummary) }
 
-                // 3. Generate AI Report (Cloud Logic)
                 if (_uiState.value.geminiInsights == null || forceRefreshGemini) {
                     fetchGeminiReport()
                 }
@@ -131,7 +128,6 @@ class AnalyticsViewModel : ViewModel() {
             .take(5)
 
         // 3. CBT Usage
-        // Explicitly name the variable to avoid confusion with KeyEvent.type
         val cbtUsage = checkIns.groupBy { it.cbtExerciseType }
             .map { (typeKey, list) -> CbtUsageData(typeKey, list.size) }
             .filter { data -> data.exerciseType != CbtExerciseType.NONE }
@@ -153,11 +149,9 @@ class AnalyticsViewModel : ViewModel() {
     }
 
     suspend fun refreshGeminiInsights() {
-        // This function can be called by a refresh button in the UI
         if (allCheckIns.isNotEmpty()) {
             fetchGeminiReport()
         } else {
-            // Optionally, try to reload all data if check-ins are missing
             loadAnalyticsData(forceRefreshGemini = true)
         }
     }

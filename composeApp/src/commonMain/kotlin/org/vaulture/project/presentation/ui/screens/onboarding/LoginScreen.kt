@@ -45,10 +45,11 @@ import org.vaulture.project.presentation.utils.ImagePicker
 @Composable
 fun LoginScreen(
     viewModel: LoginViewModel,
-    onGoogleSignInRequest: () -> Unit
+    onGoogleSignInRequest: () -> Unit,
+    initialSignUpMode: Boolean = false
 ) {
     val uiState by viewModel.uiState.collectAsState()
-    var isSignUpMode by remember { mutableStateOf(false) }
+    var isSignUpMode by remember(initialSignUpMode) { mutableStateOf(initialSignUpMode) }
     var showImagePicker by remember { mutableStateOf(false) }
 
     val focusManager = LocalFocusManager.current
@@ -63,7 +64,6 @@ fun LoginScreen(
         }
     )
 
-    // --- Responsive Layout ---
     BoxWithConstraints(
         modifier = Modifier
             .fillMaxSize()
@@ -71,9 +71,7 @@ fun LoginScreen(
             .systemBarsPadding()
     ) {
         if (maxWidth > 700.dp) {
-            // --- Wide Screen Layout (Web/Tablet) ---
             Row(modifier = Modifier.fillMaxSize()) {
-                // Decorative side panel
                 Box(
                     modifier = Modifier.weight(1f).fillMaxHeight(),
                     contentAlignment = Alignment.Center
@@ -90,26 +88,26 @@ fun LoginScreen(
                         horizontalAlignment = Alignment.Start
                     ) {
                         Text(
-                            "Vaulture",
+                            "Mindset Pulse",
                             style = MaterialTheme.typography.headlineLarge,
                             fontWeight = FontWeight.Bold,
                             color = Color.White
                         )
                         Spacer(Modifier.height(8.dp))
                         Text(
-                            "Travel Deeper and Build Connection.",
+                            "Listen,talk and Improve your mindset",
                             style = MaterialTheme.typography.titleLarge,
                             color = Color.White.copy(alpha = 0.8f)
                         )
                     }
                 }
-                // Login/Sign-up form
+
                 Box(
                     modifier = Modifier.weight(1f)
                         .fillMaxHeight(),
                     contentAlignment = Alignment.Center
                 ) {
-                    _root_ide_package_.org.vaulture.project.presentation.ui.screens.onboarding.AuthForm(
+                    AuthForm(
                         uiState = uiState,
                         isSignUpMode = isSignUpMode,
                         onToggleMode = { isSignUpMode = !isSignUpMode },
@@ -124,8 +122,8 @@ fun LoginScreen(
                 }
             }
         } else {
-            // --- Narrow Screen Layout (Mobile) ---
-            _root_ide_package_.org.vaulture.project.presentation.ui.screens.onboarding.AuthForm(
+
+            AuthForm(
                 uiState = uiState,
                 isSignUpMode = isSignUpMode,
                 onToggleMode = { isSignUpMode = !isSignUpMode },
@@ -174,7 +172,6 @@ private fun AuthForm(
     ) {
         Spacer(Modifier.height(32.dp))
 
-        // --- Dynamic Title with animation ---
         Crossfade(
             targetState = isSignUpMode,
             label = "TitleCrossfade",
@@ -188,7 +185,7 @@ private fun AuthForm(
                 )
                 Spacer(Modifier.height(4.dp))
                 Text(
-                    text = if (isSignUp) "Join us to explore the world" else "Sign in to continue your journey",
+                    text = if (isSignUp) "Join us to improve your mindset" else "Sign in to continue your journey",
                     style = MaterialTheme.typography.bodyLarge,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     textAlign = TextAlign.Center
@@ -198,7 +195,6 @@ private fun AuthForm(
 
         Spacer(Modifier.height(48.dp))
 
-        // --- Profile Picture and Fields with animation ---
         AnimatedVisibility(visible = isSignUpMode) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Box(
@@ -246,7 +242,6 @@ private fun AuthForm(
             }
         }
 
-        // --- Common Fields with Icons ---
         OutlinedTextField(
             value = uiState.email,
             onValueChange = onEmailChange,
@@ -278,7 +273,6 @@ private fun AuthForm(
         )
         Spacer(Modifier.height(24.dp))
 
-        // --- Error Message Display ---
         AnimatedVisibility(visible = uiState.error != null && uiState.error.isNotBlank()) {
             Text(
                 text = uiState.error ?: "An unknown error occurred",
@@ -291,7 +285,6 @@ private fun AuthForm(
         }
         Spacer(Modifier.height(8.dp))
 
-        // --- Action Buttons & Loading State ---
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -317,7 +310,6 @@ private fun AuthForm(
         }
         Spacer(Modifier.height(16.dp))
 
-        // --- Social Login & Toggle Mode ---
         Text("or continue with")
         Spacer(Modifier.height(16.dp))
 
@@ -329,8 +321,7 @@ private fun AuthForm(
             shape = RoundedCornerShape(16.dp),
             border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline)
         ) {
-            // Icon(painterResource(Res.drawable.google_logo), contentDescription = "Google Logo", modifier = Modifier.size(24.dp))
-            // Spacer(Modifier.width(8.dp))
+
             Text("SIGN IN WITH GOOGLE", fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface)
         }
 

@@ -11,10 +11,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import org.vaulture.project.domain.model.Space
+import org.vaulture.project.presentation.ui.components.SpaceListItem
 
 @Composable
 fun SpacesListContent(
     spaces: List<Space>,
+    activeSpaceId: String?,
     onSpaceClick: (String) -> Unit
 ) {
     if (spaces.isEmpty()) {
@@ -36,12 +38,13 @@ fun SpacesListContent(
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             items(spaces, key = { it.id }) { space ->
-                // Ensure this component is defined in your project
-                _root_ide_package_.org.vaulture.project.presentation.ui.components.SpaceListItem(
+                val isSelected = space.id == activeSpaceId
+                SpaceListItem(
                     space = space,
-                    unreadCount = space.unreadCount,
+                    isSelected = isSelected,
                     memberPhotos = space.memberPhotoUrls,
-                    onClick = { onSpaceClick(space.id) }
+                    onClick = {
+                        onSpaceClick(space.id) }
                 )
             }
         }

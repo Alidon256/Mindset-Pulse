@@ -19,8 +19,8 @@ data class CheckInResult(
 
 object RiskEngine {
     fun calculateRisk(
-        answers: List<Int>, // 1 (Good) to 5 (Bad)
-        sentimentScore: Float // -1.0 (Negative) to 1.0 (Positive)
+        answers: List<Int>,
+        sentimentScore: Float
     ): Pair<Int, MentalState> {
 
         // 1. Quantitative Score (Objective)

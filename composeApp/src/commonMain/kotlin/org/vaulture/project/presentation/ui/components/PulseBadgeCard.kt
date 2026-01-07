@@ -23,16 +23,33 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun PulseBadgeCard(streak: Int) {
     Card(
-        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer),
         shape = RoundedCornerShape(24.dp)
     ) {
-        Row(Modifier.padding(24.dp), verticalAlignment = Alignment.CenterVertically) {
+        Row(
+            Modifier.padding(24.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
             Column(Modifier.weight(1f)) {
-                Text("Resilience Streak", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
-                Text("You've stayed mindful for $streak days in a row!", style = MaterialTheme.typography.bodyMedium)
+                Text(
+                    "Resilience Streak",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold
+                )
+                Text(
+                    "You've stayed mindful for $streak days in a row!",
+                    style = MaterialTheme.typography.bodyMedium
+                )
             }
-            Icon(Icons.Default.LocalFireDepartment, null, tint = Color(0xFFFF5722), modifier = Modifier.size(48.dp))
+            Icon(
+                Icons.Default.LocalFireDepartment,
+                null,
+                tint = Color(0xFFFF5722),
+                modifier = Modifier.size(48.dp)
+            )
         }
     }
 }

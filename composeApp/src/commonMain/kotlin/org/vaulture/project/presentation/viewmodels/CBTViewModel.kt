@@ -1,7 +1,7 @@
 package org.vaulture.project.presentation.viewmodels
 
 import androidx.compose.runtime.mutableStateListOf
-import dev.icerock.moko.mvvm.viewmodel.ViewModel // Ensure you use the KMP ViewModel
+import dev.icerock.moko.mvvm.viewmodel.ViewModel
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.auth.auth
 import dev.gitlive.firebase.firestore.Timestamp
@@ -19,36 +19,26 @@ data class CBTScreenUiState(
     val isLoading: Boolean = false,
     val error: String? = null,
     val submissionSuccess: Boolean = false,
-
-    // Current entry fields
     val overallMood: String = "Okay",
     val moodIntensity: Int = 5, // 1-10
     val generalThoughts: String = "",
     val positiveHighlights: String = "",
     val challengesFaced: String = "",
-
     val cbtExerciseType: CbtExerciseType = CbtExerciseType.NONE,
-    // Thought Record specific fields
     val trSituation: String = "",
     val trAutomaticNegativeThought: String = "",
     val trEvidenceForThought: String = "",
     val trEvidenceAgainstThought: String = "",
     val trAlternativeThought: String = "",
-    // CBT Reflection (for other exercises)
     val cbtReflectionResponse: String = "",
     val learnedFromCbt: String = ""
 )
 
 class CBTViewModel : ViewModel() {
-
-    // FIX 1: Use KMP Firebase accessors instead of .getInstance()
     private val firestore = Firebase.firestore
     private val auth = Firebase.auth
-
     private val _uiState = MutableStateFlow(CBTScreenUiState())
     val uiState: StateFlow<CBTScreenUiState> = _uiState.asStateFlow()
-
-    // For multi-select items like emotions and distortions
     val selectedPrimaryEmotions = mutableStateListOf<EmotionRating>()
     val selectedCognitiveDistortions = mutableStateListOf<String>()
     val selectedTrEmotionsBefore = mutableStateListOf<EmotionRating>()
@@ -60,7 +50,6 @@ class CBTViewModel : ViewModel() {
     private val userId: String?
         get() = auth.currentUser?.uid
 
-    // --- Update functions for UI State ---
     fun onOverallMoodChange(mood: String) {
         _uiState.value = _uiState.value.copy(overallMood = mood)
     }
@@ -83,7 +72,6 @@ class CBTViewModel : ViewModel() {
 
     fun onCbtExerciseTypeChange(type: CbtExerciseType) {
         _uiState.value = _uiState.value.copy(cbtExerciseType = type)
-        // Reset specific CBT fields if type changes to NONE or a different type
         if (type != CbtExerciseType.THOUGHT_RECORD) {
             clearThoughtRecordFields()
         }
@@ -91,8 +79,6 @@ class CBTViewModel : ViewModel() {
             _uiState.value = _uiState.value.copy(cbtReflectionResponse = "", learnedFromCbt = "")
         }
     }
-
-    // Thought Record specific field updates
     fun onTrSituationChange(text: String) {
         _uiState.value = _uiState.value.copy(trSituation = text)
     }
@@ -120,8 +106,6 @@ class CBTViewModel : ViewModel() {
     fun onLearnedFromCbtChange(text: String) {
         _uiState.value = _uiState.value.copy(learnedFromCbt = text)
     }
-
-    // --- Functions for managing lists ---
     fun togglePrimaryEmotion(emotion: String, intensity: Int = 5) {
         val existing = selectedPrimaryEmotions.find { it.emotion == emotion }
         if (existing != null) {
@@ -191,11 +175,10 @@ class CBTViewModel : ViewModel() {
                 null
             }
 
-            // FIX 2 & 3: Fix UUID and Timestamp for KMP
             val newEntry = CheckInEntry(
-                id = "", // FIX: Empty string. Firestore .add() will generate the ID automatically.
+                id = "",
                 userId = currentUserId,
-                timestamp = Timestamp.now(), // FIX: Use KMP Timestamp.now()
+                timestamp = Timestamp.now(),
                 overallMood = currentState.overallMood,
                 moodIntensity = currentState.moodIntensity,
                 primaryEmotions = selectedPrimaryEmotions.toList(),
@@ -213,9 +196,8 @@ class CBTViewModel : ViewModel() {
 
             try {
                 firestore.collection("users").document(currentUserId)
-                    .collection("checkIns")
+                    .collection("cbts")
                     .add(newEntry)
-                // .await() is implicit in the suspending add() in GitLive
                 _uiState.value = _uiState.value.copy(isLoading = false, submissionSuccess = true)
                 resetAllFields()
             } catch (e: Exception) {

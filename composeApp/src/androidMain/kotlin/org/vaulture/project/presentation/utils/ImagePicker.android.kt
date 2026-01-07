@@ -8,11 +8,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.platform.LocalContext
 
-/**
- * The actual implementation of the ImagePicker for the Android platform.
- * It uses the modern PickVisualMedia contract to provide a system-native
- * image picker that is backward-compatible.
- */
 @Composable
 internal actual fun ImagePicker(
     show: Boolean,
@@ -28,7 +23,6 @@ internal actual fun ImagePicker(
                 val bytes = inputStream?.use { it.readBytes() }
                 onImageSelected(bytes)
             } else {
-                // The user cancelled the picker
                 onImageSelected(null)
             }
         }

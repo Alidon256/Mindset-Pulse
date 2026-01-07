@@ -40,7 +40,7 @@ fun PostItem(
     onOptionClick: (String) -> Unit = {}
 ) {
     val isLiked = post.likedBy.contains(currentUserId)
-    val isBookmarked = post.bookmarkedBy.contains(currentUserId) // Check bookmark state
+    val isBookmarked = post.bookmarkedBy.contains(currentUserId)
 
 
     Column(
@@ -49,9 +49,10 @@ fun PostItem(
             .background(MaterialTheme.colorScheme.background)
             .padding(vertical = 16.dp)
     ) {
-        // --- Header ---
         Row(
-            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             AsyncImage(
@@ -90,16 +91,15 @@ fun PostItem(
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        // --- Perfected "Read More" Text Content ---
         if (!post.textContent.isNullOrBlank()) {
             var isExpanded by remember { mutableStateOf(false) }
-            val textLimit = 150 // Character limit before "See more"
+            val textLimit = 150
 
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp)
-                    .animateContentSize() // Smooth transition when expanding
+                    .animateContentSize()
             ) {
                 val annotatedText = buildAnnotatedString {
                     if (post.textContent.length > textLimit && !isExpanded) {
@@ -135,7 +135,6 @@ fun PostItem(
             Spacer(modifier = Modifier.height(12.dp))
         }
 
-        // --- Optimized Media Content ---
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -148,13 +147,13 @@ fun PostItem(
                         contentDescription = "Post image",
                         modifier = Modifier
                             .fillMaxWidth()
-                            .heightIn(max = 330.dp) // Prevents ultra-long vertical images from breaking UX
+                            .heightIn(max = 330.dp)
                             .wrapContentHeight(),
-                        contentScale = ContentScale.FillWidth, // Facebook style: fill width, clip height if too long
+                        contentScale = ContentScale.FillWidth,
                     )
                 }
                 Story.ContentType.VIDEO -> if (!post.contentUrl.isNullOrEmpty()) {
-                    _root_ide_package_.org.vaulture.project.presentation.ui.components.VideoPlayerPlaceholder(
+                    VideoPlayerPlaceholder(
                         thumbnailUrl = post.thumbnailUrl,
                         aspectRatio = post.aspectRatio ?: (16f / 9f)
                     )
@@ -195,7 +194,6 @@ fun PostItem(
             color = MaterialTheme.colorScheme.outlineVariant
         )
 
-        // --- Action Buttons ---
         Row(
             modifier = Modifier.fillMaxWidth().padding(top = 4.dp),
             horizontalArrangement = Arrangement.SpaceEvenly
@@ -263,7 +261,6 @@ fun VideoPlayerPlaceholder(
                 modifier = Modifier.fillMaxSize().alpha(0.8f)
             )
         }
-        // Play button: Using PlayArrow for better compatibility
         Surface(
             shape = CircleShape,
             color = Color.Black.copy(alpha = 0.5f),

@@ -29,12 +29,9 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun StressTrendChart(height: Dp = 220.dp) {
-    // Functional Data Points (Day 1 to 7)
-    // In a real app, pass this via ViewModel
     val dataPoints = listOf(35f, 42f, 38f, 25f, 60f, 72f, 45f)
     val days = listOf("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
 
-    // Theme aware color
     val graphColor = MaterialTheme.colorScheme.primary
     val surfaceColor = MaterialTheme.colorScheme.surface
 
@@ -52,7 +49,6 @@ fun StressTrendChart(height: Dp = 220.dp) {
                     val spacing = width / (dataPoints.size - 1)
                     val path = Path()
 
-                    // Draw Bezier Curve
                     dataPoints.forEachIndexed { index, value ->
                         val x = index * spacing
                         val y = h - (value / 100f * h)
@@ -60,14 +56,12 @@ fun StressTrendChart(height: Dp = 220.dp) {
                         else {
                             val prevX = (index - 1) * spacing
                             val prevY = h - (dataPoints[index - 1] / 100f * h)
-                            // Control points for smooth curve
                             val controlX1 = prevX + spacing / 2
                             val controlX2 = x - spacing / 2
                             path.cubicTo(controlX1, prevY, controlX2, y, x, y)
                         }
                     }
 
-                    // Fill Gradient
                     val fillPath = Path().apply {
                         addPath(path)
                         lineTo(width, h)
@@ -101,14 +95,13 @@ fun StressTrendChart(height: Dp = 220.dp) {
 
             Spacer(Modifier.height(16.dp))
 
-            // X-Axis Labels
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 days.forEach { day ->
                     Text(
-                        day.first().toString(), // Just M, T, W
+                        day.first().toString(),
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         fontWeight = FontWeight.Bold

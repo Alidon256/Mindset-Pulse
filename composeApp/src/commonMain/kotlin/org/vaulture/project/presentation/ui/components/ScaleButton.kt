@@ -16,7 +16,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun ScaleButton(score: Int, onClick: () -> Unit) {
+fun ScaleButton(
+    score: Int,
+    onClick: () -> Unit
+) {
     Box(
         modifier = Modifier
             .size(48.dp)

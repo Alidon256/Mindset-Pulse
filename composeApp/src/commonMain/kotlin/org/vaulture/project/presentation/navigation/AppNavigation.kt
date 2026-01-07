@@ -40,7 +40,7 @@ import org.vaulture.project.presentation.ui.screens.home.HomeScreen
 import org.vaulture.project.presentation.ui.screens.home.RhythmHomeScreen
 import org.vaulture.project.presentation.ui.screens.home.RhythmPlayerScreen
 import org.vaulture.project.presentation.ui.screens.home.WellnessTimerScreen
-import org.vaulture.project.presentation.ui.screens.onboarding.BestDealsScreen
+import org.vaulture.project.presentation.ui.screens.onboarding.InsightScreen
 import org.vaulture.project.presentation.ui.screens.onboarding.ConnectScreen
 import org.vaulture.project.presentation.ui.screens.onboarding.LoginScreen
 import org.vaulture.project.presentation.ui.screens.onboarding.OnboardingScreenOne
@@ -57,6 +57,7 @@ import org.vaulture.project.presentation.ui.screens.space.SpacesScreen
 import org.vaulture.project.presentation.utils.rememberKmpAudioPlayer
 import org.vaulture.project.presentation.viewmodels.AnalyticsViewModel
 import org.vaulture.project.presentation.viewmodels.CBTViewModel
+import org.vaulture.project.presentation.viewmodels.ProfileFilter
 import org.vaulture.project.presentation.viewmodels.RhythmViewModel
 import org.vaulture.project.presentation.viewmodels.SpaceViewModel
 import org.vaulture.project.presentation.viewmodels.WellnessViewModel
@@ -76,13 +77,13 @@ object Routes {
     @Serializable data object BEST_DEALS : NavDestination { override val routePattern: String = "BEST_DEALS" }
     @Serializable data object CONNECT : NavDestination { override val routePattern: String = "CONNECT" }
     @Serializable data object LOGIN : NavDestination { override val routePattern: String = "LOGIN" }
+    @Serializable data object SIGN_UP : NavDestination { override val routePattern: String = "SIGN_UP" }
 
     // Main App Routes
-    @Serializable data object HOME : NavDestination { override val routePattern: String = "HOME" } // Simplified for Mindset Pulse
+    @Serializable data object HOME : NavDestination { override val routePattern: String = "HOME" }
     @Serializable data object SPACES : NavDestination { override val routePattern: String = "SPACES" }
     @Serializable data object PROFILE : NavDestination { override val routePattern: String = "PROFILE" }
 
-    // Detail/Action Routes (won't show bottom bar)
     @Serializable data class SPACE_DETAIL(val spaceId: String) : NavDestination { override val routePattern: String = "SPACE_DETAIL" }
     @Serializable data object ADD_STORY : NavDestination { override val routePattern: String = "ADD_STORY" }
     @Serializable data object CHECK_IN: NavDestination { override val routePattern: String = "CHECK_IN" }
@@ -93,7 +94,6 @@ object Routes {
     @Serializable data object SPACES_HOME: NavDestination { override val routePattern: String = "COMMUNITY" }
 
 
-    // Legacy routes - can be removed or kept for reference
     @Serializable data object CREATE_SPACE : NavDestination { override val routePattern: String = "CREATE_SPACE" }
 }
 
@@ -140,26 +140,15 @@ fun AppNavigation(
     val currentDestination = navBackStackEntry?.destination
 
     val bottomBarRoutePatterns = remember { bottomNavItems.map { it.destination.routePattern }.toSet() }
-    /*val isBottomBarVisible = currentDestination?.hierarchy?.any {
-        val routeName = it.route ?: ""
-        bottomBarRoutePatterns.any { pattern -> routeName.contains(pattern, ignoreCase = true) }
-    } == true*/
-    /*val isBottomBarVisible = currentDestination?.hierarchy?.any {
-        val routeName = it.route ?: ""
-        bottomBarRoutePatterns.any { pattern -> routeName.contains(pattern, ignoreCase = true) }
-    } == true && currentDestination.route != Routes.RHYTHM_HOME.routePattern && currentDestination.route != Routes.SPACES_HOME.routePattern*/
-
-    val excludedRoutes = setOf(Routes.RHYTHM_HOME.routePattern)
     val isBottomBarVisible = currentDestination?.hierarchy?.any {
         val routeName = it.route ?: ""
-        bottomBarRoutePatterns.any { pattern ->
-            routeName.contains(pattern, ignoreCase = true) && !excludedRoutes.contains(pattern)
-        }
+        bottomBarRoutePatterns.any { pattern -> routeName.contains(pattern, ignoreCase = true) }
     } == true
 
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     var selectedStoryIdForComments by remember { mutableStateOf<String?>(null) }
     val scope = rememberCoroutineScope()
+    var selectedFilter by rememberSaveable { mutableStateOf(ProfileFilter.MY_POSTS) }
 
 
 
@@ -167,7 +156,6 @@ fun AppNavigation(
         Scaffold(
             modifier = Modifier.fillMaxSize(),
             bottomBar = {
-                // Animate the bottom bar's appearance
                 AnimatedVisibility(
                     visible = isBottomBarVisible,
                     enter = slideInVertically { it },
@@ -243,7 +231,6 @@ fun AppNavigation(
             }
 
             if (startDestination == null) {
-                // Loading Spinner
                 Box(
                     modifier = Modifier.fillMaxSize()
                         .background(MaterialTheme.colorScheme.background),
@@ -258,7 +245,6 @@ fun AppNavigation(
                     modifier = Modifier.fillMaxSize().padding(paddingValues)
                         .consumeWindowInsets(paddingValues)
                 ) {
-                    // --- Onboarding and Auth Routes ---
                     composable<Routes.SPLASH> {
                         SplashScreen(
                             onTimeout = {
@@ -309,7 +295,7 @@ fun AppNavigation(
                         )
                     }
                     composable<Routes.BEST_DEALS> {
-                        BestDealsScreen(
+                        InsightScreen(
                             onGetStarted = { navController.navigate(Routes.CONNECT) })
                     }
                     composable<Routes.CONNECT> {
@@ -321,10 +307,17 @@ fun AppNavigation(
                                         inclusive = true
                                     }
                                 }
+                            },
+                            onNavigateToSignUp = {
+                                OnboardingManager.completeOnboarding()
+                                // Navigate to SIGN_UP route
+                                navController.navigate(Routes.SIGN_UP) {
+                                    popUpTo(navController.graph.findStartDestination().id) {
+                                        inclusive = true
+                                    }
+                                }
                             })
                     }
-
-
 
                     composable<Routes.LOGIN> {
                         LaunchedEffect(authState, navController) {
@@ -340,11 +333,27 @@ fun AppNavigation(
                             viewModel = loginViewModel,
                             onGoogleSignInRequest = {
                                 onGoogleSignInRequest?.invoke()
+                            },
+                            initialSignUpMode = false
+                        )
+                    }
+                    composable<Routes.SIGN_UP> {
+                        LaunchedEffect(authState, navController) {
+                            if (authState == true) {
+                                navController.navigate(Routes.HOME) {
+                                    popUpTo(navController.graph.id) {
+                                        inclusive = true
+                                    }
+                                }
                             }
+                        }
+                        LoginScreen(
+                            viewModel = loginViewModel,
+                            onGoogleSignInRequest = { onGoogleSignInRequest?.invoke() },
+                            initialSignUpMode = true
                         )
                     }
 
-                    // --- Mindset Pulse Main Screens ---
                     composable<Routes.HOME> {
                         val authService = loginViewModel.authService
                         HomeScreen(
@@ -382,7 +391,7 @@ fun AppNavigation(
                         val route: Routes.RHYTHM_PLAYER = backStackEntry.toRoute()
                         RhythmPlayerScreen(
                             trackId = route.trackId,
-                            viewModel = rhythmViewModel, // The shared instance
+                            viewModel = rhythmViewModel,
                             onBack = { navController.popBackStack() }
                         )
                     }
@@ -421,7 +430,7 @@ fun AppNavigation(
                             viewModel = spaceViewModel,
                             onCommentClick = { storyId ->
                                 selectedStoryIdForComments =
-                                    storyId // This triggers the ModalBottomSheet in AppNavigation.kt
+                                    storyId
                             },
                             wellnessViewModel = wellnessViewModel,
                             navController = navController,
@@ -439,7 +448,7 @@ fun AppNavigation(
                     }
                     composable<Routes.SPACES_HOME> {
                         var selectedFilter by rememberSaveable { mutableStateOf(SpaceFilter.Spaces) }
-
+                        val authService = loginViewModel.authService
                         SpacesHomeScreen(
                             selectedFilter = selectedFilter,
                             onFilterSelected = { filter -> selectedFilter = filter },
@@ -457,7 +466,17 @@ fun AppNavigation(
                                 selectedStoryIdForComments =
                                     storyId
                             },
-                            wellnessViewModel = wellnessViewModel
+                            wellnessViewModel = wellnessViewModel,
+                            navController = navController,
+                            onSignOut = {
+                                scope.launch {
+                                    loginViewModel.authService.signOut()
+                                    navController.navigate(Routes.LOGIN) {
+                                        popUpTo(0)
+                                    }
+                                }
+                            },
+                            authService = authService,
                         )
 
                     }
@@ -507,7 +526,14 @@ fun AppNavigation(
                                     }
                                 }
                             },
-                            navController = navController
+                            navController = navController,
+                            spaceViewModel = spaceViewModel,
+                            onFilterSelected = { selectedFilter = it },
+                            onCommentClick = { storyId ->
+                                selectedStoryIdForComments =
+                                    storyId
+                            },
+                            selectedFilter = selectedFilter
                         )
                     }
 

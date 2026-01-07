@@ -23,7 +23,6 @@ fun main() {
     )
 
     onWasmReady {
-        // Fix: Attach directly to the document body instead of looking for a specific ID
         val body = document.body ?: return@onWasmReady
         document.title = "Mindset Pulse"
         ComposeViewport(viewportContainer = body) {

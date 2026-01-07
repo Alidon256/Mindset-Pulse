@@ -36,7 +36,7 @@ data class PulseActionItem(
     val backgroundColor: Color,
     val contentColor: Color,
     val icon: ImageVector,
-    val route: Any // Navigation route
+    val route: Any
 )
 
 @Composable
@@ -86,7 +86,6 @@ fun CardCarousel(
 
     var currentIndex by remember { mutableStateOf(0) }
 
-    // Automatic Rotation Logic
     LaunchedEffect(Unit) {
         while (true) {
             delay(5000L) // 5 seconds per card
@@ -99,7 +98,6 @@ fun CardCarousel(
             .fillMaxWidth()
             .padding(horizontal = 8.dp)
     ) {
-        // Main Card with Animation
         AnimatedContent(
             targetState = actions[currentIndex],
             transitionSpec = {
@@ -170,7 +168,6 @@ fun CardCarousel(
                             }
                         }
 
-                        // Large Decorative Icon on the right
                         Icon(
                             action.icon,
                             contentDescription = null,

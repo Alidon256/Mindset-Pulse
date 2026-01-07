@@ -21,7 +21,7 @@ import org.vaulture.project.presentation.theme.AppTheme
 import vaulture.composeapp.generated.resources.*
 
 @Composable
-// Updated: Renamed onGetStarted to onNext for clarity
+
 fun OnboardingScreenTwo(
     onNext: () -> Unit = {},
     onSkip: () -> Unit = {}
@@ -37,7 +37,6 @@ fun OnboardingScreenTwo(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.SpaceBetween
         ) {
-            // Skip button at top
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -53,15 +52,14 @@ fun OnboardingScreenTwo(
                 }
             }
 
-            // Main content
+
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center,
                 modifier = Modifier.weight(1f).padding(horizontal = 24.dp)
             ) {
-                // Updated Text
                 Text(
-                    "Find the Best Deals",
+                    "Find Your inner peace",
                     fontSize = 28.sp,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onBackground,
@@ -76,7 +74,7 @@ fun OnboardingScreenTwo(
                 ) {
                     Image(
                         painter = painterResource(Res.drawable.val_2),
-                        contentDescription = "Scenic travel destination",
+                        contentDescription = "Mindset Image",
                         modifier = Modifier
                             .fillMaxSize()
                             .background(Color(0xFF1B5E20)),
@@ -84,9 +82,8 @@ fun OnboardingScreenTwo(
                     )
                 }
                 Spacer(modifier = Modifier.height(24.dp))
-                // Updated Description
                 Text(
-                    "Discover exclusive offers and deals for your favorite destinations. Your dream vacation is just a tap away.",
+                    "Discover more of what can improve on how you feel and react to the available environment.",
                     fontSize = 18.sp,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     textAlign = TextAlign.Center,
@@ -94,7 +91,6 @@ fun OnboardingScreenTwo(
                 )
             }
 
-            // Navigation buttons at bottom
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -102,8 +98,7 @@ fun OnboardingScreenTwo(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                // Page indicator (now shows this is screen 2 of 3 in the new flow)
-                Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                 Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                     Box(
                         modifier = Modifier
                             .height(8.dp)
@@ -113,7 +108,7 @@ fun OnboardingScreenTwo(
                     Box(
                         modifier = Modifier
                             .height(8.dp)
-                            .width(32.dp) // Active indicator is wider
+                            .width(32.dp)
                             .background(Color(0xFF2E7D32), RoundedCornerShape(4.dp))
                     )
                     Box(
@@ -125,7 +120,7 @@ fun OnboardingScreenTwo(
                 }
 
                 Button(
-                    onClick = onNext, // Use the correct callback
+                    onClick = onNext,
                     colors = ButtonDefaults.buttonColors(
                         containerColor = Color(0xFF2E7D32)
                     ),
@@ -133,7 +128,7 @@ fun OnboardingScreenTwo(
                     modifier = Modifier.height(50.dp)
                 ) {
                     Text(
-                        "Next", // Updated button text
+                        "Next",
                         color = Color.White,
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Medium,
@@ -148,7 +143,7 @@ fun OnboardingScreenTwo(
 @Composable
 @Preview
 fun OnboardingScreenTwoPreview() {
-    _root_ide_package_.org.vaulture.project.presentation.theme.AppTheme(useDarkTheme = false) {
-        _root_ide_package_.org.vaulture.project.presentation.ui.screens.onboarding.OnboardingScreenTwo()
+    AppTheme(useDarkTheme = false) {
+        OnboardingScreenTwo()
     }
 }

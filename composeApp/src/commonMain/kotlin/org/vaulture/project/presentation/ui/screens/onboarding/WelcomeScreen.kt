@@ -16,7 +16,7 @@ import androidx.compose.ui.unit.sp
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import vaulture.composeapp.generated.resources.Res
-import vaulture.composeapp.generated.resources.bg_one
+import vaulture.composeapp.generated.resources.ic_img1
 import vaulture.composeapp.generated.resources.mindset_pulse_nobg_logo
 
 
@@ -29,15 +29,13 @@ fun WelcomeScreen(
     Box(
         modifier = Modifier.fillMaxSize()
     ) {
-        // Background Image
         Image(
-            painter = painterResource(Res.drawable.bg_one),
+            painter = painterResource(Res.drawable.ic_img1),
             contentDescription = null,
             modifier = Modifier.fillMaxSize(),
             contentScale = ContentScale.Crop
         )
 
-        // Content
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -45,10 +43,7 @@ fun WelcomeScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.SpaceBetween
         ) {
-            // Top spacing
             Spacer(modifier = Modifier.height(80.dp))
-
-            // Logo and Title Section
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier.weight(1f),
@@ -125,7 +120,7 @@ fun WelcomeScreen(
 @Composable
 @Preview
 fun WelcomeScreenPreview() {
-    _root_ide_package_.org.vaulture.project.presentation.ui.screens.onboarding.WelcomeScreen(
+    WelcomeScreen(
         onGetStarted = {},
         onLoginClicked = {}
     )

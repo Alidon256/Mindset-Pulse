@@ -18,5 +18,5 @@ data class RhythmTrack(
     var previewUrl: String = "",
     var playlists: List<RhythmPlaylist> = emptyList()
 ) {
-    // No-argument constructor is implicitly generated
+
 }

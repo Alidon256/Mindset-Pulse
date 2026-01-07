@@ -12,7 +12,11 @@ import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 
 @Composable
-fun ProfileAvatar(model: String?, contentDescription: String, modifier: Modifier = Modifier) {
+fun ProfileAvatar(
+    model: String?,
+    contentDescription: String,
+    modifier: Modifier = Modifier
+) {
     Surface(
         shape = CircleShape,
         shadowElevation = 8.dp,

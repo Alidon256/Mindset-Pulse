@@ -45,14 +45,15 @@ fun InsightHeroCard(result: CheckInResult) {
     }
 
     Card(
-        modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 8.dp),
         elevation = CardDefaults.cardElevation(2.dp),
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         border = BorderStroke(1.dp, stateColor.copy(alpha = 0.3f))
     ) {
         Box {
-            // Subtle Gradient Background
             Box(
                 modifier = Modifier
                     .matchParentSize()
@@ -65,7 +66,12 @@ fun InsightHeroCard(result: CheckInResult) {
 
             Column(Modifier.padding(24.dp)) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(Icons.Default.Circle, null, tint = stateColor, modifier = Modifier.size(12.dp))
+                    Icon(
+                        Icons.Default.Circle,
+                        null,
+                        tint = stateColor,
+                        modifier = Modifier.size(12.dp)
+                    )
                     Spacer(Modifier.width(8.dp))
                     Text(
                         text = result.state.label.uppercase(),
@@ -106,7 +112,6 @@ fun InsightHeroCard(result: CheckInResult) {
 
                 Spacer(Modifier.height(24.dp))
 
-                // Gemini Insight Block
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -114,7 +119,12 @@ fun InsightHeroCard(result: CheckInResult) {
                         .padding(16.dp)
                 ) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(Icons.Default.AutoAwesome, null, tint = stateColor, modifier = Modifier.size(16.dp))
+                        Icon(
+                            Icons.Default.AutoAwesome,
+                            null,
+                            tint = stateColor,
+                            modifier = Modifier.size(16.dp)
+                        )
                         Spacer(Modifier.width(8.dp))
                         Text(
                             "Gemini Insight",

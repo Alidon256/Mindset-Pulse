@@ -23,8 +23,14 @@ fun SignOutButton(onSignOut: () -> Unit) {
         modifier = Modifier.fillMaxWidth(),
         colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.error)
     ) {
-        Icon(Icons.AutoMirrored.Filled.Logout, contentDescription = null)
+        Icon(
+            Icons.AutoMirrored.Filled.Logout,
+            contentDescription = null
+        )
         Spacer(Modifier.width(8.dp))
-        Text("Sign Out", fontWeight = FontWeight.Bold)
+        Text(
+            "Sign Out",
+            fontWeight = FontWeight.Bold
+        )
     }
 }

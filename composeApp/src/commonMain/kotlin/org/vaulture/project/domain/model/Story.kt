@@ -4,12 +4,6 @@ package org.vaulture.project.domain.model
 import dev.gitlive.firebase.firestore.Timestamp
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
-private fun isTimestampAfterNow(timestamp: Timestamp?): Boolean {
-    if (timestamp == null) return false
-    val now = Timestamp.now()
-    // Direct comparison of seconds and nanoseconds is the most reliable cross-platform approach.
-    return timestamp.seconds > now.seconds || (timestamp.seconds == now.seconds && timestamp.nanoseconds > now.nanoseconds)
-}
 
 @Serializable
 data class Story @OptIn(ExperimentalSerializationApi::class) constructor(
@@ -20,29 +14,24 @@ data class Story @OptIn(ExperimentalSerializationApi::class) constructor(
     val contentType: ContentType = ContentType.PHOTO,
     val contentUrl: String? = null,
     val thumbnailUrl: String? = null,
-    val textContent: String? = null, // Used for captions or text-only posts
+    val textContent: String? = null,
     val duration: Int = 5,
 
    val timestamp: Timestamp? = null,
     val expiryTimestamp: Timestamp? = null,
-
     val isViewed: Boolean = false,
     val viewCount: Int = 0,
-    val locationTag: String? = null,
     val musicTrack: String? = null,
     val aspectRatio: Float = 1.0f,
     val privacySetting: PrivacySetting = PrivacySetting.PUBLIC,
     val isArchived: Boolean = false,
     val tags: List<String> = emptyList(),
     val linkUrl: String? = null,
-    val isBusinessStory: Boolean = false,
     val likeCount: Int = 0,
     val likedBy: List<String> = emptyList(),
     val bookmarkedBy: List<String> = emptyList(),
     val commentCount: Int = 0,
     val comments: List<Comment> = emptyList(),
-    val shareCount: Int = 0,
-    val sharedByUserIds: List<String> = emptyList(),
     val isFeed: Boolean = false,
     val isLiked: Boolean = false
 ) {

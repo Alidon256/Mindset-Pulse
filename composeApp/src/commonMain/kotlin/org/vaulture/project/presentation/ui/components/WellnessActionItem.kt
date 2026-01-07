@@ -43,10 +43,9 @@ fun WellnessActionItem(
     modifier: Modifier = Modifier,
     bg: Color = MaterialTheme.colorScheme.primary,
     tint: Color = Color.White,
-    isTablet: Boolean = false,
+    isWide: Boolean = false,
     onClick: () -> Unit
 ) {
-    // Preserve the existing pulse animation
     val infiniteTransition = rememberInfiniteTransition(label = "pulse")
     val pulse by infiniteTransition.animateFloat(
         initialValue = 1f,
@@ -57,12 +56,11 @@ fun WellnessActionItem(
         ), label = "pulse"
     )
 
-    // Sizes adapted from the ExploreSection design
-    val itemWidth = if (isTablet) 120.dp else 100.dp
-    val itemHeight = if (isTablet) 120.dp else 100.dp
-    val iconBoxSize = if (isTablet) 52.dp else 44.dp
-    val iconSize = if (isTablet) 32.dp else 28.dp
-    val titleFontSize = if (isTablet) 14.sp else 13.sp
+    val itemWidth = if (isWide) 120.dp else 100.dp
+    val itemHeight = if (isWide) 120.dp else 100.dp
+    val iconBoxSize = if (isWide) 52.dp else 44.dp
+    val iconSize = if (isWide) 32.dp else 28.dp
+    val titleFontSize = if (isWide) 14.sp else 13.sp
 
     Column(
         modifier = Modifier

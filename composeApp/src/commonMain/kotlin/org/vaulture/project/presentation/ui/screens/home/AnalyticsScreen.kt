@@ -52,6 +52,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 import org.vaulture.project.domain.model.AnalyticsSummary
+import org.vaulture.project.presentation.theme.PoppinsTypography
 import org.vaulture.project.presentation.viewmodels.AnalyticsViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -77,7 +78,7 @@ fun AnalyticsScreen(
         modifier = Modifier.fillMaxSize(),
         topBar = {
             TopAppBar(
-                title = { Text("Wellness Analytics", style = _root_ide_package_.org.vaulture.project.presentation.theme.PoppinsTypography().headlineSmall) },
+                title = { Text("Wellness Analytics", style = PoppinsTypography().headlineSmall) },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
@@ -109,10 +110,10 @@ fun AnalyticsScreen(
                     CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
                 }
                 uiState.summary == null || (uiState.summary?.totalCheckIns == 0 && uiState.error == null) -> {
-                    _root_ide_package_.org.vaulture.project.presentation.ui.screens.home.NoDataState()
+                    NoDataState()
                 }
                 uiState.summary != null -> {
-                    _root_ide_package_.org.vaulture.project.presentation.ui.screens.home.AnalyticsContent(
+                    AnalyticsContent(
                         summary = uiState.summary!!,
                         geminiInsights = uiState.geminiInsights,
                         isLoadingGemini = uiState.isLoadingGemini
@@ -141,12 +142,12 @@ fun NoDataState() {
         Spacer(modifier = Modifier.height(16.dp))
         Text(
             text = "Not enough data yet.",
-            style = _root_ide_package_.org.vaulture.project.presentation.theme.PoppinsTypography().titleMedium,
+            style = PoppinsTypography().titleMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
         Text(
             text = "Start making check-ins to see your analytics here!",
-            style = _root_ide_package_.org.vaulture.project.presentation.theme.PoppinsTypography().bodyMedium,
+            style = PoppinsTypography().bodyMedium,
             textAlign = TextAlign.Center,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
@@ -172,7 +173,7 @@ fun AnalyticsContent(
             item {
                 Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
                     Column(Modifier.fillMaxWidth(contentFraction)) {
-                        _root_ide_package_.org.vaulture.project.presentation.ui.screens.home.AnalyticsHeader(
+                        AnalyticsHeader(
                             totalCheckIns = summary.totalCheckIns,
                             averageMoodIntensity = summary.averageMoodIntensity
                         )
@@ -184,7 +185,7 @@ fun AnalyticsContent(
             item {
                 Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
                     Column(Modifier.fillMaxWidth(contentFraction)) {
-                        _root_ide_package_.org.vaulture.project.presentation.ui.screens.home.GeminiInsightsSection(
+                        GeminiInsightsSection(
                             insights = geminiInsights,
                             isLoading = isLoadingGemini
                         )
@@ -203,32 +204,32 @@ fun AnalyticsContent(
                             ) {
                                 Column(Modifier.weight(1f)) {
                                     if (summary.overallMoodDistribution.isNotEmpty()) {
-                                        _root_ide_package_.org.vaulture.project.presentation.ui.screens.home.AnalyticsSectionTitle(
+                                        AnalyticsSectionTitle(
                                             "Overall Mood Intensity",
                                             Icons.Filled.Mood
                                         )
-                                        _root_ide_package_.org.vaulture.project.presentation.ui.screens.home.MoodIntensityBarChartCard(
+                                        MoodIntensityBarChartCard(
                                             summary,
                                             modifier = Modifier.fillMaxWidth()
                                         )
                                     } else {
-                                        _root_ide_package_.org.vaulture.project.presentation.ui.screens.home.EmptyDataPlaceholder(
+                                        EmptyDataPlaceholder(
                                             "No mood data recorded yet."
                                         )
                                     }
                                 }
                                 Column(Modifier.weight(1f)) {
                                     if (summary.mostFrequentEmotions.isNotEmpty()) {
-                                        _root_ide_package_.org.vaulture.project.presentation.ui.screens.home.AnalyticsSectionTitle(
+                                        AnalyticsSectionTitle(
                                             "Most Frequent Emotions",
                                             Icons.Filled.SentimentSatisfied
                                         )
-                                        _root_ide_package_.org.vaulture.project.presentation.ui.screens.home.EmotionPieChartCard(
+                                        EmotionPieChartCard(
                                             summary,
                                             modifier = Modifier.fillMaxWidth()
                                         )
                                     } else {
-                                        _root_ide_package_.org.vaulture.project.presentation.ui.screens.home.EmptyDataPlaceholder(
+                                        EmptyDataPlaceholder(
                                             "No specific emotions tracked yet."
                                         )
                                     }
@@ -241,22 +242,22 @@ fun AnalyticsContent(
                             ) {
                                 Column(Modifier.weight(1f)) {
                                     if (summary.cbtExerciseUsage.isNotEmpty()) {
-                                        _root_ide_package_.org.vaulture.project.presentation.ui.screens.home.AnalyticsSectionTitle(
+                                        AnalyticsSectionTitle(
                                             "CBT Exercise Usage",
                                             Icons.Filled.SelfImprovement
                                         )
-                                        _root_ide_package_.org.vaulture.project.presentation.ui.screens.home.CbtUsageBarChartCard(
+                                        CbtUsageBarChartCard(
                                             summary,
                                             modifier = Modifier.fillMaxWidth()
                                         )
                                     } else {
-                                        _root_ide_package_.org.vaulture.project.presentation.ui.screens.home.EmptyDataPlaceholder(
+                                        EmptyDataPlaceholder(
                                             "No CBT exercises logged."
                                         )
                                     }
                                 }
                                 Column(Modifier.weight(1f)) {
-                                    _root_ide_package_.org.vaulture.project.presentation.ui.screens.home.ConditionalInsightsCard(
+                                    ConditionalInsightsCard(
                                         summary,
                                         modifier = Modifier.fillMaxWidth()
                                     )
@@ -270,16 +271,16 @@ fun AnalyticsContent(
                     Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
                         Column(Modifier.fillMaxWidth(contentFraction)) {
                             if (summary.overallMoodDistribution.isNotEmpty()) {
-                                _root_ide_package_.org.vaulture.project.presentation.ui.screens.home.AnalyticsSectionTitle(
+                                AnalyticsSectionTitle(
                                     "Overall Mood Intensity",
                                     Icons.Filled.Mood
                                 )
-                                _root_ide_package_.org.vaulture.project.presentation.ui.screens.home.MoodIntensityBarChartCard(
+                                MoodIntensityBarChartCard(
                                     summary
                                 )
                                 Spacer(modifier = Modifier.height(16.dp))
                             } else {
-                                _root_ide_package_.org.vaulture.project.presentation.ui.screens.home.EmptyDataPlaceholder(
+                                EmptyDataPlaceholder(
                                     "No mood data recorded yet."
                                 )
                             }
@@ -290,16 +291,16 @@ fun AnalyticsContent(
                     Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
                         Column(Modifier.fillMaxWidth(contentFraction)) {
                             if (summary.mostFrequentEmotions.isNotEmpty()) {
-                                _root_ide_package_.org.vaulture.project.presentation.ui.screens.home.AnalyticsSectionTitle(
+                                AnalyticsSectionTitle(
                                     "Most Frequent Emotions",
                                     Icons.Filled.SentimentSatisfied
                                 )
-                                _root_ide_package_.org.vaulture.project.presentation.ui.screens.home.EmotionPieChartCard(
+                                EmotionPieChartCard(
                                     summary
                                 )
                                 Spacer(modifier = Modifier.height(16.dp))
                             } else {
-                                _root_ide_package_.org.vaulture.project.presentation.ui.screens.home.EmptyDataPlaceholder(
+                                EmptyDataPlaceholder(
                                     "No specific emotions tracked yet."
                                 )
                             }
@@ -310,16 +311,16 @@ fun AnalyticsContent(
                     Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
                         Column(Modifier.fillMaxWidth(contentFraction)) {
                             if (summary.cbtExerciseUsage.isNotEmpty()) {
-                                _root_ide_package_.org.vaulture.project.presentation.ui.screens.home.AnalyticsSectionTitle(
+                                AnalyticsSectionTitle(
                                     "CBT Exercise Usage",
                                     Icons.Filled.SelfImprovement
                                 )
-                                _root_ide_package_.org.vaulture.project.presentation.ui.screens.home.CbtUsageBarChartCard(
+                                CbtUsageBarChartCard(
                                     summary
                                 )
                                 Spacer(modifier = Modifier.height(16.dp))
                             } else {
-                                _root_ide_package_.org.vaulture.project.presentation.ui.screens.home.EmptyDataPlaceholder(
+                                EmptyDataPlaceholder(
                                     "No CBT exercises logged."
                                 )
                             }
@@ -329,7 +330,7 @@ fun AnalyticsContent(
                 item {
                     Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
                         Column(Modifier.fillMaxWidth(contentFraction)) {
-                            _root_ide_package_.org.vaulture.project.presentation.ui.screens.home.ConditionalInsightsCard(
+                            ConditionalInsightsCard(
                                 summary
                             )
                         }
@@ -341,7 +342,7 @@ fun AnalyticsContent(
                 item {
                     Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
                         Column(Modifier.fillMaxWidth(contentFraction)) {
-                            _root_ide_package_.org.vaulture.project.presentation.ui.screens.home.AnalyticsSectionTitle(
+                            AnalyticsSectionTitle(
                                 "Top Self-Care Activities",
                                 Icons.Filled.Spa
                             )
@@ -349,7 +350,7 @@ fun AnalyticsContent(
                                 .sortedByDescending { it.second }
                                 .take(5)
                                 .forEach { (activity, count) ->
-                                    _root_ide_package_.org.vaulture.project.presentation.ui.screens.home.SimpleFrequencyItem(
+                                    SimpleFrequencyItem(
                                         item = activity,
                                         count = count
                                     )
@@ -394,7 +395,7 @@ fun GeminiInsightsSection(insights: String?, isLoading: Boolean) {
                 Spacer(modifier = Modifier.width(10.dp))
                 Text(
                     text = "Personalized AI Insights ✨",
-                    style = _root_ide_package_.org.vaulture.project.presentation.theme.PoppinsTypography().titleMedium.copy(
+                    style = PoppinsTypography().titleMedium.copy(
                         color = MaterialTheme.colorScheme.onSurface,
                         fontWeight = FontWeight.Bold
                     )
@@ -426,7 +427,7 @@ fun GeminiInsightsSection(insights: String?, isLoading: Boolean) {
                         Spacer(modifier = Modifier.height(12.dp))
                         Text(
                             text = "Generating your insights with AI... 🧠",
-                            style = _root_ide_package_.org.vaulture.project.presentation.theme.PoppinsTypography().bodyMedium.copy(
+                            style = PoppinsTypography().bodyMedium.copy(
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 fontSize = 15.sp
                             )
@@ -440,7 +441,7 @@ fun GeminiInsightsSection(insights: String?, isLoading: Boolean) {
                 enter = fadeIn(animationSpec = tween(300, delayMillis = 100)),
                 exit = fadeOut(animationSpec = tween(300))
             ) {
-                _root_ide_package_.org.vaulture.project.presentation.ui.screens.home.RichAIInsightsCard(
+                RichAIInsightsCard(
                     insights
                 )
             }
@@ -452,7 +453,7 @@ fun GeminiInsightsSection(insights: String?, isLoading: Boolean) {
             ) {
                 Text(
                     text = "Hmm, I couldn't generate AI insights this time. 😕\nPlease try refreshing or check back later.",
-                    style = _root_ide_package_.org.vaulture.project.presentation.theme.PoppinsTypography().bodyMedium.copy(
+                    style = PoppinsTypography().bodyMedium.copy(
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         lineHeight = 22.sp,
                         textAlign = TextAlign.Center
@@ -493,7 +494,7 @@ fun GeminiInsightsSection(insights: String?, isLoading: Boolean) {
                 }
                 Text(
                     text = "Copied!",
-                    style = _root_ide_package_.org.vaulture.project.presentation.theme.PoppinsTypography().labelSmall.copy(color = MaterialTheme.colorScheme.primary),
+                    style = PoppinsTypography().labelSmall.copy(color = MaterialTheme.colorScheme.primary),
                     modifier = Modifier
                         .padding(top = 8.dp)
                         .align(Alignment.End)
@@ -505,14 +506,9 @@ fun GeminiInsightsSection(insights: String?, isLoading: Boolean) {
 
 @Composable
 fun RichAIInsightsCard(insights: String?) {
-    // These colors are used to style the Markdown content to match your AppTheme
-    val onSurfaceColor = MaterialTheme.colorScheme.onSurface
     val codeBorderColor = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.7f)
-    val tableBgColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.04f)
-    // Use the KMP-compatible `Markdown` composable instead of `MarkdownText`
     Markdown(
         content = insights ?: "No insights available yet. Check back soon!",
-        // Style the markdown elements using your theme
         modifier = Modifier
             .fillMaxWidth()
             .background(MaterialTheme.colorScheme.surfaceContainerHighest, MaterialTheme.shapes.small)
@@ -524,71 +520,65 @@ fun RichAIInsightsCard(insights: String?) {
 
 @Composable
 fun AnalyticsHeader(totalCheckIns: Int, averageMoodIntensity: Float) {
-    val cardShape = RoundedCornerShape(18.dp) // Define the shape once for consistency
+    val cardShape = RoundedCornerShape(18.dp)
 
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .border( // Apply the border directly to the Card
+            .border(
                 width = 1.dp,
-                brush = Brush.horizontalGradient( // You can use a brush for the border too!
+                brush = Brush.horizontalGradient(
                     colors = listOf(
-                        MaterialTheme.colorScheme.primary.copy(alpha = 0.25f), // Slightly more visible border
+                        MaterialTheme.colorScheme.primary.copy(alpha = 0.25f),
                         MaterialTheme.colorScheme.secondary.copy(alpha = 0.25f)
                     )
                 ),
-                // Or a solid color if preferred for the border:
-                // color = MaterialTheme.colorScheme.primary.copy(alpha = 0.12f),
                 shape = cardShape
             ),
-        shape = cardShape, // Apply the shape for clipping the content and background
-        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp), // Optional: remove default elevation if border provides enough visual separation
+        shape = cardShape,
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
         colors = CardDefaults.cardColors(
-            containerColor = Color.Transparent // Make the card's own container transparent
+            containerColor = Color.Transparent
         )
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .background( // Apply the gradient background to the content area (Row)
+                .background(
                     brush = Brush.horizontalGradient(
                         colors = listOf(
                             MaterialTheme.colorScheme.primary.copy(alpha = 0.08f),
                             MaterialTheme.colorScheme.secondary.copy(alpha = 0.08f)
                         )
                     ),
-                    shape = cardShape // Ensure background respects the card's shape if card itself doesn't clip
+                    shape = cardShape
                 )
-                .clip(cardShape) // Explicitly clip the Row's content to the shape
+                .clip(cardShape)
                 .padding(16.dp),
             horizontalArrangement = Arrangement.SpaceAround,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Text color needs to be legible on your new gradient background.
-            // MaterialTheme.colorScheme.onPrimaryContainer might still work if the gradient is subtle,
-            // otherwise, consider MaterialTheme.colorScheme.onSurface or a custom color.
-            val textColorOnGradient = MaterialTheme.colorScheme.onSurface // Or onPrimary/onSecondary if more appropriate
 
+            val textColorOnGradient = MaterialTheme.colorScheme.onSurface
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Text(
                     text = totalCheckIns.toString(),
-                    style = _root_ide_package_.org.vaulture.project.presentation.theme.PoppinsTypography().headlineMedium.copy(color = textColorOnGradient)
+                    style = PoppinsTypography().headlineMedium.copy(color = textColorOnGradient)
                 )
                 Text(
                     text = "Total Check-ins",
-                    style = _root_ide_package_.org.vaulture.project.presentation.theme.PoppinsTypography().bodySmall.copy(color = textColorOnGradient)
+                    style = PoppinsTypography().bodySmall.copy(color = textColorOnGradient)
                 )
             }
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                // KMP Compatible formatting
                 val formattedAvg = (averageMoodIntensity * 10).roundToInt() / 10.0
                 Text(
                     text = "$formattedAvg/10",
-                    style = _root_ide_package_.org.vaulture.project.presentation.theme.PoppinsTypography().headlineMedium.copy(color = textColorOnGradient)
+                    style = PoppinsTypography().headlineMedium.copy(color = textColorOnGradient)
                 )
                 Text(
                     text = "Avg. Mood Intensity",
-                    style = _root_ide_package_.org.vaulture.project.presentation.theme.PoppinsTypography().bodySmall.copy(color = textColorOnGradient)
+                    style = PoppinsTypography().bodySmall.copy(color = textColorOnGradient)
                 )
             }
         }
@@ -612,7 +602,7 @@ fun AnalyticsSectionTitle(title: String, icon: ImageVector? = null) {
         }
         Text(
             text = title,
-            style = _root_ide_package_.org.vaulture.project.presentation.theme.PoppinsTypography().titleMedium.copy(
+            style = PoppinsTypography().titleMedium.copy(
                 fontWeight = FontWeight.SemiBold,
                 color = MaterialTheme.colorScheme.primary
             )
@@ -631,7 +621,7 @@ private fun MoodIntensityBarChartCard(summary: AnalyticsSummary, modifier: Modif
         Column(modifier = Modifier.padding(16.dp)) {
             val maxValue = (items.maxOfOrNull { it.averageIntensity } ?: 10f).coerceAtLeast(1f)
             val barColors =
-                _root_ide_package_.org.vaulture.project.presentation.ui.screens.home.chartPalette()
+                chartPalette()
             val animProgress by animateFloatAsState(1f, tween(800), label = "MoodBarAnim")
             Row(
                 modifier = Modifier
@@ -664,7 +654,7 @@ private fun MoodIntensityBarChartCard(summary: AnalyticsSummary, modifier: Modif
                         }
                         Text(
                             text = data.mood,
-                            style = _root_ide_package_.org.vaulture.project.presentation.theme.PoppinsTypography().labelSmall,
+                            style = PoppinsTypography().labelSmall,
                             maxLines = 1
                         )
                     }
@@ -679,7 +669,7 @@ private fun EmotionPieChartCard(summary: AnalyticsSummary, modifier: Modifier = 
     val items = summary.mostFrequentEmotions
     val total = items.sumOf { it.count }.coerceAtLeast(1)
     val palette =
-        _root_ide_package_.org.vaulture.project.presentation.ui.screens.home.chartPalette()
+        chartPalette()
     val sweepAnim by animateFloatAsState(1f, tween(900), label = "PieSweep")
     Card(
         modifier = modifier,
@@ -719,7 +709,7 @@ private fun EmotionPieChartCard(summary: AnalyticsSummary, modifier: Modifier = 
                             Spacer(Modifier.width(8.dp))
                             Text(
                                 text = "${e.emotion} • ${((e.count * 100f) / total).roundToInt()}%",
-                                style = _root_ide_package_.org.vaulture.project.presentation.theme.PoppinsTypography().bodySmall
+                                style = PoppinsTypography().bodySmall
                             )
                         }
                     }
@@ -734,7 +724,7 @@ private fun CbtUsageBarChartCard(summary: AnalyticsSummary, modifier: Modifier =
     val items = summary.cbtExerciseUsage
     val maxCount = (items.maxOfOrNull { it.count } ?: 1).coerceAtLeast(1)
     val barColors =
-        _root_ide_package_.org.vaulture.project.presentation.ui.screens.home.chartPalette()
+        chartPalette()
     val animProgress by animateFloatAsState(1f, tween(800), label = "CbtBarAnim")
     Card(
         modifier = modifier,
@@ -773,7 +763,7 @@ private fun CbtUsageBarChartCard(summary: AnalyticsSummary, modifier: Modifier =
                         }
                         Text(
                             text = data.exerciseType.displayName,
-                            style = _root_ide_package_.org.vaulture.project.presentation.theme.PoppinsTypography().labelSmall,
+                            style = PoppinsTypography().labelSmall,
                             maxLines = 1
                         )
                     }
@@ -797,13 +787,13 @@ private fun ConditionalInsightsCard(summary: AnalyticsSummary, modifier: Modifie
         Column(Modifier.padding(16.dp)) {
             Text(
                 text = "Insights",
-                style = _root_ide_package_.org.vaulture.project.presentation.theme.PoppinsTypography().titleMedium.copy(fontWeight = FontWeight.SemiBold)
+                style = PoppinsTypography().titleMedium.copy(fontWeight = FontWeight.SemiBold)
             )
             Spacer(Modifier.height(8.dp))
             if (lowMood) {
                 Text(
                     text = "Your average mood intensity is trending low. Consider short grounding exercises or a brief walk today.",
-                    style = _root_ide_package_.org.vaulture.project.presentation.theme.PoppinsTypography().bodyMedium,
+                    style = PoppinsTypography().bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
                 Spacer(Modifier.height(6.dp))
@@ -811,7 +801,7 @@ private fun ConditionalInsightsCard(summary: AnalyticsSummary, modifier: Modifie
             topEmotion?.let { e ->
                 Text(
                     text = "You're often feeling ${e.emotion.lowercase()}. Try journaling or a targeted CBT exercise to explore triggers.",
-                    style = _root_ide_package_.org.vaulture.project.presentation.theme.PoppinsTypography().bodyMedium,
+                    style = PoppinsTypography().bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
                 Spacer(Modifier.height(6.dp))
@@ -819,7 +809,7 @@ private fun ConditionalInsightsCard(summary: AnalyticsSummary, modifier: Modifie
             if (lowCbt) {
                 Text(
                     text = "CBT usage is low. Practicing even once a day can help build helpful habits.",
-                    style = _root_ide_package_.org.vaulture.project.presentation.theme.PoppinsTypography().bodyMedium,
+                    style = PoppinsTypography().bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
@@ -841,7 +831,7 @@ private fun chartPalette(): List<Color> = listOf(
 fun EmptyDataPlaceholder(message: String) {
     Text(
         text = message,
-        style = _root_ide_package_.org.vaulture.project.presentation.theme.PoppinsTypography().bodyMedium,
+        style = PoppinsTypography().bodyMedium,
         color = MaterialTheme.colorScheme.onSurfaceVariant,
         modifier = Modifier
             .fillMaxWidth()
@@ -853,11 +843,11 @@ fun EmptyDataPlaceholder(message: String) {
 @Composable
 fun SimpleFrequencyItem(item: String, count: Int) {
     ListItem(
-        headlineContent = { Text(item, style = _root_ide_package_.org.vaulture.project.presentation.theme.PoppinsTypography().bodyLarge) },
+        headlineContent = { Text(item, style = PoppinsTypography().bodyLarge) },
         trailingContent = {
             Text(
                 text = "$count times",
-                style = _root_ide_package_.org.vaulture.project.presentation.theme.PoppinsTypography().labelMedium,
+                style = PoppinsTypography().labelMedium,
                 modifier = Modifier
                     .background(MaterialTheme.colorScheme.surfaceVariant, CircleShape)
                     .padding(horizontal = 8.dp, vertical = 4.dp)

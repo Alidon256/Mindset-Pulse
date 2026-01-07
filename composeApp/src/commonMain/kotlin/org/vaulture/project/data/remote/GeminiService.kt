@@ -19,7 +19,7 @@ import org.vaulture.project.domain.engine.CheckInResult
 data class GeminiResponse(
     val candidates: List<Candidate>? = null,
     val error: GeminiError? = null,
-    val promptFeedback: PromptFeedback? = null // Often returned on safety blocks
+    val promptFeedback: PromptFeedback? = null
 )
 
 @Serializable
@@ -62,10 +62,6 @@ class GeminiService {
     private val apiKey = "AIzaSyD7EIi4wCBL_JLWgi8RZ6qO5E8dT7hvxqQ"
     private val url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=$apiKey"
 
-    /**
-     * GENERATE QUESTIONS:
-     * Asks Gemini to create 5 relevant check-in questions.
-     */
     suspend fun generateDailyQuestions(): List<String> {
         val promptText = """
             Generate 5 short, empathetic mental health check-in questions for a professional young adult.
@@ -93,10 +89,6 @@ class GeminiService {
         }
     }
 
-    /**
-     * ANALYZE ANSWERS:
-     * Analyzes a single text response for immediate feedback.
-     */
     suspend fun analyzeJournalEntry(text: String): AnalysisResult {
         val promptText = """
             Act as a mental health expert. Analyze this user check-in: "$text"
@@ -122,15 +114,6 @@ class GeminiService {
         }
     }
 
-    /**
-     * GENERATE ANALYTICS REPORT:
-     * Takes a list of past check-ins and generates a weekly summary/insight report in Markdown.
-     * This corresponds to the `getAnalyticsInsights` feature.
-     */
-
-    /**
-     * GENERATE ANALYTICS REPORT
-     */
     suspend fun generateAnalyticsReport(checkIns: List<CheckInResult>): String {
         if (checkIns.isEmpty()) return "No data available for analysis yet."
 
@@ -185,10 +168,6 @@ class GeminiService {
     }
 
 
-    /**
-     * Constructs the rich prompt for the analytics report.
-     * Adapted to use CheckInResult data available in KMP.
-     */
     private fun constructAnalyticsPrompt(checkIns: List<CheckInResult>): String {
         // Summarize the recent history for the AI
         val summary = checkIns.takeLast(10).joinToString("\n") { entry ->

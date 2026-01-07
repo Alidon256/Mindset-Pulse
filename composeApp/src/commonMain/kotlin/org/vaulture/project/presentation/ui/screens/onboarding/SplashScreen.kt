@@ -26,17 +26,14 @@ fun SplashScreen(onTimeout: () -> Unit) {
     val scale = remember { Animatable(0f) }
 
     LaunchedEffect(Unit) {
-        // Animate the logo scaling up
         scale.animateTo(
             targetValue = 1f,
             animationSpec = tween(durationMillis = 800)
         )
-        // Wait for a moment to let the user see the logo
         delay(1200L)
-        // Trigger navigation
         onTimeout()
     }
-    _root_ide_package_.org.vaulture.project.presentation.theme.AppTheme {
+    AppTheme {
         Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
             Box(
                 contentAlignment = Alignment.Center,
@@ -49,7 +46,6 @@ fun SplashScreen(onTimeout: () -> Unit) {
                     modifier = Modifier
                         .size(200.dp)
                         .scale(scale.value)
-                    //tint = MaterialTheme.colorScheme.primary
                 )
             }
         }

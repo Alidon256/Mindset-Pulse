@@ -3,7 +3,6 @@ package org.vaulture.project.domain.model
 import dev.gitlive.firebase.firestore.Timestamp
 import kotlinx.serialization.Serializable
 
-// --- NEW: Mental State Enum for Risk Classification ---
 enum class MentalState(val colorHex: Long, val label: String) {
     STABLE(0xFF4CAF50, "Stable"),       // Green
     MILD_STRESS(0xFFFFC107, "Mild Stress"), // Amber
@@ -42,15 +41,11 @@ data class ThoughtRecordEntry(
 data class CheckInEntry(
     val id: String = "",
     val userId: String = "",
-    val timestamp: Timestamp = Timestamp(0,0), // Default to 0, updated on creation
-
-    // --- MINDSET PULSE CORE FIELDS (NEW) ---
-    val score: Int = 0, // 0-100 Risk Score
-    val state: MentalState = MentalState.STABLE, // Calculated by RiskEngine
-    val aiInsight: String = "", // Gemini's short observation
-    val sentimentScore: Float = 0f, // -1.0 to 1.0
-
-    // Existing CBT Fields
+    val timestamp: Timestamp = Timestamp(0,0),
+    val score: Int = 0,
+    val state: MentalState = MentalState.STABLE,
+    val aiInsight: String = "",
+    val sentimentScore: Float = 0f,
     val overallMood: String = "",
     val moodIntensity: Int = 5,
     val primaryEmotions: List<EmotionRating> = emptyList(),

@@ -45,14 +45,11 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
-import org.jetbrains.compose.resources.painterResource
 import org.vaulture.project.data.remote.AuthService
-import org.vaulture.project.domain.model.Space
 import org.vaulture.project.domain.model.WellnessType
 import org.vaulture.project.presentation.navigation.Routes
 import org.vaulture.project.presentation.theme.PoppinsTypography
 import org.vaulture.project.presentation.ui.components.AIPrivacyCard
-import org.vaulture.project.presentation.ui.components.ProfileAvatar
 import org.vaulture.project.presentation.ui.components.PulseBadgeCard
 import org.vaulture.project.presentation.ui.components.SearchBar
 import org.vaulture.project.presentation.ui.components.SectionHeader
@@ -134,8 +131,9 @@ fun SpaceScreenExpandable(
     wellnessViewModel: WellnessViewModel,
     navController: NavController,
     onSignOut: () -> Unit,
-    authService: AuthService
+    authService: AuthService,
 ){
+    val activeId by viewModel.activeSpaceId.collectAsState()
     val statsState by wellnessViewModel.uiState.collectAsState()
     var selectedRailItem by remember { mutableStateOf("Spaces") }
     var searchQuery by remember { mutableStateOf("") }
@@ -207,10 +205,7 @@ fun SpaceScreenExpandable(
                         Icons.Default.Air,
                         bg = Color(0xFF03A9F4)
                     ) {
-                        // 1. Select the activity first
                         wellnessViewModel.selectActivity(WellnessType.BREATHING)
-                        // 2. Start the timer with the duration
-                        //wellnessViewModel.startTimer(5)
                         navController.navigate(Routes.WELLNESS_TIMER)
                     }
 
@@ -221,7 +216,6 @@ fun SpaceScreenExpandable(
                         bg = Color(0xFF4CAF50)
                     ) {
                         wellnessViewModel.selectActivity(WellnessType.YOGA)
-                        //wellnessViewModel.startTimer(10)
                         navController.navigate(Routes.WELLNESS_TIMER)
                     }
 
@@ -232,7 +226,6 @@ fun SpaceScreenExpandable(
                         bg = Color(0xFF9C27B0)
                     ) {
                         wellnessViewModel.selectActivity(WellnessType.MEDITATION)
-                        //wellnessViewModel.startTimer(15)
                         navController.navigate(Routes.WELLNESS_TIMER)
                     }
                 }
@@ -401,7 +394,8 @@ fun SpaceScreenExpandable(
 
                                     viewModel.joinSpace(spaceId)
                                     onSpaceClick(spaceId)
-                                }
+                                },
+                                activeSpaceId = activeId
                             )
                         }
                         SpaceFilter.Memories -> {
@@ -459,7 +453,6 @@ fun SpaceScreenExpandable(
 
             Spacer(Modifier.weight(1f))
 
-            // Helpful Resources shortcut
             OutlinedButton(
                 onClick = { /* Navigate to Security Rules Detail */ },
                 modifier = Modifier.fillMaxWidth(),
@@ -494,6 +487,7 @@ fun SpacesScreenCompat(
     onAddStoryClick: () -> Unit,
     onCommentClick: (String) -> Unit
 ) {
+    val activeId by viewModel.activeSpaceId.collectAsState()
     var searchQuery by remember { mutableStateOf("") }
     var isSearchExpanded by remember { mutableStateOf(false) }
     val isSearching by viewModel.isSearching.collectAsState()
@@ -561,15 +555,15 @@ fun SpacesScreenCompat(
         ) { filter ->
             when (filter) {
                 SpaceFilter.Spaces -> {
-                    // Use filteredSpaces instead of spaces
                     val spaces by viewModel.filteredSpaces.collectAsState()
                     SpacesListContent(
                         spaces = spaces,
                         onSpaceClick = { spaceId ->
-                            println("🖱️ [UI] User clicked space: $spaceId. Triggering Join...")
+                            println("[UI] User clicked space: $spaceId. Triggering Join...")
                             viewModel.joinSpace(spaceId)
                             onSpaceClick(spaceId)
-                        }
+                        },
+                        activeSpaceId = activeId
                     )
                 }
                 SpaceFilter.Memories -> {
@@ -670,4 +664,5 @@ private fun FilterTabBar(
         }
     }
 }
+
 

@@ -15,11 +15,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import org.vaulture.project.domain.model.Story
+import org.vaulture.project.presentation.ui.components.PostItem
 import org.vaulture.project.presentation.viewmodels.SpaceViewModel
 
 @Composable
 fun MemoriesScreen(
-    stories: List<Story>, // Now correctly receives filtered results from parent
+    stories: List<Story>,
     viewModel: SpaceViewModel,
     modifier: Modifier = Modifier,
     onCommentClick: (String) -> Unit,
@@ -45,26 +46,26 @@ fun MemoriesScreen(
             }
 
             error != null -> {
-                _root_ide_package_.org.vaulture.project.presentation.ui.screens.space.ErrorPlaceholder(
+                ErrorPlaceholder(
                     errorMessage = error!!
                 )
             }
 
             stories.isEmpty() && !isLoading -> {
-                _root_ide_package_.org.vaulture.project.presentation.ui.screens.space.EmptySearchPlaceholder()
+                EmptySearchPlaceholder()
             }
 
            else -> {
                 LazyColumn(
                     modifier = Modifier.fillMaxSize(),
-                    contentPadding = PaddingValues(bottom = 80.dp), // Space for FAB
+                    contentPadding = PaddingValues(bottom = 80.dp),
                     verticalArrangement = Arrangement.spacedBy(4.dp)
                 ) {
                     items(
                         items = stories,
                         key = { it.storyId }
                     ) { post ->
-                        _root_ide_package_.org.vaulture.project.presentation.ui.components.PostItem(
+                       PostItem(
                             post = post,
                             currentUserId = currentUserId,
                             onLikeClick = { viewModel.toggleLike(post) },
@@ -73,7 +74,7 @@ fun MemoriesScreen(
                             onBookmarkClick = { viewModel.toggleBookmark(post) },
                             onOptionClick = {}
                         )
-                        _root_ide_package_.org.vaulture.project.presentation.ui.screens.space.ListItemDivider()
+                        ListItemDivider()
                     }
                 }
             }

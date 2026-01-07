@@ -33,9 +33,8 @@ import org.vaulture.project.presentation.viewmodels.WellnessViewModel
 @Composable
 fun WellnessTimerScreen(viewModel: WellnessViewModel, onBack: () -> Unit) {
     val state by viewModel.uiState.collectAsState()
-    val currentActivity = state.currentActivity ?: return // Exit if no activity is selected
+    val currentActivity = state.currentActivity ?: return
 
-    // Dynamic background gradient based on the selected activity
     val backgroundBrush = Brush.verticalGradient(
         colors = listOf(
             currentActivity.gradientStartColor.copy(alpha = 0.3f),
@@ -57,7 +56,6 @@ fun WellnessTimerScreen(viewModel: WellnessViewModel, onBack: () -> Unit) {
             Modifier.fillMaxSize()
         }
 
-        // Back button that's always visible
         IconButton(
             onClick = onBack,
             modifier = Modifier
@@ -95,7 +93,6 @@ fun WellnessTimerScreen(viewModel: WellnessViewModel, onBack: () -> Unit) {
     }
 }
 
-// --- SETUP SCREEN (ENHANCED) ---
 @Composable
 private fun SetupContent(modifier: Modifier, viewModel: WellnessViewModel, onBack: () -> Unit) {
     val activity = viewModel.uiState.value.currentActivity ?: return
@@ -108,7 +105,6 @@ private fun SetupContent(modifier: Modifier, viewModel: WellnessViewModel, onBac
     ) {
         Spacer(Modifier.weight(0.5f))
 
-        // Hero Icon with Gradient
         Box(
             modifier = Modifier
                 .size(120.dp)
@@ -156,7 +152,6 @@ private fun SetupContent(modifier: Modifier, viewModel: WellnessViewModel, onBac
             modifier = Modifier.padding(bottom = 16.dp)
         )
 
-        // Duration selection buttons
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -219,7 +214,6 @@ private fun ExpandableInfoCard(title: String, description: String) {
 }
 
 
-// --- ACTIVE TIMER SCREEN ---
 @Composable
 private fun ActiveTimerContent(modifier: Modifier, state: WellnessUiState, viewModel: WellnessViewModel) {
     val infiniteTransition = rememberInfiniteTransition(label = "breathing_animation")
@@ -301,8 +295,6 @@ private fun ActiveTimerContent(modifier: Modifier, state: WellnessUiState, viewM
     }
 }
 
-
-// --- SUMMARY SCREEN ---
 @Composable
 private fun SummaryContent(modifier: Modifier, state: WellnessUiState, onBack: () -> Unit) {
     Column(modifier.padding(24.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
@@ -321,7 +313,6 @@ private fun SummaryContent(modifier: Modifier, state: WellnessUiState, onBack: (
         Text("Great job on completing your session.", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
 
 
-        // Resilience Battery Indicator
         Row(Modifier.padding(vertical = 24.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             repeat(5) { index ->
                 val isActive = index < state.stats.sessionsToday
@@ -333,7 +324,6 @@ private fun SummaryContent(modifier: Modifier, state: WellnessUiState, onBack: (
             }
         }
 
-        // Streak Card
         Card(
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(24.dp),

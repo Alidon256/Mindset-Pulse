@@ -85,7 +85,6 @@ fun SearchBar(
     val keyboardController = LocalSoftwareKeyboardController.current
     val focusManager = LocalFocusManager.current
 
-    // Animate padding/elevation for a smoother transition
     val searchBarHorizontalPadding by animateDpAsState(
         targetValue = if (isExpanded) 0.dp else 16.dp,
         animationSpec = tween(durationMillis = 300),
@@ -102,7 +101,6 @@ fun SearchBar(
             focusRequester.requestFocus()
             keyboardController?.show()
         } else {
-            // focusManager.clearFocus() // Clearing focus can sometimes have unintended side effects
             keyboardController?.hide()
         }
     }
@@ -110,13 +108,13 @@ fun SearchBar(
     Column(
         modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = searchBarHorizontalPadding) // Animated padding
+            .padding(horizontal = searchBarHorizontalPadding)
     ) {
-        Card( // Using Card for better elevation control and shape
+        Card(
             modifier = Modifier
                 .fillMaxWidth()
-                .heightIn(min = 48.dp), // Reduced height for more compact search bar
-            shape = RoundedCornerShape(if (isExpanded) 0.dp else 28.dp), // Full rounded when collapsed
+                .heightIn(min = 48.dp),
+            shape = RoundedCornerShape(if (isExpanded) 0.dp else 28.dp),
             elevation = CardDefaults.cardElevation(defaultElevation = searchBarElevation),
             colors = CardDefaults.cardColors(
                 containerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp)
@@ -125,16 +123,15 @@ fun SearchBar(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 4.dp) // Reduced inner padding for icon buttons
+                    .padding(horizontal = 4.dp)
                     .clickable(
-                        enabled = !isExpanded, // Only clickable to expand when collapsed
+                        enabled = !isExpanded,
                         onClick = {
                             if (!isExpanded) onToggleExpanded()
                         }
                     ),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                // Leading Icon: ArrowBack when expanded, Search when collapsed
                 IconButton(onClick = onToggleExpanded) {
                     Crossfade(
                         targetState = isExpanded,
@@ -159,7 +156,6 @@ fun SearchBar(
                                 .focusRequester(focusRequester)
                                 .onFocusChanged { focusState ->
                                     if (!focusState.isFocused && isExpanded) {
-                                        // Optional: Collapse if focus is lost and query is empty
                                         // if (query.isEmpty()) onToggleExpand()
                                     }
                                 },
@@ -207,7 +203,6 @@ fun SearchBar(
                     }
                 }
 
-                // Clear Query Button (Trailing Icon)
                 if (isExpanded && query.isNotEmpty()) {
                     IconButton(onClick = { onQueryChange("") /* Clears query */ }) {
                         Icon(
@@ -217,7 +212,7 @@ fun SearchBar(
                         )
                     }
                 } else if (isExpanded && query.isEmpty()) {
-                    Spacer(Modifier.width(48.dp)) // Maintain space for consistency if no clear button
+                    Spacer(Modifier.width(48.dp))
                 }
             }
         }
@@ -237,11 +232,11 @@ fun SearchBar(
                 animationSpec = tween(durationMillis = 200),
                 targetOffsetY = { -it / 2 })
         ) {
-            Surface( // Use Surface for elevation and shape of suggestions dropdown
+            Surface(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = 8.dp) // Space between search bar and suggestions
-                    .padding(horizontal = if (isExpanded) 0.dp else 16.dp), // Align with expanded search bar
+                    .padding(top = 8.dp)
+                    .padding(horizontal = if (isExpanded) 0.dp else 16.dp),
                 shape = RoundedCornerShape(12.dp),
                 shadowElevation = 8.dp,
                 color = MaterialTheme.colorScheme.surfaceColorAtElevation(6.dp)
@@ -254,7 +249,7 @@ fun SearchBar(
                             modifier = Modifier.padding(16.dp)
                         )
                         recentSearches.forEach { recent ->
-                            _root_ide_package_.org.vaulture.project.presentation.ui.components.SuggestionRow(
+                            SuggestionRow(
                                 icon = Icons.Default.History,
                                 text = recent,
                                 highlight = "", // No highlight for recent searches
@@ -266,14 +261,13 @@ fun SearchBar(
                             HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.2f))
                         }
                     } else if (suggestions.isNotEmpty()) {
-                        // Always show the query as the first suggestion if typed
                         if (query.isNotBlank()) {
-                            _root_ide_package_.org.vaulture.project.presentation.ui.components.SuggestionRow(
+                            SuggestionRow(
                                 icon = Icons.Default.Search,
                                 text = query,
                                 highlight = query, // Highlight the typed query within itself
                                 onClick = {
-                                    onSearch(query) // Treat as direct search
+                                    onSearch(query)
                                     focusManager.clearFocus()
                                 }
                             )
@@ -281,11 +275,11 @@ fun SearchBar(
                         }
                         suggestions.filterNot { it.title.equals(query, ignoreCase = true) }
                             .forEachIndexed { idx, suggestion ->
-                                _root_ide_package_.org.vaulture.project.presentation.ui.components.SuggestionRow(
+                                SuggestionRow(
                                     icon = when (suggestion.type) {
                                         ItemType.VIDEO -> Icons.Default.VideoLibrary
-                                        ItemType.CHANNEL -> Icons.Default.AccountBox // Or Icons.Filled.Person, Icons.Filled.Storefront
-                                        ItemType.SHORTS -> Icons.Default.SmartDisplay // Or Icons.Filled.OndemandVideo, Icons.Filled.Bolt
+                                        ItemType.CHANNEL -> Icons.Default.AccountBox
+                                        ItemType.SHORTS -> Icons.Default.SmartDisplay
                                         ItemType.AUDIO -> Icons.Default.MusicNote
                                         ItemType.SONG -> TODO()
                                         ItemType.ARTIST -> TODO()
@@ -362,7 +356,6 @@ private fun SuggestionRow(
         )
     }
 }
-// --- Previews ---
 
 @Preview
 @Composable
@@ -370,7 +363,7 @@ fun SearchBarPreviewCollapsed() {
     MaterialTheme {
         var isExpanded by remember { mutableStateOf(false) }
         var query by remember { mutableStateOf("") }
-        _root_ide_package_.org.vaulture.project.presentation.ui.components.SearchBar(
+        SearchBar(
             query = query,
             onQueryChange = { query = it },
             onSearch = {},
@@ -386,13 +379,13 @@ fun SearchBarPreviewExpandedEmpty() {
     MaterialTheme {
         var isExpanded by remember { mutableStateOf(true) }
         var query by remember { mutableStateOf("") }
-        _root_ide_package_.org.vaulture.project.presentation.ui.components.SearchBar(
+        SearchBar(
             query = query,
             onQueryChange = { query = it },
             onSearch = {},
             isExpanded = isExpanded,
             onToggleExpanded = { isExpanded = !isExpanded },
-            recentSearches = listOf("Uganda", "Masai Mara", "Bwindi Game park", "Nairobi")
+            recentSearches = listOf("Mindset", "Mental health", "wellness", "Relaxation")
         )
     }
 }
@@ -403,14 +396,14 @@ fun SearchBarPreviewExpandedWithQuery() {
     MaterialTheme {
         var isExpanded by remember { mutableStateOf(true) }
         var query by remember { mutableStateOf("Compose") }
-        _root_ide_package_.org.vaulture.project.presentation.ui.components.SearchBar(
+        SearchBar(
             query = query,
             onQueryChange = { query = it },
             onSearch = {},
             isExpanded = isExpanded,
             onToggleExpanded = { isExpanded = !isExpanded },
             suggestions = listOf(),
-            recentSearches = listOf("Uganda", "Masai Mara", "Bwindi Game park", "Nairobi")
+            recentSearches = listOf("Mindset", "Mental health", "wellness", "Relaxation")
         )
     }
 }

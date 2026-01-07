@@ -19,11 +19,9 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
@@ -32,12 +30,16 @@ import androidx.compose.ui.unit.sp
 
 
 @Composable
-fun StreakBanner(streak: Int, isTablet: Boolean = false, onClick: () -> Unit = {}) {
+fun StreakBanner(
+    streak: Int,
+    isWide: Boolean = false,
+    onClick: () -> Unit = {}
+) {
 
-    val bannerHeight = if (isTablet) 120.dp else 100.dp
-    val iconBoxSize = if (isTablet) 52.dp else 44.dp
-    val iconSize = if (isTablet) 32.dp else 28.dp
-    val titleFontSize = if (isTablet) 14.sp else 13.sp
+    val bannerHeight = if (isWide) 120.dp else 100.dp
+    val iconBoxSize = if (isWide) 52.dp else 44.dp
+    val iconSize = if (isWide) 32.dp else 28.dp
+    val titleFontSize = if (isWide) 14.sp else 13.sp
 
     Column(
         modifier = Modifier

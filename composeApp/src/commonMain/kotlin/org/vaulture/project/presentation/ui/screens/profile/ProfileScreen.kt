@@ -7,6 +7,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -38,12 +39,14 @@ import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import org.jetbrains.compose.resources.painterResource
 import org.vaulture.project.data.remote.AuthService
+import org.vaulture.project.domain.model.Story
 import org.vaulture.project.presentation.viewmodels.WellnessViewModel
 import org.vaulture.project.domain.model.WellnessStats
 import org.vaulture.project.domain.model.WellnessType
 import org.vaulture.project.presentation.navigation.Routes
 import org.vaulture.project.presentation.theme.PoppinsTypography
 import org.vaulture.project.presentation.ui.components.AIPrivacyCard
+import org.vaulture.project.presentation.ui.components.PostItem
 import org.vaulture.project.presentation.ui.components.ProfileAvatar
 import org.vaulture.project.presentation.ui.components.PulseBadgeCard
 import org.vaulture.project.presentation.ui.components.SectionHeader
@@ -52,6 +55,8 @@ import org.vaulture.project.presentation.ui.components.StatBox
 import org.vaulture.project.presentation.ui.components.StreakBanner
 import org.vaulture.project.presentation.ui.components.WellnessActionItem
 import org.vaulture.project.presentation.ui.components.WellnessStatsRow
+import org.vaulture.project.presentation.viewmodels.ProfileFilter
+import org.vaulture.project.presentation.viewmodels.SpaceViewModel
 import vaulture.composeapp.generated.resources.*
 import kotlin.time.Clock
 
@@ -60,10 +65,31 @@ fun ProfileScreen(
     authService: AuthService,
     wellnessViewModel: WellnessViewModel,
     onSignOut: () -> Unit,
-    navController: NavController
+    navController: NavController,
+    spaceViewModel: SpaceViewModel,
+    selectedFilter: ProfileFilter,
+    onFilterSelected: (ProfileFilter) -> Unit,
+    onCommentClick: (String) -> Unit,
 ) {
     val statsState by wellnessViewModel.uiState.collectAsState()
+    val user by authService.currentUser.collectAsState(null)
+    val currentUserId = user?.uid ?: ""
 
+    val myPosts by spaceViewModel.userStories.collectAsState()
+    val likedPosts by spaceViewModel.userLikedStories.collectAsState()
+    val bookmarkedPosts by spaceViewModel.userBookmarkedStories.collectAsState()
+    val isLoading by spaceViewModel.isLoadingProfileData.collectAsState()
+
+    val displayedStories = when (selectedFilter) {
+        ProfileFilter.MY_POSTS -> myPosts
+        ProfileFilter.LIKED -> likedPosts
+        ProfileFilter.BOOKMARKED -> bookmarkedPosts
+    }
+
+    // Trigger data loading when the filter changes
+    LaunchedEffect(selectedFilter) {
+        spaceViewModel.loadProfileData(selectedFilter)
+    }
     BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
         val isExpanded = maxWidth > 920.dp
 
@@ -84,7 +110,14 @@ fun ProfileScreen(
                 ProfileScreenCompact(
                     authService = authService,
                     stats = statsState.stats,
-                    onSignOut = onSignOut
+                    onSignOut = onSignOut,
+                    spaceViewModel = spaceViewModel,
+                    selectedFilter = selectedFilter,
+                    onFilterSelected = onFilterSelected,
+                    isLoading = isLoading,
+                    displayedStories = displayedStories,
+                    currentUserId = currentUserId,
+                    onCommentClick = onCommentClick
                 )
             }
         }
@@ -98,13 +131,22 @@ private fun ProfileScreenCompact(
     stats: WellnessStats,
     onSignOut: () -> Unit,
     onNavigateToSettings: () -> Unit = {},
+    spaceViewModel: SpaceViewModel,
+    onFilterSelected: (ProfileFilter) -> Unit,
+    onCommentClick: (String) -> Unit,
+    selectedFilter: ProfileFilter,
+    isLoading: Boolean,
+    displayedStories: List<Story>,
+    currentUserId: String,
 ) {
     val user by authService.currentUser.collectAsState(null)
+
     val lazyListState = rememberLazyListState()
     val bannerHeight = 200.dp
     val bannerHeightPx = with(LocalDensity.current) { bannerHeight.toPx() }
     val avatarInitialSize = 110.dp
     val avatarFinalSize = 40.dp
+
 
     Scaffold(containerColor = MaterialTheme.colorScheme.background) { paddingValues ->
         LazyColumn(
@@ -153,6 +195,72 @@ private fun ProfileScreenCompact(
                 )
                 Spacer(Modifier.height(32.dp))
             }
+
+            item {
+                Row(
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                ProfileFilter.entries.forEach { filter ->
+                    FilterChip(
+                        selected = selectedFilter == filter,
+                        onClick = { onFilterSelected(filter) },
+                        label = {
+                            Text(when(filter) {
+                                ProfileFilter.MY_POSTS -> "My Posts"
+                                ProfileFilter.LIKED -> "Liked"
+                                ProfileFilter.BOOKMARKED -> "Saved"
+                            })
+                        },
+                        leadingIcon = {
+                            Icon(
+                                imageVector = when(filter) {
+                                    ProfileFilter.MY_POSTS -> Icons.Default.Article
+                                    ProfileFilter.LIKED -> Icons.Default.Favorite
+                                    ProfileFilter.BOOKMARKED -> Icons.Default.Bookmark
+                                },
+                                contentDescription = null,
+                                modifier = Modifier.size(16.dp)
+                            )
+                        }
+                    )
+                }
+            }
+                Spacer(Modifier.height(16.dp))
+            }
+
+            if (isLoading) {
+                item {
+                    Box(Modifier.fillMaxWidth().padding(32.dp), contentAlignment = Alignment.Center) {
+                        CircularProgressIndicator()
+                    }
+                }
+            } else if (displayedStories.isEmpty()) {
+                item {
+                    Column(
+                        modifier = Modifier.fillMaxWidth().padding(32.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Icon(Icons.Default.Info, null, tint = MaterialTheme.colorScheme.outline)
+                        Spacer(Modifier.height(8.dp))
+                        Text("No posts found here yet.", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    }
+                }
+            } else {
+                items(displayedStories, key = { it.storyId }) { story ->
+                    PostItem(
+                        post = story,
+                        currentUserId = currentUserId,
+                        onLikeClick = { spaceViewModel.toggleLike(story) },
+                        onCommentClick = { onCommentClick(story.storyId) },
+                        onProfileClick = { /* Navigate to Profile */ },
+                        onBookmarkClick = { spaceViewModel.toggleBookmark(story) },
+                        onOptionClick = {}
+                    )
+                    Spacer(Modifier.height(16.dp))
+                }
+            }
+
 
             item {
                 Column(Modifier.padding(horizontal = 16.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
@@ -246,10 +354,7 @@ private fun ProfileScreenExpanded(
                         Icons.Default.Air,
                         bg = Color(0xFF03A9F4)
                     ) {
-                        // 1. Select the activity first
                         wellnessViewModel.selectActivity(WellnessType.BREATHING)
-                        // 2. Start the timer with the duration
-                        //wellnessViewModel.startTimer(5)
                         navController.navigate(Routes.WELLNESS_TIMER)
                     }
 
@@ -260,7 +365,6 @@ private fun ProfileScreenExpanded(
                         bg = Color(0xFF4CAF50)
                     ) {
                         wellnessViewModel.selectActivity(WellnessType.YOGA)
-                        //wellnessViewModel.startTimer(10)
                         navController.navigate(Routes.WELLNESS_TIMER)
                     }
 
@@ -271,7 +375,6 @@ private fun ProfileScreenExpanded(
                         bg = Color(0xFF9C27B0)
                     ) {
                         wellnessViewModel.selectActivity(WellnessType.MEDITATION)
-                        //wellnessViewModel.startTimer(15)
                         navController.navigate(Routes.WELLNESS_TIMER)
                     }
                 }
@@ -414,30 +517,6 @@ private fun ProfileScreenExpanded(
             }
         }
 
-        /*VerticalDivider(thickness = 1.dp, color = MaterialTheme.colorScheme.outlineVariant)
-
-        Column(
-            modifier = Modifier
-                .width(350.dp)
-                .fillMaxHeight()
-                .background(MaterialTheme.colorScheme.surfaceContainerLow)
-                .padding(24.dp),
-            verticalArrangement = Arrangement.spacedBy(24.dp)
-        ) {
-            Text("The Mindset Vault", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
-
-            AIPrivacyCard()
-
-            Card(
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.4f)),
-                shape = RoundedCornerShape(16.dp)
-            ) {
-                Column(Modifier.padding(16.dp)) {
-                    Text("Total Investment", style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.primary)
-                    Text("${stats.totalMinutes} Mindful Minutes", style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
-                    Text("Saved across all your devices.", style = MaterialTheme.typography.bodySmall)
-                }
-            }*/
         VerticalDivider(thickness = 1.dp, color = MaterialTheme.colorScheme.outlineVariant)
         Column(
             modifier = Modifier
@@ -475,10 +554,7 @@ private fun ProfileScreenExpanded(
                 }
             }
             AIPrivacyCard()
-
             Spacer(Modifier.weight(1f))
-
-            // Helpful Resources shortcut
             OutlinedButton(
                 onClick = { /* Navigate to Security Rules Detail */ },
                 modifier = Modifier.fillMaxWidth(),

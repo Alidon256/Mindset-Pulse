@@ -1,10 +1,9 @@
-// Create a new file: ErrorScreen.kt
 package org.vaulture.project.presentation.ui.components
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Refresh // Or a custom error/warning icon
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -21,10 +20,10 @@ import org.vaulture.project.presentation.theme.AppTheme
 @Composable
 fun ErrorScreen(
     onTryAgain: () -> Unit,
-    onBack: (() -> Unit)? = null // Make back navigation optional
+    onBack: (() -> Unit)? = null
 ) {
     Scaffold(
-        containerColor = MaterialTheme.colorScheme.surface // Or Color.White
+        containerColor = MaterialTheme.colorScheme.surface
     ) { paddingValues ->
         Column(
             modifier = Modifier
@@ -35,10 +34,10 @@ fun ErrorScreen(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Icon(
-                // painter = painterResource(Res.drawable.ic_error_refresh), // Use your custom refresh/error icon
-                imageVector = Icons.Filled.Refresh, // Placeholder Material Icon
+                // painter = painterResource(Res.drawable.ic_error_refresh),
+                imageVector = Icons.Filled.Refresh,
                 contentDescription = "Error Refresh",
-                tint = MaterialTheme.colorScheme.primary, // Green color from mockup
+                tint = MaterialTheme.colorScheme.primary,
                 modifier = Modifier.size(80.dp)
             )
 
@@ -68,18 +67,18 @@ fun ErrorScreen(
                     .fillMaxWidth()
                     .height(56.dp),
                 shape = RoundedCornerShape(12.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2E7D32)) // Green
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2E7D32))
             ) {
                 Text("Try again", fontSize = 16.sp, fontWeight = FontWeight.Medium)
             }
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            onBack?.let { // Show "Back" button only if onBack is provided
+            onBack?.let {
                 TextButton(onClick = it) {
                     Text(
                         "Back",
-                        color = MaterialTheme.colorScheme.primary, // Green
+                        color = MaterialTheme.colorScheme.primary,
                         fontWeight = FontWeight.Medium
                     )
                 }
@@ -90,7 +89,7 @@ fun ErrorScreen(
 @Composable
 @Preview
 fun ErrorScreenPreview() {
-    _root_ide_package_.org.vaulture.project.presentation.theme.AppTheme {
-        org.vaulture.project.presentation.ui.components.ErrorScreen({}, {})
+    AppTheme {
+        ErrorScreen({}, {})
     }
 }

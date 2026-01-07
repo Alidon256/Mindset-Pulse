@@ -22,9 +22,9 @@ import kotlin.time.Clock
 import kotlin.time.Instant
 
 data class CheckInUiState(
-    val isLoadingQuestions: Boolean = true, // New state for initial load
+    val isLoadingQuestions: Boolean = true,
     val step: Int = 0,
-    val questions: List<String> = emptyList(), // Dynamic list
+    val questions: List<String> = emptyList(),
     val answers: MutableList<Int> = mutableListOf(),
     val textResponse: String = "",
     val isAnalyzing: Boolean = false,
@@ -36,7 +36,6 @@ class CheckInViewModel : ViewModel() {
     val uiState = _uiState.asStateFlow()
     private val firestore = Firebase.firestore
     private val auth = Firebase.auth
-    // This state will be observed by the UI
     private val _latestResult = MutableStateFlow<CheckInResult?>(null)
     val latestResult = _latestResult.asStateFlow()
 
@@ -58,67 +57,9 @@ class CheckInViewModel : ViewModel() {
         }
     }
 
-    // Inside CheckInViewModel.kt
     fun syncResult(result: CheckInResult) {
         _uiState.update { it.copy(result = result) }
     }
-
-    /*
-    private fun observeTodayResult() {
-        val uid = auth.currentUser?.uid ?: return
-
-        checkInListenerJob?.cancel()
-        checkInListenerJob = viewModelScope.launch {
-            try {
-                // To make the app feel "instant" and persistent, we query for
-                // the most recent check-in, even if it was from yesterday.
-                firestore.collection("users").document(uid)
-                    .collection("checkIns")
-                    .orderBy("timestamp", Direction.DESCENDING)
-                    .limit(1)
-                    .snapshots()
-                    .collect { snapshot ->
-                        val document = snapshot.documents.firstOrNull()
-                        if (document != null) {
-                            try {
-                                val entry = document.data<CheckInEntry>()
-
-                                // Map the Data Enum to the Domain Enum safely
-                                val domainState = when(entry.state.name) {
-                                    "STABLE" -> org.vaulture.project.domain.engine.MentalState.STABLE
-                                    "MILD_STRESS" -> org.vaulture.project.domain.engine.MentalState.MILD_STRESS
-                                    "HIGH_STRESS" -> org.vaulture.project.domain.engine.MentalState.HIGH_STRESS
-                                    "BURNOUT_RISK" -> org.vaulture.project.domain.engine.MentalState.BURNOUT_RISK
-                                    else -> org.vaulture.project.domain.engine.MentalState.STABLE
-                                }
-
-                                val domainResult = CheckInResult(
-                                    score = entry.score,
-                                    state = domainState,
-                                    aiInsight = entry.aiInsight,
-                                    timestamp = entry.timestamp.seconds * 1000
-                                )
-
-                                // Update BOTH flows. This ensures the Dashboard loads.
-                                _latestResult.value = domainResult
-                                _uiState.update { it.copy(result = domainResult) }
-
-                                println("✅ PERSISTENCE: Loaded result from ${entry.timestamp.seconds}")
-
-                            } catch (e: Exception) {
-                                println("❌ MAPPING ERROR: ${e.message}")
-                            }
-                        } else {
-                            _latestResult.value = null
-                            println("📡 DB STATUS: No previous check-ins found.")
-                        }
-                    }
-            } catch (e: Exception) {
-                println("❌ FIREBASE ERROR: ${e.message}")
-            }
-        }
-    }
-*/
 
     private fun observeTodayResult() {
         val uid = auth.currentUser?.uid ?: return
@@ -159,22 +100,22 @@ class CheckInViewModel : ViewModel() {
 
                                     _latestResult.value = domainResult
                                     _uiState.update { it.copy(result = domainResult) }
-                                    println("✅ LOADED TODAY'S CHECK-IN")
+                                    println("LOADED TODAY'S CHECK-IN")
                                 } else {
                                     _latestResult.value = null
                                     _uiState.update { it.copy(result = null) }
-                                    println("ℹ️ Latest entry is from $entryDate (Today is $todayDate). Resetting UI.")
+                                    println("Latest entry is from $entryDate (Today is $todayDate). Resetting UI.")
                                 }
 
                             } catch (e: Exception) {
-                                println("❌ MAPPING ERROR: ${e.message}")
+                                println("MAPPING ERROR: ${e.message}")
                             }
                         } else {
                             _latestResult.value = null
                         }
                     }
             } catch (e: Exception) {
-                println("❌ FIREBASE ERROR: ${e.message}")
+                println(" FIREBASE ERROR: ${e.message}")
             }
         }
     }
@@ -245,15 +186,12 @@ class CheckInViewModel : ViewModel() {
                     .collection("checkIns")
                     .add(newEntry)
 
-                // 6. CRITICAL: Update the UI state so HomeScreen knows to "Proceed"
                 _uiState.update {
                     it.copy(
                         isAnalyzing = false,
-                        result = finalResult // This triggers the AnimatedContent in HomeScreen
+                        result = finalResult
                     )
                 }
-
-                // Optional: Clear the text so it's fresh for tomorrow
                 _uiState.update { it.copy(textResponse = "") }
 
             } catch (e: Exception) {

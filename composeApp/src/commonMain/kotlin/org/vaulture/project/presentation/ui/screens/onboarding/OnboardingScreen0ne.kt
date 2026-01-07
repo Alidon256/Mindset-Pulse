@@ -29,6 +29,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil3.compose.AsyncImage
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.vaulture.project.presentation.theme.AppTheme
@@ -49,9 +50,8 @@ fun OnboardingScreenOne(
                 .fillMaxSize()
                 .padding(innerPadding),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.SpaceBetween // Ensures space between top, middle, and bottom
+            verticalArrangement = Arrangement.SpaceBetween
         ) {
-            // Skip button at top
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -67,12 +67,11 @@ fun OnboardingScreenOne(
                 }
             }
 
-            // Main content
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center,
                 modifier = Modifier
-                    .weight(1f) // Allows this column to take up available space
+                    .weight(1f)
                     .padding(horizontal = 24.dp)
             ) {
                 Text(
@@ -88,14 +87,14 @@ fun OnboardingScreenOne(
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(300.dp)
-                        .clip(RoundedCornerShape(24.dp)) // Add clipping for a modern look
+                        .clip(RoundedCornerShape(24.dp))
                 ) {
-                    Image(
-                        painter = painterResource(Res.drawable.val_1),
+                    AsyncImage(
+                        model = "https://images.pexels.com/photos/15286/pexels-photo.jpg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
                         contentDescription = "Better Mindset",
                         modifier = Modifier
                             .fillMaxSize()
-                            .background(Color(0xFF1B5E20)),
+                            .background(MaterialTheme.colorScheme.primary),
                         contentScale = ContentScale.Crop
                     )
                 }
@@ -103,26 +102,25 @@ fun OnboardingScreenOne(
                 Text(
                     "Whether you’re seeking a quiet place to find your balance or the mental clarity to conquer the city grind, we’ve mapped out the best paths for your mindset.",
                     fontSize = 18.sp,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant, // Use theme color
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     textAlign = TextAlign.Center,
-                    lineHeight = 26.sp // Improve line spacing for body
+                    lineHeight = 26.sp
                 )
             }
 
-            // Navigation buttons at bottom
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 24.dp, vertical = 24.dp), // Consistent padding
+                    .padding(horizontal = 24.dp, vertical = 24.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                // Improved Page indicator with fixed widths
+
                 Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                     Box(
                         modifier = Modifier
                             .height(8.dp)
-                            .width(32.dp) // Active indicator is wider
+                            .width(32.dp)
                             .background(Color(0xFF2E7D32), RoundedCornerShape(4.dp))
                     )
                     Box(
@@ -163,7 +161,7 @@ fun OnboardingScreenOne(
 @Composable
 @Preview
 fun OnboardingScreenPreview() {
-    _root_ide_package_.org.vaulture.project.presentation.theme.AppTheme(useDarkTheme = false) {
-        _root_ide_package_.org.vaulture.project.presentation.ui.screens.onboarding.OnboardingScreenOne()
+    AppTheme(useDarkTheme = false) {
+        OnboardingScreenOne()
     }
 }

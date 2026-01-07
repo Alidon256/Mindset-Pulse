@@ -31,7 +31,7 @@ fun RhythmPlayerScreen(trackId: String?, viewModel: RhythmViewModel, onBack: () 
     val track = state.currentTrack
 
     Box(modifier = Modifier.fillMaxSize().background(Color.Black)) {
-        // 1. Immersive Background (Blurred Art)
+
         AsyncImage(
             model = track?.thumbnailUrl,
             contentDescription = null,
@@ -40,7 +40,6 @@ fun RhythmPlayerScreen(trackId: String?, viewModel: RhythmViewModel, onBack: () 
             alpha = 0.5f
         )
 
-        // 2. Gradient Overlay for readability
         Box(modifier = Modifier.fillMaxSize().background(
             Brush.verticalGradient(listOf(Color.Transparent, Color.Black))
         ))
@@ -49,7 +48,6 @@ fun RhythmPlayerScreen(trackId: String?, viewModel: RhythmViewModel, onBack: () 
             modifier = Modifier.fillMaxSize().padding(24.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // Header
             Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                 IconButton(onClick = onBack) {
                     Icon(Icons.AutoMirrored.Filled.ArrowBack, null, tint = Color.White)
@@ -59,7 +57,7 @@ fun RhythmPlayerScreen(trackId: String?, viewModel: RhythmViewModel, onBack: () 
 
             Spacer(Modifier.weight(1f))
 
-            // Main Artwork
+
             ElevatedCard(
                 modifier = Modifier.size(300.dp),
                 shape = MaterialTheme.shapes.large,
@@ -81,7 +79,6 @@ fun RhythmPlayerScreen(trackId: String?, viewModel: RhythmViewModel, onBack: () 
 
             Spacer(Modifier.height(32.dp))
 
-            // Progress Slider
             Slider(
                 value = state.progress.toFloat(),
                 onValueChange = { viewModel.seekTo(it.toLong()) },
@@ -90,18 +87,17 @@ fun RhythmPlayerScreen(trackId: String?, viewModel: RhythmViewModel, onBack: () 
             )
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                 Text(
-                    _root_ide_package_.org.vaulture.project.presentation.ui.screens.home.formatMillis(
+                    formatMillis(
                         state.progress
                     ), color = Color.White, style = MaterialTheme.typography.labelSmall)
                 Text(
-                    _root_ide_package_.org.vaulture.project.presentation.ui.screens.home.formatMillis(
+                    formatMillis(
                         state.duration
                     ), color = Color.White, style = MaterialTheme.typography.labelSmall)
             }
 
             Spacer(Modifier.height(32.dp))
 
-            // Controls
             Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(24.dp)) {
                 IconButton(onClick = {}) { Icon(Icons.Default.SkipPrevious, null, tint = Color.White, modifier = Modifier.size(32.dp)) }
 

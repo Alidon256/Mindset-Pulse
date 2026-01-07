@@ -31,8 +31,8 @@ import org.vaulture.project.presentation.ui.screens.space.SpaceFilter
 
 @Composable
 fun FilterTabBar(
-    selectedFilter: org.vaulture.project.presentation.ui.screens.space.SpaceFilter,
-    onFilterSelected: (org.vaulture.project.presentation.ui.screens.space.SpaceFilter) -> Unit
+    selectedFilter: SpaceFilter,
+    onFilterSelected: (SpaceFilter) -> Unit
 ) {
     Box(
         modifier = Modifier
@@ -55,7 +55,7 @@ fun FilterTabBar(
             verticalAlignment = Alignment.CenterVertically
         ) {
             // Spaces Tab
-            val isSpaces = selectedFilter == _root_ide_package_.org.vaulture.project.presentation.ui.screens.space.SpaceFilter.Spaces
+            val isSpaces = selectedFilter == SpaceFilter.Spaces
             val spacesBg = if (isSpaces) MaterialTheme.colorScheme.primaryContainer else Color.Transparent
             val spacesContent = if (isSpaces) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
 
@@ -64,12 +64,17 @@ fun FilterTabBar(
                     .weight(1f)
                     .clip(RoundedCornerShape(20.dp))
                     .background(spacesBg)
-                    .clickable { onFilterSelected(_root_ide_package_.org.vaulture.project.presentation.ui.screens.space.SpaceFilter.Spaces) }
+                    .clickable { onFilterSelected(SpaceFilter.Spaces) }
                     .padding(vertical = 10.dp, horizontal = 12.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Center
             ) {
-                Icon(Icons.Outlined.People, contentDescription = null, tint = spacesContent, modifier = Modifier.size(20.dp))
+                Icon(
+                    Icons.Outlined.People,
+                    contentDescription = null,
+                    tint = spacesContent,
+                    modifier = Modifier.size(20.dp)
+                )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
                     text = "Spaces",
@@ -83,7 +88,7 @@ fun FilterTabBar(
             }
 
             // Memories Tab
-            val isMemories = selectedFilter == _root_ide_package_.org.vaulture.project.presentation.ui.screens.space.SpaceFilter.Memories
+            val isMemories = selectedFilter == SpaceFilter.Memories
             val memoriesBg = if (isMemories) MaterialTheme.colorScheme.primaryContainer else Color.Transparent
             val memoriesContent = if (isMemories) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
 
@@ -92,12 +97,17 @@ fun FilterTabBar(
                     .weight(1f)
                     .clip(RoundedCornerShape(20.dp))
                     .background(memoriesBg)
-                    .clickable { onFilterSelected(_root_ide_package_.org.vaulture.project.presentation.ui.screens.space.SpaceFilter.Memories) }
+                    .clickable { onFilterSelected(SpaceFilter.Memories) }
                     .padding(vertical = 10.dp, horizontal = 12.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Center
             ) {
-                Icon(Icons.Outlined.Stream, contentDescription = null, tint = memoriesContent, modifier = Modifier.size(20.dp))
+                Icon(
+                    Icons.Outlined.Stream,
+                    contentDescription = null,
+                    tint = memoriesContent,
+                    modifier = Modifier.size(20.dp)
+                )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
                     text = "Memories",

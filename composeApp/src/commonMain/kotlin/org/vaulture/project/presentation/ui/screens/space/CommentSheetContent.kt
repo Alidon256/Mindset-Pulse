@@ -46,13 +46,13 @@ fun CommentSheetContent(
     storyId: String,
     viewModel: SpaceViewModel,
     onClose: () -> Unit
-) {var commentText by remember { mutableStateOf("") }
-    // Observe comments sub-collection from ViewModel
+) {
+    var commentText by remember { mutableStateOf("") }
     val comments by viewModel.getCommentsForStory(storyId).collectAsState(emptyList())
 
     Column(
         modifier = Modifier
-            .fillMaxHeight(0.8f) // Modern sheets take up ~80% of screen
+            .fillMaxHeight(0.8f)
             .padding(horizontal = 16.dp)
     ) {
         Text(
@@ -62,7 +62,6 @@ fun CommentSheetContent(
             modifier = Modifier.padding(bottom = 16.dp)
         )
 
-        // 1. Comments List
         Box(modifier = Modifier.weight(1f)) {
             if (comments.isEmpty()) {
                 Text(
@@ -73,7 +72,7 @@ fun CommentSheetContent(
             } else {
                 LazyColumn(verticalArrangement = Arrangement.spacedBy(16.dp)) {
                     items(comments) { comment ->
-                        _root_ide_package_.org.vaulture.project.presentation.ui.screens.space.CommentItem(
+                        CommentItem(
                             comment
                         )
                     }
@@ -81,7 +80,6 @@ fun CommentSheetContent(
             }
         }
 
-        // 2. Input Area (Modern & Elevated)
         Surface(
             tonalElevation = 2.dp,
             modifier = Modifier.padding(vertical = 16.dp),
@@ -135,7 +133,7 @@ fun CommentItem(comment: Story.Comment) {
             Text(comment.userName, style = MaterialTheme.typography.labelLarge, fontWeight = FontWeight.Bold)
             Text(comment.text, style = MaterialTheme.typography.bodyMedium)
             Text(
-                "Just now", // Replace with TimeUtils.formatTimestamp
+                "Just now",
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )

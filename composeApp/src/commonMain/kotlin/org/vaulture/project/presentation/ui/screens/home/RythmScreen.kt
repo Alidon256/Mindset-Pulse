@@ -25,18 +25,18 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import org.vaulture.project.data.repos.SearchContext
 import org.vaulture.project.data.repos.SearchableItem
+import org.vaulture.project.presentation.ui.components.SearchBar
 import org.vaulture.project.presentation.viewmodels.RhythmViewModel
 import kotlin.math.roundToInt
 import kotlin.text.contains
 import kotlin.text.lowercase
 
-// Categories for classification
 data class RhythmCategory(val name: String, val tags: List<String>)
 
 @Composable
 fun RhythmHomeScreen(
     navController: NavHostController,
-    viewModel: RhythmViewModel, // Injected from AppNavigation
+    viewModel: RhythmViewModel,
     modifier: Modifier = Modifier,
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -45,7 +45,6 @@ fun RhythmHomeScreen(
     var isSearchExpanded by remember { mutableStateOf(false) }
     val recentSearches = remember { mutableStateListOf<String>() }
 
-    // Multiplatform alternative to LocalConfiguration
     BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
         val screenWidth = maxWidth
         val isTablet = screenWidth >= 600.dp
@@ -64,7 +63,7 @@ fun RhythmHomeScreen(
                     )
                 )
         ) {
-            // Header: Search & Navigation
+
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -82,7 +81,7 @@ fun RhythmHomeScreen(
                     }
                 }
 
-                _root_ide_package_.org.vaulture.project.presentation.ui.components.SearchBar(
+                SearchBar(
                     query = uiState.searchQuery,
                     onQueryChange = { newQuery ->
                         viewModel.updateSearchQuery(newQuery, SearchContext.RHYTHM)
@@ -108,7 +107,7 @@ fun RhythmHomeScreen(
                 )
             }
 
-            _root_ide_package_.org.vaulture.project.presentation.ui.screens.home.RhythmHomeContent(
+            RhythmHomeContent(
                 searchQuery = uiState.searchQuery,
                 navController = navController,
                 viewModel = viewModel,
