@@ -18,6 +18,8 @@ import androidx.compose.ui.unit.sp
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.vaulture.project.presentation.theme.AppTheme
+import org.vaulture.project.presentation.theme.AppThemeMode
+import org.vaulture.project.presentation.theme.ThemePalette
 import vaulture.composeapp.generated.resources.*
 
 @Composable
@@ -143,7 +145,12 @@ fun OnboardingScreenTwo(
 @Composable
 @Preview
 fun OnboardingScreenTwoPreview() {
-    AppTheme(useDarkTheme = false) {
-        OnboardingScreenTwo()
-    }
+    AppTheme(
+        useDarkTheme = true,
+        themeMode = AppThemeMode.DARK,
+        themePalette = ThemePalette.NATURE,
+        content = {
+            OnboardingScreenTwo()
+        }
+    )
 }

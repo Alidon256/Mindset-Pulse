@@ -1,6 +1,5 @@
 package org.vaulture.project.presentation.ui.screens.onboarding
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -30,11 +29,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
-import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.vaulture.project.presentation.theme.AppTheme
-import vaulture.composeapp.generated.resources.Res
-import vaulture.composeapp.generated.resources.val_1
 
 @Composable
 fun OnboardingScreenOne(
@@ -155,13 +151,5 @@ fun OnboardingScreenOne(
                 }
             }
         }
-    }
-}
-
-@Composable
-@Preview
-fun OnboardingScreenPreview() {
-    AppTheme(useDarkTheme = false) {
-        OnboardingScreenOne()
     }
 }

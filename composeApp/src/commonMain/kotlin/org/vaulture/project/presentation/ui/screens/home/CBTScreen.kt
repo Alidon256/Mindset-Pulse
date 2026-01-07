@@ -85,7 +85,7 @@ import kotlin.time.Clock
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CheckInScreen(
+fun CBTScreen(
     navController: NavController,
     viewModel: CBTViewModel
 ) {
@@ -110,183 +110,208 @@ fun CheckInScreen(
                 duration = SnackbarDuration.Short
             )
             viewModel.resetSubmissionStatus()
-            // Optionally navigate back or to a different screen
             // navController.popBackStack()
         }
     }
 
-    Scaffold(
+    BoxWithConstraints(
         modifier = Modifier.fillMaxSize(),
-        topBar = {
-            TopAppBar(
-                title = { Text("Daily Check-In", style = PoppinsTypography().headlineMedium) }, // Adjusted style
-                navigationIcon = {
-                    IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
-                    }
-                },
-                actions = {
-                    IconButton(onClick = { navController.navigate(Routes.ANALYTICS) }) {
-                        Icon(
-                            Icons.Filled.BarChart,
-                            contentDescription = "Analytics",
-                            tint = MaterialTheme.colorScheme.primary
-                        )
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.background
-                )
-            )
-        },
-        snackbarHost = { SnackbarHost(snackbarHostState) },
-        floatingActionButton = {
-            ExtendedFloatingActionButton(
-                onClick = { viewModel.submitCheckIn() },
-                icon = { Icon(Icons.Filled.Done, "Submit Check-in") },
-                text = { Text("Submit", style = PoppinsTypography().labelLarge) }, // Applied Poppins
-                expanded = !uiState.isLoading,
-                containerColor = MaterialTheme.colorScheme.primary,
-                contentColor = MaterialTheme.colorScheme.onPrimary
-            )
-        },
-        floatingActionButtonPosition = FabPosition.Center
-    ) { paddingValues ->
-        Column(
+        contentAlignment = Alignment.Center
+    ) {
+        val containerWidth = if (maxWidth > 800.dp) 800.dp else maxWidth
+        Box(
             modifier = Modifier
+                .width(containerWidth)
                 .fillMaxSize()
-                .padding(paddingValues)
-                .padding(horizontal = 16.dp)
-                .verticalScroll(scrollState)
-        ) {
-            if (uiState.isLoading) {
-                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    CircularProgressIndicator()
-                }
-            } else {
-               SectionTitle("How are you feeling overall?")
-                OverallMoodSelector(
-                    selectedMood = uiState.overallMood,
-                    onMoodSelected = viewModel::onOverallMoodChange
-                )
-                Spacer(modifier = Modifier.height(8.dp))
-                IntensitySlider(
-                    label = "Overall Mood Intensity",
-                    intensity = uiState.moodIntensity,
-                    onIntensityChange = viewModel::onMoodIntensityChange
-                )
-
-               SectionTitle("Any specific emotions?")
-                MultiSelectChipGroup(
-                    title = "Select Primary Emotions",
-                    items = commonEmotions,
-                    selectedItems = viewModel.selectedPrimaryEmotions.map { it.emotion },
-                    onItemSelected = { emotion ->
-                        viewModel.togglePrimaryEmotion(emotion)
-                    },
-                    itemToString = { it }
-                )
-                viewModel.selectedPrimaryEmotions.forEach { emotionRating ->
-                    IntensitySlider(
-                        label = "Intensity for ${emotionRating.emotion}",
-                        intensity = emotionRating.intensity,
-                        onIntensityChange = { newIntensity ->
-                            viewModel.updatePrimaryEmotionIntensity(
-                                emotionRating.emotion,
-                                newIntensity
-                            )
-                        },
-                        modifier = Modifier.padding(start = 16.dp, top = 4.dp)
-                    )
-                }
-
-                SectionTitle("Your Reflections")
-               StyledTextField(
-                    value = uiState.generalThoughts,
-                    onValueChange = viewModel::onGeneralThoughtsChange,
-                    label = "General thoughts or notes for today...",
-                    minLines = 3
-                )
-                StyledTextField(
-                    value = uiState.positiveHighlights,
-                    onValueChange = viewModel::onPositiveHighlightsChange,
-                    label = "What went well today? (Positive Highlights)",
-                    minLines = 2
-                )
-               StyledTextField(
-                    value = uiState.challengesFaced,
-                    onValueChange = viewModel::onChallengesFacedChange,
-                    label = "What was challenging today?",
-                    minLines = 2
-                )
-
-               SectionTitle("Activities Log")
-                ActivityInputSection(
-                    title = "Significant Activities",
-                    activities = viewModel.selectedSignificantActivities,
-                    onAddActivity = viewModel::addSignificantActivity,
-                    onRemoveActivity = viewModel::removeSignificantActivity
-                )
-                ActivityInputSection(
-                    title = "Self-Care Activities",
-                    activities = viewModel.selectedSelfCareActivities,
-                    onAddActivity = viewModel::addSelfCareActivity,
-                    onRemoveActivity = viewModel::removeSelfCareActivity
-                )
-
-                SectionTitle("Cognitive Behavioral Therapy (CBT) Exercise")
-                CbtExerciseTypeSelector(
-                    selectedType = uiState.cbtExerciseType,
-                    onTypeSelected = viewModel::onCbtExerciseTypeChange
-                )
-
-                AnimatedVisibility(visible = uiState.cbtExerciseType != CbtExerciseType.NONE) {
-                    Column(modifier = Modifier.padding(top = 8.dp)) {
-                        when (uiState.cbtExerciseType) {
-                            CbtExerciseType.THOUGHT_RECORD -> {
-                               ThoughtRecordForm(
-                                    viewModel = viewModel,
-                                    uiState = uiState
-                                )
-                            }
-                            CbtExerciseType.GRATITUDE_JOURNALING,
-                            CbtExerciseType.BEHAVIORAL_ACTIVATION,
-                            CbtExerciseType.PROBLEM_SOLVING,
-                            CbtExerciseType.MINDFULNESS_REFLECTION -> {
-                                val prompt = when (uiState.cbtExerciseType) {
-                                    CbtExerciseType.GRATITUDE_JOURNALING -> "What are three things you are grateful for today and why?"
-                                    CbtExerciseType.BEHAVIORAL_ACTIVATION -> "Describe a positive or valued activity you engaged in or plan to."
-                                    CbtExerciseType.PROBLEM_SOLVING -> "Outline a problem and how you approached or might approach solving it."
-                                    CbtExerciseType.MINDFULNESS_REFLECTION -> "Reflect on your mindfulness practice or a mindful moment today."
-                                    else -> "Your reflections on this exercise:"
-                                }
-                                Text(
-                                    prompt,
-                                    style = PoppinsTypography().bodyMedium,
-                                    modifier = Modifier.padding(vertical = 8.dp)
-                                )
-                                StyledTextField(
-                                    value = uiState.cbtReflectionResponse,
-                                    onValueChange = viewModel::onCbtReflectionResponseChange,
-                                    label = "Your reflections...",
-                                    minLines = 3
-                                )
-                            }
-                            CbtExerciseType.NONE -> { /* Handled by AnimatedVisibility */ }
+                .padding(24.dp)
+        ){
+        Scaffold(
+            modifier = Modifier.fillMaxSize(),
+            topBar = {
+                TopAppBar(
+                    title = {
+                        Text(
+                            "Daily CBT",
+                            style = PoppinsTypography().headlineMedium
+                        )
+                    }, // Adjusted style
+                    navigationIcon = {
+                        IconButton(onClick = { navController.popBackStack() }) {
+                            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
                         }
-                        // "Learned from CBT" field (visible if any exercise is selected)
-                        StyledTextField(
-                            value = uiState.learnedFromCbt,
-                            onValueChange = viewModel::onLearnedFromCbtChange,
-                            label = "Key takeaway or what I learned from this exercise",
-                            minLines = 2,
-                            modifier = Modifier.padding(top = 16.dp)
+                    },
+                    actions = {
+                        IconButton(onClick = { navController.navigate(Routes.ANALYTICS) }) {
+                            Icon(
+                                Icons.Filled.BarChart,
+                                contentDescription = "Analytics",
+                                tint = MaterialTheme.colorScheme.primary
+                            )
+                        }
+                    },
+                    colors = TopAppBarDefaults.topAppBarColors(
+                        containerColor = MaterialTheme.colorScheme.background
+                    )
+                )
+            },
+            snackbarHost = { SnackbarHost(snackbarHostState) },
+            floatingActionButton = {
+                ExtendedFloatingActionButton(
+                    onClick = { viewModel.submitCheckIn() },
+                    icon = { Icon(Icons.Filled.Done, "Submit Check-in") },
+                    text = {
+                        Text(
+                            "Submit",
+                            style = PoppinsTypography().labelLarge
+                        )
+                    }, // Applied Poppins
+                    expanded = !uiState.isLoading,
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = MaterialTheme.colorScheme.onPrimary
+                )
+            },
+            floatingActionButtonPosition = FabPosition.Center
+        ) { paddingValues ->
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues)
+                    .padding(horizontal = 16.dp)
+                    .verticalScroll(scrollState)
+            ) {
+                if (uiState.isLoading) {
+                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        CircularProgressIndicator()
+                    }
+                } else {
+                    SectionTitle("How are you feeling overall?")
+                    OverallMoodSelector(
+                        selectedMood = uiState.overallMood,
+                        onMoodSelected = viewModel::onOverallMoodChange
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    IntensitySlider(
+                        label = "Overall Mood Intensity",
+                        intensity = uiState.moodIntensity,
+                        onIntensityChange = viewModel::onMoodIntensityChange
+                    )
+
+                    SectionTitle("Any specific emotions?")
+                    MultiSelectChipGroup(
+                        title = "Select Primary Emotions",
+                        items = commonEmotions,
+                        selectedItems = viewModel.selectedPrimaryEmotions.map { it.emotion },
+                        onItemSelected = { emotion ->
+                            viewModel.togglePrimaryEmotion(emotion)
+                        },
+                        itemToString = { it }
+                    )
+                    viewModel.selectedPrimaryEmotions.forEach { emotionRating ->
+                        IntensitySlider(
+                            label = "Intensity for ${emotionRating.emotion}",
+                            intensity = emotionRating.intensity,
+                            onIntensityChange = { newIntensity ->
+                                viewModel.updatePrimaryEmotionIntensity(
+                                    emotionRating.emotion,
+                                    newIntensity
+                                )
+                            },
+                            modifier = Modifier.padding(start = 16.dp, top = 4.dp)
                         )
                     }
+
+                    SectionTitle("Your Reflections")
+                    StyledTextField(
+                        value = uiState.generalThoughts,
+                        onValueChange = viewModel::onGeneralThoughtsChange,
+                        label = "General thoughts or notes for today...",
+                        minLines = 3
+                    )
+                    StyledTextField(
+                        value = uiState.positiveHighlights,
+                        onValueChange = viewModel::onPositiveHighlightsChange,
+                        label = "What went well today? (Positive Highlights)",
+                        minLines = 2
+                    )
+                    StyledTextField(
+                        value = uiState.challengesFaced,
+                        onValueChange = viewModel::onChallengesFacedChange,
+                        label = "What was challenging today?",
+                        minLines = 2
+                    )
+
+                    SectionTitle("Activities Log")
+                    ActivityInputSection(
+                        title = "Significant Activities",
+                        activities = viewModel.selectedSignificantActivities,
+                        onAddActivity = viewModel::addSignificantActivity,
+                        onRemoveActivity = viewModel::removeSignificantActivity
+                    )
+                    ActivityInputSection(
+                        title = "Self-Care Activities",
+                        activities = viewModel.selectedSelfCareActivities,
+                        onAddActivity = viewModel::addSelfCareActivity,
+                        onRemoveActivity = viewModel::removeSelfCareActivity
+                    )
+
+                    SectionTitle("Cognitive Behavioral Therapy (CBT) Exercise")
+                    CbtExerciseTypeSelector(
+                        selectedType = uiState.cbtExerciseType,
+                        onTypeSelected = viewModel::onCbtExerciseTypeChange
+                    )
+
+                    AnimatedVisibility(visible = uiState.cbtExerciseType != CbtExerciseType.NONE) {
+                        Column(modifier = Modifier.padding(top = 8.dp)) {
+                            when (uiState.cbtExerciseType) {
+                                CbtExerciseType.THOUGHT_RECORD -> {
+                                    ThoughtRecordForm(
+                                        viewModel = viewModel,
+                                        uiState = uiState
+                                    )
+                                }
+
+                                CbtExerciseType.GRATITUDE_JOURNALING,
+                                CbtExerciseType.BEHAVIORAL_ACTIVATION,
+                                CbtExerciseType.PROBLEM_SOLVING,
+                                CbtExerciseType.MINDFULNESS_REFLECTION -> {
+                                    val prompt = when (uiState.cbtExerciseType) {
+                                        CbtExerciseType.GRATITUDE_JOURNALING -> "What are three things you are grateful for today and why?"
+                                        CbtExerciseType.BEHAVIORAL_ACTIVATION -> "Describe a positive or valued activity you engaged in or plan to."
+                                        CbtExerciseType.PROBLEM_SOLVING -> "Outline a problem and how you approached or might approach solving it."
+                                        CbtExerciseType.MINDFULNESS_REFLECTION -> "Reflect on your mindfulness practice or a mindful moment today."
+                                        else -> "Your reflections on this exercise:"
+                                    }
+                                    Text(
+                                        prompt,
+                                        style = PoppinsTypography().bodyMedium,
+                                        modifier = Modifier.padding(vertical = 8.dp)
+                                    )
+                                    StyledTextField(
+                                        value = uiState.cbtReflectionResponse,
+                                        onValueChange = viewModel::onCbtReflectionResponseChange,
+                                        label = "Your reflections...",
+                                        minLines = 3
+                                    )
+                                }
+
+                                CbtExerciseType.NONE -> { /* Handled by AnimatedVisibility */
+                                }
+                            }
+                            // "Learned from CBT" field (visible if any exercise is selected)
+                            StyledTextField(
+                                value = uiState.learnedFromCbt,
+                                onValueChange = viewModel::onLearnedFromCbtChange,
+                                label = "Key takeaway or what I learned from this exercise",
+                                minLines = 2,
+                                modifier = Modifier.padding(top = 16.dp)
+                            )
+                        }
+                    }
+                    Spacer(modifier = Modifier.height(120.dp))
                 }
-                Spacer(modifier = Modifier.height(120.dp))
             }
         }
+            }
     }
 }
 

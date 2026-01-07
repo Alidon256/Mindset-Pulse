@@ -15,6 +15,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.vaulture.project.presentation.theme.AppTheme
+import org.vaulture.project.presentation.theme.AppThemeMode
+import org.vaulture.project.presentation.theme.ThemePalette
 
 
 @Composable
@@ -89,7 +91,12 @@ fun ErrorScreen(
 @Composable
 @Preview
 fun ErrorScreenPreview() {
-    AppTheme {
-        ErrorScreen({}, {})
-    }
+    AppTheme(
+        content = {
+            ErrorScreen({}, {})
+        },
+        themeMode = AppThemeMode.DARK,
+        themePalette = ThemePalette.NATURE,
+        useDarkTheme = true,
+    )
 }

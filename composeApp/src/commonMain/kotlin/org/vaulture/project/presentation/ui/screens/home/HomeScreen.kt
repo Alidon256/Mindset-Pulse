@@ -514,8 +514,8 @@ fun DashboardMobileLayout(
                 title = "Weekly Stress Trend",
                 icon = Icons.Default.Timeline
             )
-            Spacer(Modifier.height(12.dp))
-            StressTrendChart()
+            //Spacer(Modifier.height(12.dp))
+            //StressTrendChart()
         }
     }
 }
@@ -653,36 +653,10 @@ fun DashboardWebLayout(
                     }
                 }
             }
-            item {
-                Card(
-                    onClick = { selectedRailItem = "Insights" },
-                    colors = CardDefaults.cardColors(
-                        containerColor = if (selectedRailItem == "Insights") MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surface
-                    ),
-                    shape = RoundedCornerShape(16.dp),
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Row(
-                        modifier = Modifier.padding(16.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Icon(
-                            Icons.Default.Analytics,
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.primary
-                        )
-                        Spacer(Modifier.width(12.dp))
-                        Text(
-                            "Insights",
-                            style = MaterialTheme.typography.bodyLarge,
-                            color = MaterialTheme.colorScheme.onSurface
-                        )
-                    }
-                }
-            }
+
             item{
                 Card(
-                    onClick = { selectedRailItem = "Settings" },
+                    onClick = { navController.navigate(Routes.SETTINGS) },
                     colors = CardDefaults.cardColors(
                         containerColor = if (selectedRailItem == "Settings")
                             MaterialTheme.colorScheme.primaryContainer

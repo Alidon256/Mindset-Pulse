@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import org.vaulture.project.domain.engine.MentalState
 import org.vaulture.project.domain.model.CbtExerciseType
 import org.vaulture.project.domain.model.CheckInEntry
 import org.vaulture.project.domain.model.EmotionRating
@@ -174,11 +175,27 @@ class CBTViewModel : ViewModel() {
             } else {
                 null
             }
+            val calculatedScore = ((10 - currentState.moodIntensity) * 10).coerceIn(0, 100)
+
+            val calculatedState = when {
+                calculatedScore < 30 -> MentalState.STABLE
+                calculatedScore < 60 -> MentalState.MILD_STRESS
+                calculatedScore < 80 -> MentalState.HIGH_STRESS
+                else -> MentalState.BURNOUT_RISK
+            }
+
+            // Map the Domain enum to the Data enum used in CheckInEntry if they differ,
+            // or ensure CheckInEntry uses the same enum. Assuming they are compatible:
+            val finalState = org.vaulture.project.domain.model.MentalState.valueOf(calculatedState.name)
+
 
             val newEntry = CheckInEntry(
                 id = "",
                 userId = currentUserId,
                 timestamp = Timestamp.now(),
+                score = calculatedScore,
+                state = finalState,
+                aiInsight = "Self-guided ${currentState.cbtExerciseType.name} session.",
                 overallMood = currentState.overallMood,
                 moodIntensity = currentState.moodIntensity,
                 primaryEmotions = selectedPrimaryEmotions.toList(),

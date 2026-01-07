@@ -18,6 +18,8 @@ import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
 import org.jetbrains.compose.resources.painterResource
 import org.vaulture.project.presentation.theme.AppTheme
+import org.vaulture.project.presentation.theme.AppThemeMode
+import org.vaulture.project.presentation.theme.ThemePalette
 import vaulture.composeapp.generated.resources.Res
 import vaulture.composeapp.generated.resources.mindset_pulse_nobg_logo
 
@@ -33,21 +35,26 @@ fun SplashScreen(onTimeout: () -> Unit) {
         delay(1200L)
         onTimeout()
     }
-    AppTheme {
-        Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
-            Box(
-                contentAlignment = Alignment.Center,
-                modifier = Modifier.fillMaxSize()
-            ) {
+    AppTheme(
+        content = {
+            Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
+                Box(
+                    contentAlignment = Alignment.Center,
+                    modifier = Modifier.fillMaxSize()
+                ) {
 
-                Icon(
-                    painter = painterResource(Res.drawable.mindset_pulse_nobg_logo),
-                    contentDescription = "Mindset Pulse Logo",
-                    modifier = Modifier
-                        .size(200.dp)
-                        .scale(scale.value)
-                )
+                    Icon(
+                        painter = painterResource(Res.drawable.mindset_pulse_nobg_logo),
+                        contentDescription = "Mindset Pulse Logo",
+                        modifier = Modifier
+                            .size(200.dp)
+                            .scale(scale.value)
+                    )
+                }
             }
-        }
-    }
+        },
+        useDarkTheme = true,
+        themeMode = AppThemeMode.DARK,
+        themePalette = ThemePalette.NATURE
+    )
 }

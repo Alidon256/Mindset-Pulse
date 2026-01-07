@@ -19,15 +19,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
-
-data class PulseStory(
-    val id: String,
-    val title: String,
-    val imageUrl: String,
-    val category: String,
-    val isLarge: Boolean = false,
-    val span: Int = 1
-)
+import org.vaulture.project.domain.model.PulseStory
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

@@ -58,7 +58,7 @@ class AnalyticsViewModel : ViewModel() {
             try {
                 if (allCheckIns.isEmpty() || forceRefreshGemini) {
                     val querySnapshot = firestore.collection("users").document(user.uid)
-                        .collection("checkIns")
+                        .collection("cbts")
                         .orderBy("timestamp", Direction.DESCENDING)
                         .limit(30)
                         .get()
@@ -87,38 +87,22 @@ class AnalyticsViewModel : ViewModel() {
 
     private suspend fun fetchGeminiReport() {
         _uiState.update { it.copy(isLoadingGemini = true) }
-
-        // Convert Firestore Entities to Domain Models for Gemini
-        val domainResults = allCheckIns.map { entry ->
-            val domainState = MentalState.values()
-                .firstOrNull { it.name == entry.state.name }
-                ?: MentalState.values().first()
-
-            CheckInResult(
-                score = entry.score,
-                state = domainState,
-                aiInsight = entry.aiInsight,
-                timestamp = entry.timestamp.seconds * 1000L
-            )
-        }
-
-        // Call the Service
-        val report = geminiService.generateAnalyticsReport(domainResults)
-
+        val report = geminiService.generateAnalyticsReport(allCheckIns)
         _uiState.update { it.copy(isLoadingGemini = false, geminiInsights = report) }
     }
+
 
     private fun processCheckInsForAnalytics(checkIns: List<CheckInEntry>): AnalyticsSummary {
         val total = checkIns.size
 
-        // 1. Mood Distribution
+        // Mood Distribution
         val moodCounts = checkIns.groupBy { it.overallMood }
             .map { (mood, list) ->
                 MoodTrendData(mood, list.size, list.map { it.moodIntensity }.average().toFloat())
             }
             .sortedByDescending { it.count }
 
-        // 2. Top Emotions
+        // Top Emotions
         val emotionFreq = checkIns.flatMap { it.primaryEmotions }
             .groupBy { it.emotion }
             .map { (emo, list) ->
@@ -127,7 +111,7 @@ class AnalyticsViewModel : ViewModel() {
             .sortedByDescending { it.count }
             .take(5)
 
-        // 3. CBT Usage
+        // CBT Usage
         val cbtUsage = checkIns.groupBy { it.cbtExerciseType }
             .map { (typeKey, list) -> CbtUsageData(typeKey, list.size) }
             .filter { data -> data.exerciseType != CbtExerciseType.NONE }

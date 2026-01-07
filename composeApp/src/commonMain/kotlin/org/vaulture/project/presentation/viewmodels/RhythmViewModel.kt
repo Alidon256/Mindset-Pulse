@@ -69,6 +69,29 @@ class RhythmViewModel(
         }
     }
 
+    fun playNext() {
+        val current = _uiState.value.currentTrack ?: return
+        val list = _uiState.value.tracks
+        val index = list.indexOf(current)
+        if (index != -1 && index < list.lastIndex) {
+            playTrack(list[index + 1])
+        }
+    }
+
+    fun playPrevious() {
+        val current = _uiState.value.currentTrack ?: return
+        val list = _uiState.value.tracks
+        val index = list.indexOf(current)
+        if (index > 0) {
+            playTrack(list[index - 1])
+        }
+    }
+
+    fun closePlayer() {
+        audioPlayer.stop()
+        _uiState.update { it.copy(currentTrack = null, isPlaying = false, progress = 0) }
+    }
+
     fun loadTrackById(trackId: String) {
         val existingTrack = _uiState.value.tracks.find { it.id == trackId }
         if (existingTrack != null) {

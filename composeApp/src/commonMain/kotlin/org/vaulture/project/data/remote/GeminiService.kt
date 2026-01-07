@@ -1,5 +1,6 @@
 package org.vaulture.project.data.remote
 
+import dev.gitlive.firebase.firestore.Timestamp
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
@@ -8,12 +9,14 @@ import io.ktor.client.request.setBody
 import io.ktor.http.ContentType
 import io.ktor.http.contentType
 import io.ktor.serialization.kotlinx.json.json
+import kotlinx.coroutines.delay
 import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
-import org.vaulture.project.domain.engine.CheckInResult
+import org.vaulture.project.domain.model.CbtExerciseType
+import org.vaulture.project.domain.model.CheckInEntry
 
 @Serializable
 data class GeminiResponse(
@@ -62,6 +65,25 @@ class GeminiService {
     private val apiKey = "AIzaSyD7EIi4wCBL_JLWgi8RZ6qO5E8dT7hvxqQ"
     private val url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=$apiKey"
 
+    private suspend fun <T> retryWithBackoff(
+        times: Int = 3,
+        initialDelay: Long = 1000, // 1 second start
+        maxDelay: Long = 5000,
+        factor: Double = 2.0,
+        block: suspend () -> T
+    ): T {
+        var currentDelay = initialDelay
+        repeat(times - 1) { attempt ->
+            try {
+                return block()
+            } catch (e: Exception) {
+                println("GeminiService: Attempt ${attempt + 1} failed: ${e.message}. Retrying in ${currentDelay}ms...")
+                delay(currentDelay)
+                currentDelay = (currentDelay * factor).toLong().coerceAtMost(maxDelay)
+            }
+        }
+        return block()
+    }
     suspend fun generateDailyQuestions(): List<String> {
         val promptText = """
             Generate 5 short, empathetic mental health check-in questions for a professional young adult.
@@ -73,19 +95,32 @@ class GeminiService {
 
         val requestBody = GeminiRequest(listOf(Content(listOf(Part(promptText)))))
 
-        try {
-            val response: GeminiResponse = client.post(url) {
-                contentType(ContentType.Application.Json)
-                setBody(requestBody)
-            }.body()
+        return try {
+            retryWithBackoff {
+                println("🚀 GeminiService: Requesting questions...")
 
-            val rawText = response.candidates?.firstOrNull()?.content?.parts?.firstOrNull()?.text ?: ""
-            val questions = rawText.replace("\n", "").split("|").map { it.trim() }
+                val response: GeminiResponse = client.post(url) {
+                    contentType(ContentType.Application.Json)
+                    setBody(requestBody)
+                }.body()
 
-            return if (questions.size >= 3) questions.take(5) else getDefaultQuestions()
+                if (response.error != null) {
+                    throw Exception("API Error: ${response.error.message}")
+                }
+
+                val rawText = response.candidates?.firstOrNull()?.content?.parts?.firstOrNull()?.text
+                    ?: throw Exception("Empty response candidates")
+                val questions = rawText.replace("\n", "").split("|").map { it.trim() }
+
+                if (questions.size < 3) {
+                    throw Exception("Parsing failed or too few questions returned.")
+                }
+
+                questions.take(5)
+            }
         } catch (e: Exception) {
-            println("GeminiService: Error generating questions: ${e.message}")
-            return getDefaultQuestions()
+            println("❌ GeminiService: All retries failed. Falling back to defaults. Error: ${e.message}")
+            getDefaultQuestions()
         }
     }
 
@@ -114,7 +149,7 @@ class GeminiService {
         }
     }
 
-    suspend fun generateAnalyticsReport(checkIns: List<CheckInResult>): String {
+    suspend fun generateAnalyticsReport(checkIns: List<CheckInEntry>): String {
         if (checkIns.isEmpty()) return "No data available for analysis yet."
 
         val promptText = constructAnalyticsPrompt(checkIns)
@@ -151,12 +186,10 @@ class GeminiService {
         var score = 0.0f
         var insight = "Take a moment to breathe."
 
-        // Safety check for empty strings
         if (rawText.isBlank()) return AnalysisResult(score, insight)
 
         rawText.lines().forEach { line ->
             if (line.contains("SCORE:", ignoreCase = true)) {
-                // Better parsing for floats that might have brackets or text
                 val scorePart = line.substringAfter(":").replace("[", "").replace("]", "").trim()
                 score = scorePart.toFloatOrNull() ?: 0.0f
             }
@@ -168,13 +201,41 @@ class GeminiService {
     }
 
 
-    private fun constructAnalyticsPrompt(checkIns: List<CheckInResult>): String {
+    private fun constructAnalyticsPrompt(checkIns: List<CheckInEntry>): String {
         // Summarize the recent history for the AI
-        val summary = checkIns.takeLast(10).joinToString("\n") { entry ->
-            "- Date: ${formatTimestamp(entry.timestamp)} | Score: ${entry.score}/100 (${entry.state.label}) | Previous Insight: ${entry.aiInsight}"
+
+        val summary = checkIns.takeLast(15).joinToString("\n\n---\n\n") { entry ->
+            val primaryEmotionsStr = if (entry.primaryEmotions.isNotEmpty()) {
+                entry.primaryEmotions.joinToString { "${it.emotion} (${it.intensity}/10)" }
+            } else "N/A"
+
+            val selfCareStr = if (entry.selfCareActivities.isNotEmpty()) {
+                entry.selfCareActivities.joinToString(", ")
+            } else "N/A"
+
+            val cbtDisplayName = if (entry.cbtExerciseType != CbtExerciseType.NONE) {
+                entry.cbtExerciseType.name
+            } else "None"
+
+            val highlights = entry.positiveHighlights.ifBlank { "N/A" }
+            val challenges = entry.challengesFaced.ifBlank { "N/A" }
+            val learned = entry.learnedFromCbt.ifBlank { "N/A" }
+
+            """
+            Date: ${formatTimestamp(entry.timestamp)}
+            Score: ${entry.score}/100 (${entry.state.label})
+            Overall Mood: ${entry.overallMood} (Intensity: ${entry.moodIntensity}/10)
+            Primary Emotions: $primaryEmotionsStr
+            Highlights: $highlights
+            Challenges: $challenges
+            CBT Exercise: $cbtDisplayName
+            Learned from CBT: $learned
+            Self-Care Activities: $selfCareStr
+            Previous Insight: ${entry.aiInsight}
+            """.trimIndent()
         }
 
-        return """
+            return """
             You are a supportive, empathetic, and insightful AI assistant for the Mindset Pulse app. 
             Your goal is to help a user understand their wellbeing based on their recent check-ins.
             Please use relevant emojis to make the insights more engaging and friendly. 😊
@@ -212,10 +273,12 @@ class GeminiService {
         "How optimistic do you feel about tomorrow?"
     )
 
-    private fun formatTimestamp(timestamp: Long): String {
-        val instant = Instant.fromEpochMilliseconds(timestamp)
+    private fun formatTimestamp(timestamp: Timestamp): String {
+        val instant = kotlin.time.Instant.fromEpochMilliseconds(timestamp.seconds * 1000)
         val date = instant.toLocalDateTime(TimeZone.currentSystemDefault())
-        return "${date.month.name} ${date.dayOfMonth}"
+        return "${date.month.name.take(3)} ${date.dayOfMonth}"
     }
+
 }
+
 
