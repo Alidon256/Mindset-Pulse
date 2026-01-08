@@ -27,14 +27,18 @@ import org.vaulture.project.presentation.viewmodels.RhythmViewModel
 @Composable
 fun RhythmPlayerScreen(trackId: String?, viewModel: RhythmViewModel, onBack: () -> Unit) {
     val state by viewModel.uiState.collectAsState()
+    val track = state.currentTrack
 
+   /* LaunchedEffect(track) {
+        if (track != null) {
+            viewModel.incrementListenerCount(track.id)
+        }
+    }*/
     LaunchedEffect(trackId) {
         if (trackId != null && state.currentTrack?.id != trackId) {
             viewModel.loadTrackById(trackId)
         }
     }
-
-    val track = state.currentTrack
 
     BoxWithConstraints(modifier = Modifier.fillMaxSize().background(Color.Black)) {
         val maxHeight = maxHeight

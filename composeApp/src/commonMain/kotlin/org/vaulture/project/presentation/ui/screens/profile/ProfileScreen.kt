@@ -205,7 +205,7 @@ private fun ProfileScreenCompact(
             item(span = StaggeredGridItemSpan.FullLine) {
                 Column {
                     Row(
-                        modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp),
+                        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         ProfileFilter.entries.forEach { filter ->

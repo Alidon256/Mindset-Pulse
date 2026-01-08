@@ -117,18 +117,18 @@ class RhythmViewModel(
     fun playTrack(track: RhythmTrack) {
         _uiState.update { it.copy(currentTrack = track) }
 
-        val url = if (track.previewUrl.isNotBlank()) track.previewUrl else track.previewUrl
+        val url = track.previewUrl.ifBlank { track.previewUrl }
         if (url.isNotBlank()) {
             println(" RHYTHM: Attempting to play URL: $url")
             audioPlayer.play(url, track.title, track.artist)
 
-            incrementListenerCount(track.id)
+           // incrementListenerCount(track.id)
         } else {
             println("RHYTHM: No valid URL found for track ${track.title}")
         }
     }
-    private fun incrementListenerCount(trackId: String) {
-        viewModelScope.launch {
+    fun incrementListenerCount(trackId: String) {
+        viewModelScope.launch{
             try {
                 firestore.collection("tracks").document(trackId).update(
                     "listenerCount" to FieldValue.increment(1)
