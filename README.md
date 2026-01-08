@@ -97,14 +97,42 @@ Watch the full demo of **Mindset Pulse** in action:
 
 Or embed a thumbnail:
 
-[![Watch the Demo](path/to/thumbnail.png)](https://firebasestorage.googleapis.com/v0/b/tija-a7b75.firebasestorage.app/o/My%20videos%2FMindset%20Pulse%20Video.mp4?alt=media&token=ddb883f7-2374-4436-8199-a1ca996d2fa2)
+[![Watch the Demo](https://firebasestorage.googleapis.com/v0/b/tija-a7b75.firebasestorage.app/o/My%20videos%2FScreenshot%20(1362).png?alt=media&token=f3dd592c-8b1d-4f83-8046-ca4df4545e41)](https://firebasestorage.googleapis.com/v0/b/tija-a7b75.firebasestorage.app/o/My%20videos%2FMindset%20Pulse%20Video.mp4?alt=media&token=ddb883f7-2374-4436-8199-a1ca996d2fa2)
 
 **Disclaimer:** The Windows recorder could not capture the **image picker** during recording. This feature **works correctly in the app**, even though it is not visible in the demo video. 
 ---
 
-## 📚 Libraries & Dependencies
-*(detailed list of plugins and libraries as already documented)*
+## 📚 Libraries & Dependencies 
+Mindset Pulse leverages a rich ecosystem of libraries for cross-platform development: 
 
+### 🔹 Core Plugins 
+- **Kotlin Multiplatform** – Enables shared logic across Android, Web, and (future) WASM.
+- **Compose Multiplatform** – Declarative UI framework for Android + Web.
+- **Compose Compiler** – Optimized compiler for Jetpack Compose.
+- **Kotlinx Serialization** – JSON serialization for structured data exchange.
+
+### 🔹 Android-Specific
+- **AndroidX Activity Compose** – Lifecycle-aware integration with Compose.
+- **Google Play Services Auth** – Secure authentication flows.
+- **Firebase BOM (Auth, Firestore, Storage)** – Unified backend services.
+- **Coil (OkHttp)** – Image loading and caching.
+- **Ktor CIO Client** – High-performance networking.
+- **Google Play Services Location** – Context-aware features.
+- **Media3 (ExoPlayer, UI, Session, DASH, HLS)** – Advanced audio/video playback.
+
+### 🔹 Common Multiplatform 
+- **Compose Runtime, Foundation, Material3, UI** – Core UI building blocks.
+- **Lifecycle ViewModel + Runtime Compose** – MVVM state management.
+- **Material Icons Extended** – Rich iconography.
+- **Coil Compose + Ktor** – Image loading across platforms.
+- **Navigation Compose** – Declarative navigation.
+- **MVVM Core** – Shared architecture for ViewModels.
+- **Firebase (Auth, Firestore, Storage, Database)** – Cloud-first data handling. - **Kotlinx Serialization Core + Datetime** – Data modeling and time utilities.
+- **Ktor (Core, Content Negotiation, JSON, Logging)** – Networking + structured API calls.
+- **Multiplatform Markdown Renderer (M3)** – Rich text rendering for analytics reports.
+  
+### 🔹 Testing 
+- **Kotlin Test** – Unit testing across platforms.
 ---
 
 ## 👨‍💻 Developed By
