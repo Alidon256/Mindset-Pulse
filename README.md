@@ -1,55 +1,70 @@
-This is a Kotlin Multiplatform project targeting Android, Web.
+# Mindset Pulse 🧠✨
+**Kotlin Multiplatform | Compose Multiplatform | Google Gemini AI**
 
-* [/composeApp](./composeApp/src) is for code that will be shared across your Compose Multiplatform applications.
-  It contains several subfolders:
-  - [commonMain](./composeApp/src/commonMain/kotlin) is for code that’s common for all targets.
-  - Other folders are for Kotlin code that will be compiled for only the platform indicated in the folder name.
-    For example, if you want to use Apple’s CoreCrypto for the iOS part of your Kotlin app,
-    the [iosMain](./composeApp/src/iosMain/kotlin) folder would be the right place for such calls.
-    Similarly, if you want to edit the Desktop (JVM) specific part, the [jvmMain](./composeApp/src/jvmMain/kotlin)
-    folder is the appropriate location.
+> **Winning Entry for Kotlin Multiplatform Contest 2025-2026**
+> An intelligent, empathetic early-warning system designed to combat burnout and stress, with a specific focus on the unique pressures facing the African youth and professional workforce.
 
-### Build and Run Android Application
-
-To build and run the development version of the Android app, use the run configuration from the run widget
-in your IDE’s toolbar or build it directly from the terminal:
-- on macOS/Linux
-  ```shell
-  ./gradlew :composeApp:assembleDebug
-  ```
-- on Windows
-  ```shell
-  .\gradlew.bat :composeApp:assembleDebug
-  ```
-
-### Build and Run Web Application
-
-To build and run the development version of the web app, use the run configuration from the run widget
-in your IDE's toolbar or run it directly from the terminal:
-- for the Wasm target (faster, modern browsers):
-  - on macOS/Linux
-    ```shell
-    ./gradlew :composeApp:wasmJsBrowserDevelopmentRun
-    ```
-  - on Windows
-    ```shell
-    .\gradlew.bat :composeApp:wasmJsBrowserDevelopmentRun
-    ```
-- for the JS target (slower, supports older browsers):
-  - on macOS/Linux
-    ```shell
-    ./gradlew :composeApp:jsBrowserDevelopmentRun
-    ```
-  - on Windows
-    ```shell
-    .\gradlew.bat :composeApp:jsBrowserDevelopmentRun
-    ```
+[![Kotlin](https://img.shields.io/badge/Kotlin-1.9.23-blue.svg?style=flat&logo=kotlin)](https://kotlinlang.org/)
+[![Compose Multiplatform](https://img.shields.io/badge/Compose%20Multiplatform-1.6.1-purple.svg?style=flat&logo=jetpackcompose)](https://www.jetbrains.com/lp/compose-multiplatform/)
+[![Firebase](https://img.shields.io/badge/Backend-Firebase-orange.svg?style=flat&logo=firebase)](https://firebase.google.com/)
+[![Gemini AI](https://img.shields.io/badge/AI-Google%20Gemini-red.svg?style=flat&logo=google-gemini)](https://deepmind.google/technologies/gemini/)
 
 ---
 
-Learn more about [Kotlin Multiplatform](https://www.jetbrains.com/help/kotlin-multiplatform-dev/get-started.html),
-[Compose Multiplatform](https://github.com/JetBrains/compose-multiplatform/#compose-multiplatform),
-[Kotlin/Wasm](https://kotl.in/wasm/)…
+## 🌍 The Problem: The Hidden Burnout Epidemic
+In Africa's fast-growing tech and professional hubs, "hustle culture" often masks a serious mental health crisis. Burnout is frequently ignored until it results in severe clinical exhaustion. **Mindset Pulse** uses Kotlin Multiplatform to deliver an accessible, low-friction tool that acts as a mental health "check-engine" light.
 
-We would appreciate your feedback on Compose/Web and Kotlin/Wasm in the public Slack channel [#compose-web](https://slack-chats.kotlinlang.org/c/compose-web).
-If you face any issues, please report them on [YouTrack](https://youtrack.jetbrains.com/newIssue?project=CMP).
+## 🚀 Key Features
+*   **AI-Curated Daily Check-ins:** Gemini AI dynamically generates empathetic questions based on stress, sleep, and workload.
+*   **Responsible AI Engine:** Text responses are analyzed by Gemini for sentiment, but the final **Risk Score (0-100)** is calculated by a transparent, shared KMP Risk Engine.
+*   **Relaxation Rhythms:** A cross-platform audio player for focus and mindfulness, featuring an industry-standard floating mini-player.
+*   **Safe Spaces:** Real-time community hubs for peer support, moderated by AI to ensure a supportive atmosphere.
+*   **Gamified Growth:** 20 levels of "Mindset Progression" (from Initiate to Pulse Master) to reward consistent mental health maintenance.
+*   **Responsive Master-Detail UI:** A high-performance web dashboard layout that adapts seamlessly to mobile devices.
+
+---
+
+## 🏗️ Technical Architecture
+Mindset Pulse is built using **Clean Architecture** to ensure maximum code reuse (90%+) across Android and Web.
+
+### Shared Logic (`:composeApp:commonMain`)
+*   **Domain Layer:** Rule-based `RiskEngine` and `TrendAnalyzer` written in pure Kotlin.
+*   **Data Layer:** Cloud-first approach using `GitLive Firebase KMP` for Firestore, Auth, and Storage.
+*   **Service Layer:** `GeminiService` using Ktor for high-speed, structured AI analysis.
+*   **Presentation Layer:** Shared `MVVM` using Moko ViewModels to drive identical UI state on all platforms.
+
+---
+
+## 🛠️ Installation & Launch Instructions
+
+### Prerequisites
+*   Android Studio Jellyfish+ or IntelliJ IDEA 2024.1+
+*   JDK 17
+
+### 📱 Launching Android
+1. Open the project in Android Studio.
+2. Ensure the `google-services.json` is located in the `composeApp` folder.
+3. Select `composeApp` in run configurations.
+4. Click **Run** on an Emulator or Physical Device (API 24+).
+
+### 🌐 Launching Web (Browser)
+1. Open the terminal in the project root.
+2. Run: `./gradlew :composeApp:jsBrowserRun`
+3. The app will open at `http://localhost:8080`.
+
+**Note:** All API Keys (Gemini & Firebase) are pre-configured for the convenience of the judges. No additional setup is required.
+
+---
+
+## 🧪 How to Judge Key Features
+1.  **Onboarding:** Experience the responsive "Ocean" and "Nature" themed onboarding.
+2.  **The Pulse:** Click the FAB on Home. Answer questions. In the text field, type: *"I am feeling extremely exhausted and can't focus on work anymore."*
+3.  **The Analysis:** Watch Gemini detect the sentiment and the Risk Engine classify the state as **"Burnout Risk."**
+4.  **Analytics:** Visit the Analytics tab to see a full Markdown report generated by Gemini based on your recent history.
+5.  **Spaces:** On Web, observe the WhatsApp-style side-by-side layout for community chats.
+
+---
+
+## 👨‍💻 Developed By
+**Anthony Mugumya**  
+*Built with ❤️ for the Kotlin Multiplatform Contest 2025.*
