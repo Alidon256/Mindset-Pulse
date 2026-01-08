@@ -54,7 +54,7 @@ Mindset Pulse is built using **Clean Architecture** to ensure maximum code reuse
 
 ### 🌐 Launching Web (Browser)
 1. Open the terminal in the project root.  
-2. Run: `./gradlew :composeApp:jsBrowserRun`  
+2. Run: `./gradlew :composeApp:jsBrowserDevelopmentRun`  
 3. The app will open at `http://localhost:8080`.  
 
 **Note:** On Web, users should **sign in using Email authentication only**. Google Sign-In is **not working for now**.  
@@ -77,27 +77,27 @@ Mindset Pulse is built using **Clean Architecture** to ensure maximum code reuse
 ## 📸 Screenshots
 
 ### Home
-![Home Screen]([path/to/onboarding.png](https://firebasestorage.googleapis.com/v0/b/tija-a7b75.firebasestorage.app/o/My%20videos%2FScreenshot%20(1366).png?alt=media&token=0184d16c-6761-432b-be05-ebfede36543c))
+![Home Screen]([https://firebasestorage.googleapis.com/v0/b/tija-a7b75.firebasestorage.app/o/My%20videos%2FScreenshot%20(1366).png?alt=media&token=0184d16c-6761-432b-be05-ebfede36543c])
 
 ### Spaces
-![Spaces Screen]([path/to/spaces.png](https://firebasestorage.googleapis.com/v0/b/tija-a7b75.firebasestorage.app/o/My%20videos%2FScreenshot%20(1373).png?alt=media&token=b9e58251-b714-4e98-8f5e-a66f16174f6e))
+![Spaces Screen]([https://firebasestorage.googleapis.com/v0/b/tija-a7b75.firebasestorage.app/o/My%20videos%2FScreenshot%20(1373).png?alt=media&token=b9e58251-b714-4e98-8f5e-a66f16174f6e])
 
 ### Mindful Actions
-![Mindful Actions Screen]([path/to/mindful_actions.png](https://firebasestorage.googleapis.com/v0/b/tija-a7b75.firebasestorage.app/o/My%20videos%2FScreenshot%20(1372).png?alt=media&token=1d5fbfca-c768-43cf-a2ac-7f9a2953b38a))
+![Mindful Actions Screen]([https://firebasestorage.googleapis.com/v0/b/tija-a7b75.firebasestorage.app/o/My%20videos%2FScreenshot%20(1372).png?alt=media&token=1d5fbfca-c768-43cf-a2ac-7f9a2953b38a])
 
 ### Profile
-![Profile Screen]([path/to/profile.png](https://firebasestorage.googleapis.com/v0/b/tija-a7b75.firebasestorage.app/o/My%20videos%2FScreenshot%20(1365).png?alt=media&token=ab1bc094-e5fa-48ca-ad3a-286966cb693a))
+![Profile Screen]([https://firebasestorage.googleapis.com/v0/b/tija-a7b75.firebasestorage.app/o/My%20videos%2FScreenshot%20(1365).png?alt=media&token=ab1bc094-e5fa-48ca-ad3a-286966cb693a])
 
 ---
 
 ## 🎥 Demo Video
 
 Watch the full demo of **Mindset Pulse** in action:  
-[▶️ Click here to view the demo]([https://your-video-link.com](https://firebasestorage.googleapis.com/v0/b/tija-a7b75.firebasestorage.app/o/My%20videos%2FMindset%20Pulse%20Video.mp4?alt=media&token=ddb883f7-2374-4436-8199-a1ca996d2fa2))
+[▶️ Click here to view the demo]([https://firebasestorage.googleapis.com/v0/b/tija-a7b75.firebasestorage.app/o/My%20videos%2FMindset%20Pulse%20Video.mp4?alt=media&token=ddb883f7-2374-4436-8199-a1ca996d2fa2])
 
 Or embed a thumbnail:
 
-[![Watch the Demo](path/to/thumbnail.png)]([https://your-video-link.com](https://firebasestorage.googleapis.com/v0/b/tija-a7b75.firebasestorage.app/o/My%20videos%2FMindset%20Pulse%20Video.mp4?alt=media&token=ddb883f7-2374-4436-8199-a1ca996d2fa2))
+[![Watch the Demo](path/to/thumbnail.png)]([https://firebasestorage.googleapis.com/v0/b/tija-a7b75.firebasestorage.app/o/My%20videos%2FMindset%20Pulse%20Video.mp4?alt=media&token=ddb883f7-2374-4436-8199-a1ca996d2fa2])
 
 **Disclaimer:** The Windows recorder could not capture the **image picker** during recording. This feature **works correctly in the app**, even though it is not visible in the demo video. 
 ---
