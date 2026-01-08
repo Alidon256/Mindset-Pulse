@@ -1,5 +1,7 @@
 package org.vaulture.project.presentation.viewmodels
 
+import androidx.compose.animation.core.copy
+import androidx.compose.foundation.gestures.forEach
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -162,7 +164,6 @@ open class SpaceViewModel(
             .get()
         _userStories.value = snapshot.documents.mapNotNull { it.data<Story>() }
     }
-
     private suspend fun fetchLikedStories(uid: String) {
         val snapshot = firestore.collection("stories")
             .where { "likedBy" contains uid }
@@ -188,8 +189,6 @@ open class SpaceViewModel(
             _userBookmarkedStories.value = emptyList()
         }
     }
-
-
     private fun fetchSpaces() {
         spacesListenerJob?.cancel()
         spacesListenerJob = viewModelScope.launch {
@@ -221,30 +220,6 @@ open class SpaceViewModel(
             }
         }
     }
-
-    private fun listenForFeeds() {
-        feedsListenerJob?.cancel() // Clear existing
-        feedsListenerJob = viewModelScope.launch {
-            try {
-                firestore.collection("stories")
-                    .where { "isFeed" equalTo true }
-                    .orderBy("timestamp", Direction.DESCENDING)
-                    .snapshots
-                    .collect { snapshot ->
-                        val storiesList = snapshot.documents.mapNotNull { doc ->
-                            try { doc.data<Story>().copy(storyId = doc.id) } catch (e: Exception) { null }
-                        }
-                        _feeds.value = storiesList
-                        if (!_isSearching.value) _filteredFeeds.value = storiesList
-                        _isLoading.value = false
-                    }
-            } catch (e: Exception) {
-                println("🛑 SpaceVM: Feeds Listener Blocked (Safe during sign-out)")
-            }
-        }
-    }
-
-
     fun addStory(
         mediaContent: ByteArray?,
         thumbnailContent: ByteArray?,
@@ -314,12 +289,28 @@ open class SpaceViewModel(
             }
         }
     }
-
-    fun createSpace(
-        coverImageBytes: ByteArray?,
-        onSuccess: (String) -> Unit,
-        onError: (String) -> Unit
-    ) {
+    private fun listenForFeeds() {
+        feedsListenerJob?.cancel() // Clear existing
+        feedsListenerJob = viewModelScope.launch {
+            try {
+                firestore.collection("stories")
+                    .where { "isFeed" equalTo true }
+                    .orderBy("timestamp", Direction.DESCENDING)
+                    .snapshots
+                    .collect { snapshot ->
+                        val storiesList = snapshot.documents.mapNotNull { doc ->
+                            try { doc.data<Story>().copy(storyId = doc.id) } catch (e: Exception) { null }
+                        }
+                        _feeds.value = storiesList
+                        if (!_isSearching.value) _filteredFeeds.value = storiesList
+                        _isLoading.value = false
+                    }
+            } catch (e: Exception) {
+                println("SpaceVM: Feeds Listener Blocked (Safe during sign-out)")
+            }
+        }
+    }
+    fun createSpace(coverImageBytes: ByteArray?, onSuccess: (String) -> Unit, onError: (String) -> Unit) {
         viewModelScope.launch {
             _isCreatingSpace.value = true
             val currentUser = auth.currentUser
@@ -361,16 +352,11 @@ open class SpaceViewModel(
             }
         }
     }
-
-    private suspend fun uploadFileToStorage(
-        fileBytes: ByteArray,
-        storagePath: String
-    ): String {
+    private suspend fun uploadFileToStorage(fileBytes: ByteArray, storagePath: String): String {
         val storageRef = storage.reference(storagePath)
         storageRef.upload(fileBytes)
         return storageRef.getDownloadUrl()
     }
-
     fun onSearchQueryChanged(query: String) {
         viewModelScope.launch {
             _isSearching.value = true
@@ -395,8 +381,6 @@ open class SpaceViewModel(
             _isSearching.value = false
         }
     }
-
-
     fun loadInitialData() {
         val currentUser = auth.currentUser
         if (currentUser != null) {
@@ -407,47 +391,51 @@ open class SpaceViewModel(
             )
         }
     }
-
-    /*fun loadSpaceDetails(spaceId: String) {
+    fun loadSpaceDetails(spaceId: String) {
         _activeSpaceId.value = spaceId
+
+        isLoadingPosts.value = true
+        val existingSpace = _filteredSpaces.value.find { it.id == spaceId }
+        if (existingSpace != null) {
+            _currentSpace.value = existingSpace
+        }
         viewModelScope.launch {
+            isLoadingPosts.value = true
             try {
+
                 val doc = firestore.collection("spaces").document(spaceId).get()
+                var spaceData = doc.data<Space>().copy(id = doc.id)
                 _currentSpace.value = doc.data()
+
+                val photos = mutableListOf<String>()
+                spaceData.memberIds.take(5).forEach { memberId ->
+                    val cached = userPhotoCache[memberId]
+                    if (cached != null) {
+                        photos.add(cached)
+                    } else {
+                        try {
+                            val userDoc = firestore.collection("users").document(memberId).get()
+                            val photo = userDoc.data<User>().photoUrl ?: ""
+                            if (photo.isNotEmpty()) {
+                                userPhotoCache[memberId] = photo
+                                photos.add(photo)
+                            }
+                        } catch (e: Exception) { /* Handle hidden profiles */ }
+                    }
+                }
+
+                spaceData = spaceData.copy(memberPhotoUrls = photos)
+
                 loadSpacePosts(spaceId)
                 listenForChatMessages(spaceId)
+
             } catch (e: Exception) {
+                println("Error loading space details for $spaceId: ${e.message}")
                 _currentSpace.value = null
             }
         }
-    }*/
-
-    fun loadSpaceDetails(spaceId: String) {
-        // Step 1: Set the active ID immediately.
-        // This ensures the UI highlight updates instantly and STAYS.
-        _activeSpaceId.value = spaceId
-
-        // Step 2: Launch a coroutine to fetch the details for the new active space.
-        // This runs in the background without blocking the UI.
-        viewModelScope.launch {
-            isLoadingPosts.value = true // Show loading indicator for the detail pane
-            try {
-                // Fetch the specific space document.
-                val doc = firestore.collection("spaces").document(spaceId).get()
-                _currentSpace.value = doc.data()
-
-                // Now that the current space is set, load its specific content.
-                loadSpacePosts(spaceId)
-                listenForChatMessages(spaceId)
-
-            } catch (e: Exception) {
-                println("❌ Error loading space details for $spaceId: ${e.message}")
-                _currentSpace.value = null // Clear details if the fetch fails
-            }
-        }
     }
-
-    private fun loadSpacePosts(spaceId: String) {
+    fun loadSpacePosts(spaceId: String) {
         postsListenerJob?.cancel()
 
         postsListenerJob = firestore.collection("spaces").document(spaceId)
@@ -466,7 +454,6 @@ open class SpaceViewModel(
             }
             .launchIn(viewModelScope)
     }
-
     fun listenForChatMessages(spaceId: String) {
         chatListenerJob?.cancel()
         chatListenerJob = firestore.collection("spaces").document(spaceId)
@@ -479,8 +466,6 @@ open class SpaceViewModel(
             .catch { e -> println("Error listening for chat messages: ${e.message}") }
             .launchIn(viewModelScope)
     }
-
-
     fun clearSpaceDetails() {
         chatListenerJob?.cancel()
         postsListenerJob?.cancel()
@@ -489,7 +474,6 @@ open class SpaceViewModel(
         _spacePosts.value = emptyList()
         _spaceMessages.value = emptyList()
     }
-
     fun createPost(spaceId: String, content: String) {
         viewModelScope.launch {
             val currentUser = auth.currentUser ?: return@launch
@@ -521,7 +505,6 @@ open class SpaceViewModel(
             }
         }
     }
-
     fun sendChatMessage(spaceId: String) {
         val text = newMessageText.value
         if (text.isBlank()) return
@@ -549,9 +532,8 @@ open class SpaceViewModel(
             }
         }
     }
-
     fun joinSpace(spaceId: String) {
-        println("🖱️ [SpaceVM] joinSpace CALLED for ID: $spaceId")
+        println("[SpaceVM] joinSpace CALLED for ID: $spaceId")
 
         viewModelScope.launch {
             withContext(NonCancellable) {
@@ -578,8 +560,6 @@ open class SpaceViewModel(
             }
         }
     }
-
-
     fun getCommentsForStory(storyId: String): Flow<List<Story.Comment>> {
         return firestore.collection("stories").document(storyId)
             .collection("comments")
@@ -589,7 +569,6 @@ open class SpaceViewModel(
                 snapshot.documents.map { it.data<Story.Comment>() }
             }
     }
-
     fun toggleLike(story: Story) {
         val uid = auth.currentUser?.uid ?: return;
         val storyRef = firestore.collection("stories").document(story.storyId)
@@ -598,13 +577,11 @@ open class SpaceViewModel(
         viewModelScope.launch {
             try {
                 if (isLiked) {
-                    // Remove like
                     storyRef.update(
                         "likeCount" to story.likeCount - 1,
                         "likedBy" to story.likedBy.filter { it != uid }
                     )
                 } else {
-                    // Add like
                     storyRef.update(
                         "likeCount" to story.likeCount + 1,
                         "likedBy" to story.likedBy + uid
@@ -615,7 +592,6 @@ open class SpaceViewModel(
             }
         }
     }
-
     fun addComment(storyId: String, text: String) {
         val user = auth.currentUser ?: return
         if (text.isBlank()) return
@@ -633,11 +609,9 @@ open class SpaceViewModel(
                     timestamp = Timestamp.now()
                 )
 
-                // 1. Add the comment to a sub-collection
                 firestore.collection("stories").document(storyId)
                     .collection("comments").document(commentId).set(newComment)
 
-                // 2. Increment comment count on the main story
                 firestore.collection("stories").document(storyId).update(
                     "commentCount" to FieldValue.increment(1)
                 )
@@ -654,13 +628,11 @@ open class SpaceViewModel(
         viewModelScope.launch {
             try {
                 if (isLiked) {
-                    // Remove like
                     postRef.update(
                         "likeCount" to story.likeCount - 1,
                         "likedBy" to story.likedBy.filter { it != uid }
                     )
                 } else {
-                    // Add like
                     postRef.update(
                         "likeCount" to story.likeCount + 1,
                         "likedBy" to story.likedBy + uid
@@ -671,7 +643,6 @@ open class SpaceViewModel(
             }
         }
     }
-
     fun addCommentSpace(spaceId: String, postId: String, text: String) {
         val user = auth.currentUser ?: return
         if (text.isBlank()) return
@@ -689,12 +660,10 @@ open class SpaceViewModel(
                     timestamp = Timestamp.now()
                 )
 
-                // 1. Add the comment to a sub-collection
                 firestore.collection("spaces").document(spaceId)
                     .collection("posts").document(postId)
                     .collection("comments").document(commentId).set(newComment)
 
-                // 2. Increment comment count on the main post
                 firestore.collection("spaces").document(spaceId)
                     .collection("posts").document(postId)
                     .update("commentCount" to FieldValue.increment(1))
@@ -703,7 +672,6 @@ open class SpaceViewModel(
             }
         }
     }
-
     fun toggleBookmarkSpace(story: Story, spaceId: String) {
         val uid = auth.currentUser?.uid ?: return
         val postRef = firestore.collection("spaces").document(spaceId).collection("posts").document(story.storyId)
@@ -713,13 +681,10 @@ open class SpaceViewModel(
         viewModelScope.launch {
             try {
                 if (isBookmarked) {
-                    // 1. Remove from global post list
                     postRef.update("bookmarkedBy" to story.bookmarkedBy.filter { it != uid })
                     userRef.delete()
                 } else {
-                    // 1. Add to global post list
                     postRef.update("bookmarkedBy" to story.bookmarkedBy + uid)
-                    // 2. Add to user's private collection for easy "My Saved" filtering
                     userRef.set(mapOf("savedAt" to Timestamp.now()))
                 }
             } catch (e: Exception) {
@@ -727,7 +692,6 @@ open class SpaceViewModel(
             }
         }
     }
-
     fun getCommentsForPost(spaceId: String, postId: String): Flow<List<Story.Comment>> {
         return firestore.collection("spaces").document(spaceId)
             .collection("posts").document(postId)
@@ -738,7 +702,6 @@ open class SpaceViewModel(
                 snapshot.documents.map { it.data<Story.Comment>() }
             }
     }
-
     fun toggleBookmark(story: Story) {
         val uid = auth.currentUser?.uid ?: return
         val storyRef = firestore.collection("stories").document(story.storyId)
@@ -748,14 +711,10 @@ open class SpaceViewModel(
         viewModelScope.launch {
             try {
                 if (isBookmarked) {
-                    // 1. Remove from global story list
                     storyRef.update("bookmarkedBy" to story.bookmarkedBy.filter { it != uid })
-                    // 2. Remove from user's private collection
                     userRef.delete()
                 } else {
-                    // 1. Add to global story list
                     storyRef.update("bookmarkedBy" to story.bookmarkedBy + uid)
-                    // 2. Add to user's private collection for easy "My Saved" filtering
                     userRef.set(mapOf("savedAt" to Timestamp.now()))
                 }
             } catch (e: Exception) {

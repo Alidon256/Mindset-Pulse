@@ -25,6 +25,10 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import org.vaulture.project.data.repos.SearchContext
 import org.vaulture.project.data.repos.SearchableItem
+import org.vaulture.project.presentation.navigation.Routes
+import org.vaulture.project.presentation.theme.PoppinsTypography
+import org.vaulture.project.presentation.ui.components.FilterChips
+import org.vaulture.project.presentation.ui.components.RhythmItem
 import org.vaulture.project.presentation.ui.components.SearchBar
 import org.vaulture.project.presentation.viewmodels.RhythmViewModel
 import kotlin.math.roundToInt
@@ -128,7 +132,6 @@ fun RhythmHomeContent(
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
-    // Filter tracks based on the search query
     val filteredBySearch = remember(uiState.tracks, searchQuery) {
         if (searchQuery.isBlank()) uiState.tracks
         else uiState.tracks.filter { track ->
@@ -140,19 +143,19 @@ fun RhythmHomeContent(
 
     val categories = remember {
         listOf(
-            _root_ide_package_.org.vaulture.project.presentation.ui.screens.home.RhythmCategory(
+            RhythmCategory(
                 "Focus",
                 listOf("productivity", "concentration", "work")
             ),
-            _root_ide_package_.org.vaulture.project.presentation.ui.screens.home.RhythmCategory(
+            RhythmCategory(
                 "Sleep",
                 listOf("calm", "sleep", "ambient")
             ),
-            _root_ide_package_.org.vaulture.project.presentation.ui.screens.home.RhythmCategory(
+            RhythmCategory(
                 "Relax",
                 listOf("chill", "peaceful", "meditation")
             ),
-            _root_ide_package_.org.vaulture.project.presentation.ui.screens.home.RhythmCategory(
+            RhythmCategory(
                 "Energy",
                 listOf("upbeat", "motivation", "workout")
             )
@@ -161,7 +164,6 @@ fun RhythmHomeContent(
 
     var selectedCategoryName by remember { mutableStateOf<String?>(null) }
 
-    // Apply category filter on top of search results
     val finalTracks = remember(filteredBySearch, selectedCategoryName) {
         if (selectedCategoryName == null) filteredBySearch
         else filteredBySearch.filter { track ->
@@ -176,14 +178,14 @@ fun RhythmHomeContent(
     val columnCount = (screenWidth.value / 180).roundToInt().coerceAtLeast(2)
 
     if (selectedCategoryName == null && searchQuery.isBlank()) {
-        // --- Category Overview Mode ---
+
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
             verticalArrangement = Arrangement.spacedBy(24.dp),
             contentPadding = PaddingValues(bottom = 32.dp)
         ) {
             item {
-                _root_ide_package_.org.vaulture.project.presentation.ui.components.FilterChips(
+                FilterChips(
                     categories = categories.map { it.name },
                     selectedCategory = selectedCategoryName,
                     onFilterSelected = { selected ->
@@ -203,7 +205,7 @@ fun RhythmHomeContent(
                     Column {
                         Text(
                             text = category.name,
-                            style = _root_ide_package_.org.vaulture.project.presentation.theme.PoppinsTypography().headlineMedium.copy(
+                            style = PoppinsTypography().headlineMedium.copy(
                                 fontSize = 20.sp,
                                 fontWeight = FontWeight.Bold
                             ),
@@ -214,11 +216,11 @@ fun RhythmHomeContent(
                             horizontalArrangement = Arrangement.spacedBy(12.dp)
                         ) {
                             items(categoryTracks) { track ->
-                                _root_ide_package_.org.vaulture.project.presentation.ui.components.RhythmItem(
+                                RhythmItem(
                                     track = track,
                                     onClick = {
                                         viewModel.playTrack(track)
-                                        navController.navigate("rhythmPlayer/${track.id}")
+                                        navController.navigate(Routes.RHYTHM_PLAYER(track.id))
                                     }
                                 )
                             }
@@ -228,9 +230,9 @@ fun RhythmHomeContent(
             }
         }
     } else {
-        // --- Search / Grid Mode ---
+
         Column(modifier = Modifier.fillMaxSize()) {
-            _root_ide_package_.org.vaulture.project.presentation.ui.components.FilterChips(
+            FilterChips(
                 categories = categories.map { it.name },
                 selectedCategory = selectedCategoryName,
                 onFilterSelected = { selected ->
@@ -257,12 +259,12 @@ fun RhythmHomeContent(
                         contentPadding = PaddingValues(bottom = 32.dp)
                     ) {
                         items(tracksToShow) { track ->
-                            _root_ide_package_.org.vaulture.project.presentation.ui.components.RhythmItem(
+                            RhythmItem(
                                 track = track,
                                 isSelected = uiState.currentTrack?.id == track.id,
                                 onClick = {
                                     viewModel.playTrack(track)
-                                    navController.navigate("rhythmPlayer/${track.id}")
+                                    navController.navigate(Routes.RHYTHM_PLAYER(track.id))
                                 }
                             )
                         }

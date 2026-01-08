@@ -48,7 +48,7 @@ fun WellnessTimerScreen(viewModel: WellnessViewModel, onBack: () -> Unit) {
             .background(backgroundBrush),
         contentAlignment = Alignment.Center
     ) {
-        val contentModifier = if (maxWidth > 600.dp) {
+        val contentModifier = if (maxWidth > 800.dp) {
             Modifier
                 .width(500.dp)
                 .align(Alignment.Center)

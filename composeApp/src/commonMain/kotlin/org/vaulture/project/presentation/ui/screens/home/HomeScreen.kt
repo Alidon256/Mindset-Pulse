@@ -16,6 +16,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.outlined.Groups
+import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.getValue
@@ -278,7 +279,7 @@ private fun PopularSection(
         )
     }
 }
-@Composable
+/*@Composable
 private fun RecommendedSection(
     tracks: List<RhythmTrack>,
     isLoading: Boolean,
@@ -354,7 +355,106 @@ private fun RecommendedSection(
             )
         }
     }
+}*/
+@Composable
+private fun RecommendedSection(
+    tracks: List<RhythmTrack>,
+    isLoading: Boolean,
+    viewModel: RhythmViewModel,
+    navController: NavController
+) {
+    val currentHour = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).hour
+
+    val (greetingTitle, targetTags) = remember(currentHour) {
+        when (currentHour) {
+            in 5..11 -> "Start Your Day ☀️" to listOf("energy", "upbeat", "motivation", "focus")
+            in 12..17 -> "Afternoon Focus 🧠" to listOf("focus", "productivity", "concentration", "chill")
+            else -> "Wind Down for Sleep 🌙" to listOf("sleep", "relaxation", "calm", "peaceful")
+        }
+    }
+
+    val recommendedTracks = remember(tracks, targetTags) {
+        if (tracks.isEmpty()) return@remember emptyList()
+
+        val filtered = tracks.filter { track ->
+            track.tags.any { tag -> targetTags.contains(tag.lowercase()) }
+        }
+
+        if (filtered.isNotEmpty()) filtered.take(10) else tracks.shuffled().take(10)
+    }
+
+    Column {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(
+                    start = 16.dp,
+                    top = 8.dp,
+                    end = 8.dp
+                ),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = greetingTitle,
+                style = PoppinsTypography().headlineMedium.copy(
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+            )
+            Text(
+                text = "See All",
+                style = PoppinsTypography().bodySmall.copy(
+                    fontSize = 14.sp,
+                    color = MaterialTheme.colorScheme.primary
+                ),
+                modifier = Modifier
+                    .clickable { navController.navigate(Routes.RHYTHM_HOME) }
+            )
+        }
+
+        if (isLoading || tracks.isEmpty()) {
+            LazyRow(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 8.dp, start = 16.dp),
+                contentPadding = PaddingValues(horizontal = 0.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                items(4, key = { "shimmer_recommended_$it" }) {
+                    ShimmerRhythmItem()
+                }
+            }
+        } else {
+            LazyRow(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 8.dp),
+                contentPadding = PaddingValues(horizontal = 8.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                items(recommendedTracks, key = { it.id }) { track ->
+                    RhythmItem(
+                        track = track,
+                        onClick = {
+                            viewModel.playTrack(track)
+                            navController.navigate(Routes.RHYTHM_PLAYER(track.id))
+                        }
+                    )
+                }
+            }
+            HorizontalDivider(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 12.dp, vertical = 12.dp)
+                    .background(MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.3f)),
+                thickness = 1.dp
+            )
+        }
+    }
 }
+
 
 @Composable
 fun DashboardMobileLayout(
@@ -509,14 +609,6 @@ fun DashboardMobileLayout(
                 }
             }
         }
-        item {
-            SectionHeader(
-                title = "Weekly Stress Trend",
-                icon = Icons.Default.Timeline
-            )
-            //Spacer(Modifier.height(12.dp))
-            //StressTrendChart()
-        }
     }
 }
 @Composable
@@ -531,7 +623,7 @@ fun DashboardWebLayout(
 ) {
     val state by viewModel.uiState.collectAsState()
     val wellnessState by wellnessViewModel.uiState.collectAsState()
-    var selectedRailItem by remember { mutableStateOf("Spaces") }
+    var selectedRailItem by remember { mutableStateOf("Home") }
     val user by authService.currentUser.collectAsState(null)
     val currentHour = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).hour
     val greeting = when (currentHour) {
@@ -626,9 +718,9 @@ fun DashboardWebLayout(
             }
             item {
                 Card(
-                    onClick = { selectedRailItem = "Spaces" },
+                    onClick = { selectedRailItem = "Home" },
                     colors = CardDefaults.cardColors(
-                        containerColor = if (selectedRailItem == "Spaces") MaterialTheme.colorScheme.primaryContainer
+                        containerColor = if (selectedRailItem == "Home") MaterialTheme.colorScheme.primaryContainer
                         else
                             MaterialTheme.colorScheme.surface
                     ),
@@ -640,13 +732,13 @@ fun DashboardWebLayout(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Icon(
-                            if (selectedRailItem == "Spaces") Icons.Filled.Groups else Icons.Outlined.Groups,
+                            if (selectedRailItem == "Home") Icons.Filled.Home else Icons.Outlined.Home,
                             contentDescription = null,
                             tint = MaterialTheme.colorScheme.primary
                         )
                         Spacer(Modifier.width(12.dp))
                         Text(
-                            "Spaces",
+                            "Home",
                             style = MaterialTheme.typography.bodyLarge,
                             color = MaterialTheme.colorScheme.onSurface
                         )
@@ -703,7 +795,6 @@ fun DashboardWebLayout(
         }
         VerticalDivider(thickness = 1.dp, color = MaterialTheme.colorScheme.outlineVariant)
 
-        // Center Column (Main Data)
         LazyColumn(
             modifier = Modifier.weight(1f),
             verticalArrangement = Arrangement.spacedBy(24.dp)
@@ -738,17 +829,6 @@ fun DashboardWebLayout(
                     onStartCheckIn
                 )
             }
-            item {
-                SectionHeader(
-                    title = "Weekly Stress Trend",
-                    icon = Icons.Default.Timeline
-                )
-            }
-            item {
-                StressTrendChart(
-                    height = 300.dp
-                )
-            }
 
         }
         VerticalDivider(thickness = 1.dp, color = MaterialTheme.colorScheme.outlineVariant)
@@ -767,7 +847,7 @@ fun DashboardWebLayout(
                 fontWeight = FontWeight.Bold
             )
 
-            PulseBadgeCard(streak = 12)
+            PulseBadgeCard(totalPoints = wellnessState.stats.resiliencePoints)
 
             WellnessStatsRow(stats = wellnessState.stats)
 
@@ -781,7 +861,7 @@ fun DashboardWebLayout(
                     Icon(Icons.Default.ShieldMoon, null, tint = MaterialTheme.colorScheme.primary)
                     Spacer(Modifier.width(12.dp))
                     Text(
-                        "Your spaces are end-to-end encrypted and AI-moderated for your safety.",
+                        "This is a safe space. Please be kind, supportive, and respectful to everyone in the Mindset Pulse community.",
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSecondaryContainer
                     )
@@ -789,26 +869,7 @@ fun DashboardWebLayout(
             }
             AIPrivacyCard()
 
-            Spacer(Modifier.weight(1f))
-
-            OutlinedButton(
-                onClick = { /* Navigate to Security Rules Detail */ },
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(12.dp)
-            ) {
-                Icon(Icons.Default.Shield, null)
-                Spacer(Modifier.width(8.dp))
-                Text("Data Security Settings")
-            }
-            OutlinedButton(
-                onClick = {},
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(12.dp)
-            ) {
-                Icon(Icons.Default.Nightlife, null)
-                Spacer(Modifier.width(8.dp))
-                Text("Emergency Resources")
-            }
+            Spacer(Modifier.padding(vertical = 60.dp))
         }
     }
 }

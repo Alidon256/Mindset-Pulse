@@ -133,9 +133,9 @@ fun InsightScreen(onGetStarted: () -> Unit) {
                             val spanCount = if (isWideScreen) {
                                 if (item.isLarge) 2 else 1
                             } else {
-                                GridItemSpan(item.span)
+                                if (item.isLarge) 2 else 1
                             }
-                            spanCount as GridItemSpan
+                            GridItemSpan(spanCount)
                         }
                     ) { _, story ->
                         PulseStoryCard(story)

@@ -9,7 +9,7 @@ import org.vaulture.project.presentation.theme.ThemePalette
 
 data class SettingsUiState(
     val themeMode: AppThemeMode = AppThemeMode.DARK,
-    val themePalette: ThemePalette = ThemePalette.NATURE,
+    val themePalette: ThemePalette = ThemePalette.OCEAN,
     val notificationsEnabled: Boolean = true,
     val dataSaverEnabled: Boolean = false,
     val appVersion: String = "1.0.0"

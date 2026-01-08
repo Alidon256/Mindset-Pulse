@@ -53,7 +53,6 @@ fun SplashScreen(onTimeout: () -> Unit) {
                 }
             }
         },
-        useDarkTheme = true,
         themeMode = AppThemeMode.DARK,
         themePalette = ThemePalette.NATURE
     )

@@ -83,7 +83,7 @@ fun SpacesScreen(
 
 ){
     BoxWithConstraints(modifier = Modifier.fillMaxSize()){
-        val isExpanded = maxWidth > 920.dp
+        val isExpanded = maxWidth > 800.dp
 
         AnimatedContent(
             targetState = isExpanded,
@@ -257,33 +257,6 @@ fun SpaceScreenExpandable(
                    }
                }
            }
-            item {
-                Card(
-                    onClick = { selectedRailItem = "Insights" },
-                    colors = CardDefaults.cardColors(
-                        containerColor = if (selectedRailItem == "Insights") MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surface
-                    ),
-                    shape = RoundedCornerShape(16.dp),
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Row(
-                        modifier = Modifier.padding(16.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Icon(
-                            Icons.Default.Analytics,
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.primary
-                        )
-                        Spacer(Modifier.width(12.dp))
-                        Text(
-                            "Insights",
-                            style = MaterialTheme.typography.bodyLarge,
-                            color = MaterialTheme.colorScheme.onSurface
-                        )
-                    }
-                }
-            }
             item{
                 Card(
                     onClick = { selectedRailItem = "Settings" },
@@ -429,7 +402,7 @@ fun SpaceScreenExpandable(
                 fontWeight = FontWeight.Bold
             )
 
-            PulseBadgeCard(streak = 12)
+            PulseBadgeCard(totalPoints = statsState.stats.resiliencePoints)
 
             WellnessStatsRow(stats = statsState.stats)
 
@@ -443,34 +416,14 @@ fun SpaceScreenExpandable(
                     Icon(Icons.Default.ShieldMoon, null, tint = MaterialTheme.colorScheme.primary)
                     Spacer(Modifier.width(12.dp))
                     Text(
-                        "Your spaces are end-to-end encrypted and AI-moderated for your safety.",
+                        "This is a safe space. Please be kind, supportive, and respectful to everyone in the Mindset Pulse community.",
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSecondaryContainer
                     )
                 }
             }
             AIPrivacyCard()
-
-            Spacer(Modifier.weight(1f))
-
-            OutlinedButton(
-                onClick = { /* Navigate to Security Rules Detail */ },
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(12.dp)
-            ) {
-                Icon(Icons.Default.Shield, null)
-                Spacer(Modifier.width(8.dp))
-                Text("Data Security Settings")
-            }
-            OutlinedButton(
-                onClick = {},
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(12.dp)
-            ) {
-                Icon(Icons.Default.Nightlife, null)
-                Spacer(Modifier.width(8.dp))
-                Text("Emergency Resources")
-            }
+            Spacer(Modifier.padding(vertical = 60.dp))
         }
     }
 }

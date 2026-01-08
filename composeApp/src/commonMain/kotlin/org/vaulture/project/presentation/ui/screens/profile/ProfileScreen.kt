@@ -9,6 +9,11 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
+import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
+import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridItemSpan
+import androidx.compose.foundation.lazy.staggeredgrid.items
+import androidx.compose.foundation.lazy.staggeredgrid.rememberLazyStaggeredGridState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -51,6 +56,7 @@ import org.vaulture.project.presentation.ui.components.ProfileAvatar
 import org.vaulture.project.presentation.ui.components.PulseBadgeCard
 import org.vaulture.project.presentation.ui.components.SectionHeader
 import org.vaulture.project.presentation.ui.components.SignOutButton
+import org.vaulture.project.presentation.ui.components.StaggeredStoryItem
 import org.vaulture.project.presentation.ui.components.StatBox
 import org.vaulture.project.presentation.ui.components.StreakBanner
 import org.vaulture.project.presentation.ui.components.WellnessActionItem
@@ -70,6 +76,7 @@ fun ProfileScreen(
     selectedFilter: ProfileFilter,
     onFilterSelected: (ProfileFilter) -> Unit,
     onCommentClick: (String) -> Unit,
+    onNavigateToSettings: () -> Unit
 ) {
     val statsState by wellnessViewModel.uiState.collectAsState()
     val user by authService.currentUser.collectAsState(null)
@@ -104,20 +111,27 @@ fun ProfileScreen(
                     stats = statsState.stats,
                     onSignOut = onSignOut,
                     wellnessViewModel = wellnessViewModel,
-                    navController = navController
+                    navController = navController,
+                    selectedFilter = selectedFilter,
+                    onFilterSelected = onFilterSelected,
+                    isLoading = isLoading,
+                    displayedStories = displayedStories,
+                    currentUserId = currentUserId,
+                    onCommentClick = onCommentClick,
+                    spaceViewModel = spaceViewModel
                 )
             } else {
                 ProfileScreenCompact(
                     authService = authService,
                     stats = statsState.stats,
-                    onSignOut = onSignOut,
                     spaceViewModel = spaceViewModel,
                     selectedFilter = selectedFilter,
                     onFilterSelected = onFilterSelected,
                     isLoading = isLoading,
                     displayedStories = displayedStories,
                     currentUserId = currentUserId,
-                    onCommentClick = onCommentClick
+                    onCommentClick = onCommentClick,
+                    onNavigateToSettings = onNavigateToSettings
                 )
             }
         }
@@ -129,51 +143,45 @@ fun ProfileScreen(
 private fun ProfileScreenCompact(
     authService: AuthService,
     stats: WellnessStats,
-    onSignOut: () -> Unit,
-    onNavigateToSettings: () -> Unit = {},
+    onNavigateToSettings: () -> Unit,
     spaceViewModel: SpaceViewModel,
     onFilterSelected: (ProfileFilter) -> Unit,
     onCommentClick: (String) -> Unit,
     selectedFilter: ProfileFilter,
     isLoading: Boolean,
     displayedStories: List<Story>,
-    currentUserId: String,
+    currentUserId: String
 ) {
     val user by authService.currentUser.collectAsState(null)
-
-    val lazyListState = rememberLazyListState()
     val bannerHeight = 200.dp
-    val bannerHeightPx = with(LocalDensity.current) { bannerHeight.toPx() }
     val avatarInitialSize = 110.dp
-    val avatarFinalSize = 40.dp
 
+    val gridState = rememberLazyStaggeredGridState()
 
     Scaffold(containerColor = MaterialTheme.colorScheme.background) { paddingValues ->
-        LazyColumn(
-            modifier = Modifier.fillMaxSize().padding(bottom = paddingValues.calculateBottomPadding()),
-            state = lazyListState,
-            horizontalAlignment = Alignment.CenterHorizontally,
+        LazyVerticalStaggeredGrid(
+            columns = StaggeredGridCells.Fixed(2),
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(bottom = paddingValues.calculateBottomPadding()),
+            state = gridState,
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalItemSpacing = 8.dp,
+            contentPadding = PaddingValues(horizontal = 8.dp)
         ) {
-            item {
+            item(span = StaggeredGridItemSpan.FullLine) {
                 Box(modifier = Modifier.fillMaxWidth().height(bannerHeight + avatarInitialSize / 2)) {
                     AsyncImage(
                         model = "https://images.pexels.com/photos/1231265/pexels-photo-1231265.jpeg",
                         contentDescription = "Wellness banner",
                         contentScale = ContentScale.Crop,
-                        modifier = Modifier.fillMaxWidth().height(bannerHeight).graphicsLayer {
-                            val scrollOffset = if (lazyListState.firstVisibleItemIndex == 0) lazyListState.firstVisibleItemScrollOffset.toFloat() else bannerHeightPx
-                            alpha = 1f - (scrollOffset / bannerHeightPx).coerceIn(0f, 1f)
-                        }
+                        modifier = Modifier.fillMaxWidth().height(bannerHeight)
                     )
                     Box(modifier = Modifier.matchParentSize().background(Brush.verticalGradient(listOf(Color.Black.copy(0.3f), Color.Transparent))))
 
-                    val scrollOffset = if (lazyListState.firstVisibleItemIndex == 0) lazyListState.firstVisibleItemScrollOffset.toFloat() else bannerHeightPx
-                    val collapsedPercentage = (scrollOffset / (bannerHeightPx - (avatarInitialSize.value / 2))).coerceIn(0f, 1f)
-                    val avatarSize = lerp(avatarInitialSize, avatarFinalSize, collapsedPercentage)
                     val avatarY = (bannerHeight - (avatarInitialSize / 2))
-
-                    Box(Modifier.padding(top = avatarY).size(avatarSize).align(Alignment.TopCenter)) {
-                       ProfileAvatar(
+                    Box(Modifier.padding(top = avatarY).size(110.dp).align(Alignment.TopCenter)) {
+                        ProfileAvatar(
                             user?.photoUrl,
                             "Profile"
                         )
@@ -181,62 +189,62 @@ private fun ProfileScreenCompact(
                 }
             }
 
-            item {
+            item(span = StaggeredGridItemSpan.FullLine) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.padding(top = 8.dp)) {
                     Text(user?.displayName ?: "Guest User", style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
                     Text(user?.email ?: "", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Spacer(Modifier.height(24.dp))
                 }
-                Spacer(Modifier.height(24.dp))
             }
 
-            item {
-                RealWellnessStatsRow(
-                    stats
-                )
-                Spacer(Modifier.height(32.dp))
+            item(span = StaggeredGridItemSpan.FullLine) {
+                RealWellnessStatsRow(stats)
+
             }
 
-            item {
-                Row(
-                modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                ProfileFilter.entries.forEach { filter ->
-                    FilterChip(
-                        selected = selectedFilter == filter,
-                        onClick = { onFilterSelected(filter) },
-                        label = {
-                            Text(when(filter) {
-                                ProfileFilter.MY_POSTS -> "My Posts"
-                                ProfileFilter.LIKED -> "Liked"
-                                ProfileFilter.BOOKMARKED -> "Saved"
-                            })
-                        },
-                        leadingIcon = {
-                            Icon(
-                                imageVector = when(filter) {
-                                    ProfileFilter.MY_POSTS -> Icons.Default.Article
-                                    ProfileFilter.LIKED -> Icons.Default.Favorite
-                                    ProfileFilter.BOOKMARKED -> Icons.Default.Bookmark
+            item(span = StaggeredGridItemSpan.FullLine) {
+                Column {
+                    Row(
+                        modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        ProfileFilter.entries.forEach { filter ->
+                            FilterChip(
+                                selected = selectedFilter == filter,
+                                onClick = { onFilterSelected(filter) },
+                                label = {
+                                    Text(when(filter) {
+                                        ProfileFilter.MY_POSTS -> "My Posts"
+                                        ProfileFilter.LIKED -> "Liked"
+                                        ProfileFilter.BOOKMARKED -> "Saved"
+                                    })
                                 },
-                                contentDescription = null,
-                                modifier = Modifier.size(16.dp)
+                                leadingIcon = {
+                                    Icon(
+                                        imageVector = when(filter) {
+                                            ProfileFilter.MY_POSTS -> Icons.Default.Article
+                                            ProfileFilter.LIKED -> Icons.Default.Favorite
+                                            ProfileFilter.BOOKMARKED -> Icons.Default.Bookmark
+                                        },
+                                        contentDescription = null,
+                                        modifier = Modifier.size(16.dp)
+                                    )
+                                }
                             )
                         }
-                    )
+                    }
+                    Spacer(Modifier.height(16.dp))
                 }
-            }
-                Spacer(Modifier.height(16.dp))
             }
 
             if (isLoading) {
-                item {
+                item(span = StaggeredGridItemSpan.FullLine) {
                     Box(Modifier.fillMaxWidth().padding(32.dp), contentAlignment = Alignment.Center) {
                         CircularProgressIndicator()
                     }
                 }
             } else if (displayedStories.isEmpty()) {
-                item {
+                item(span = StaggeredGridItemSpan.FullLine) {
                     Column(
                         modifier = Modifier.fillMaxWidth().padding(32.dp),
                         horizontalAlignment = Alignment.CenterHorizontally
@@ -248,35 +256,22 @@ private fun ProfileScreenCompact(
                 }
             } else {
                 items(displayedStories, key = { it.storyId }) { story ->
-                    PostItem(
-                        post = story,
+                    StaggeredStoryItem(
+                        story = story,
                         currentUserId = currentUserId,
                         onLikeClick = { spaceViewModel.toggleLike(story) },
-                        onCommentClick = { onCommentClick(story.storyId) },
-                        onProfileClick = { /* Navigate to Profile */ },
-                        onBookmarkClick = { spaceViewModel.toggleBookmark(story) },
-                        onOptionClick = {}
+                        onClick = { onCommentClick(story.storyId) }
                     )
-                    Spacer(Modifier.height(16.dp))
                 }
             }
 
-
-            item {
-                Column(Modifier.padding(horizontal = 16.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                    PulseBadgeCard(
-                        streak = stats.currentStreak
-                    )
+            item(span = StaggeredGridItemSpan.FullLine) {
+                Column(Modifier.padding(horizontal = 8.dp, vertical = 32.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                    PulseBadgeCard(totalPoints = stats.resiliencePoints)
                     AIPrivacyCard()
+                    SettingsItem(onClick = onNavigateToSettings )
+                    Spacer(Modifier.height(32.dp))
                 }
-                Spacer(Modifier.height(32.dp))
-            }
-
-            item {
-                SignOutButton(
-                    onSignOut
-                )
-                Spacer(Modifier.height(32.dp))
             }
         }
     }
@@ -288,11 +283,18 @@ private fun ProfileScreenExpanded(
     stats: WellnessStats,
     onSignOut: () -> Unit,
     wellnessViewModel: WellnessViewModel,
-    navController: NavController
+    navController: NavController,
+    selectedFilter: ProfileFilter,
+    onFilterSelected: (ProfileFilter) -> Unit,
+    isLoading: Boolean,
+    displayedStories: List<Story>,
+    currentUserId: String,
+    onCommentClick: (String) -> Unit,
+    spaceViewModel: SpaceViewModel
 ) {
     val user by authService.currentUser.collectAsState(null)
     val wellnessState by wellnessViewModel.uiState.collectAsState()
-    var selectedRailItem by remember { mutableStateOf("Account") }
+    var selectedRailItem by remember { mutableStateOf("Profile") }
     val currentHour = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).hour
     val greeting = when (currentHour) {
         in 0..11 -> "Good Morning 🌄,"
@@ -381,9 +383,9 @@ private fun ProfileScreenExpanded(
             }
             item {
                 Card(
-                    onClick = { selectedRailItem = "Spaces" },
+                    onClick = { selectedRailItem == "Profile"},
                     colors = CardDefaults.cardColors(
-                        containerColor = if (selectedRailItem == "Spaces") MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surface
+                        containerColor = if (selectedRailItem == "Profile") MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surface
                     ),
                     shape = RoundedCornerShape(16.dp),
                     modifier = Modifier.fillMaxWidth()
@@ -393,40 +395,13 @@ private fun ProfileScreenExpanded(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Icon(
-                            if (selectedRailItem == "Spaces") Icons.Filled.Groups else Icons.Outlined.Groups,
+                            if (selectedRailItem == "Profile") Icons.Filled.Person else Icons.Outlined.Person,
                             contentDescription = null,
                             tint = MaterialTheme.colorScheme.primary
                         )
                         Spacer(Modifier.width(12.dp))
                         Text(
-                            "Spaces",
-                            style = MaterialTheme.typography.bodyLarge,
-                            color = MaterialTheme.colorScheme.onSurface
-                        )
-                    }
-                }
-            }
-            item {
-                Card(
-                    onClick = { selectedRailItem = "Insights" },
-                    colors = CardDefaults.cardColors(
-                        containerColor = if (selectedRailItem == "Insights") MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surface
-                    ),
-                    shape = RoundedCornerShape(16.dp),
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Row(
-                        modifier = Modifier.padding(16.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Icon(
-                            Icons.Default.Analytics,
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.primary
-                        )
-                        Spacer(Modifier.width(12.dp))
-                        Text(
-                            "Insights",
+                            "Profile",
                             style = MaterialTheme.typography.bodyLarge,
                             color = MaterialTheme.colorScheme.onSurface
                         )
@@ -435,7 +410,7 @@ private fun ProfileScreenExpanded(
             }
             item{
                 Card(
-                    onClick = { selectedRailItem = "Settings" },
+                    onClick = { navController.navigate(Routes.SETTINGS)},
                     colors = CardDefaults.cardColors(
                         containerColor = if (selectedRailItem == "Settings") MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surface
                     ),
@@ -479,42 +454,101 @@ private fun ProfileScreenExpanded(
         }
         VerticalDivider(thickness = 1.dp, color = MaterialTheme.colorScheme.outlineVariant)
 
-        LazyColumn(
-            modifier = Modifier.weight(1f).padding(horizontal = 48.dp),
-            contentPadding = PaddingValues(vertical = 64.dp)
-        ) {
-            item {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    ProfileAvatar(
-                        user?.photoUrl,
-                        "User",
-                        Modifier.size(120.dp)
-                    )
-                    Spacer(Modifier.width(32.dp))
-                    Column {
-                        Text(user?.displayName ?: "User", style = MaterialTheme.typography.displaySmall, fontWeight = FontWeight.Bold)
-                        Text(user?.email ?: "", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        val gridState = rememberLazyStaggeredGridState()
+
+        LazyVerticalStaggeredGrid(
+                columns = StaggeredGridCells.Fixed(2),
+                modifier = Modifier
+                    .weight(1f).padding(start = 48.dp,end = 48.dp) ,
+                state = gridState,
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalItemSpacing = 8.dp,
+                contentPadding = PaddingValues(horizontal = 8.dp)
+            ) {
+                item(span = StaggeredGridItemSpan.FullLine) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth().padding(16.dp),
+                        verticalAlignment = Alignment.CenterVertically) {
+                        ProfileAvatar(
+                            user?.photoUrl,
+                            "User",
+                            Modifier.size(120.dp)
+                        )
+                        Spacer(Modifier.width(32.dp))
+                        Column {
+                            Text(user?.displayName ?: "User", style = MaterialTheme.typography.displaySmall, fontWeight = FontWeight.Bold)
+                            Text(user?.email ?: "", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        }
                     }
                 }
-                Spacer(Modifier.height(48.dp))
-            }
 
-            item {
-                Text("Wellness Overview", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
-                Spacer(Modifier.height(16.dp))
-                RealWellnessStatsRow(
-                    stats
-                )
-                Spacer(Modifier.height(48.dp))
-            }
+                item(span = StaggeredGridItemSpan.FullLine) {
+                    RealWellnessStatsRow(stats)
+                }
 
-            item {
-                Text("Your Resilience Journey", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
-                Spacer(Modifier.height(16.dp))
-                PulseBadgeCard(
-                    streak = stats.currentStreak
-                )
-            }
+                item(span = StaggeredGridItemSpan.FullLine) {
+                    Column {
+                        Row(
+                            modifier = Modifier.fillMaxWidth().padding(start = 16.dp,end = 16.dp,top = 24.dp),
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            ProfileFilter.entries.forEach { filter ->
+                                FilterChip(
+                                    selected = selectedFilter == filter,
+                                    onClick = { onFilterSelected(filter) },
+                                    label = {
+                                        Text(when(filter) {
+                                            ProfileFilter.MY_POSTS -> "My Posts"
+                                            ProfileFilter.LIKED -> "Liked"
+                                            ProfileFilter.BOOKMARKED -> "Saved"
+                                        })
+                                    },
+                                    leadingIcon = {
+                                        Icon(
+                                            imageVector = when(filter) {
+                                                ProfileFilter.MY_POSTS -> Icons.Default.Article
+                                                ProfileFilter.LIKED -> Icons.Default.Favorite
+                                                ProfileFilter.BOOKMARKED -> Icons.Default.Bookmark
+                                            },
+                                            contentDescription = null,
+                                            modifier = Modifier.size(16.dp)
+                                        )
+                                    }
+                                )
+                            }
+                        }
+                        Spacer(Modifier.height(16.dp))
+                    }
+                }
+
+                if (isLoading) {
+                    item(span = StaggeredGridItemSpan.FullLine) {
+                        Box(Modifier.fillMaxWidth().padding(32.dp), contentAlignment = Alignment.Center) {
+                            CircularProgressIndicator()
+                        }
+                    }
+                } else if (displayedStories.isEmpty()) {
+                    item(span = StaggeredGridItemSpan.FullLine) {
+                        Column(
+                            modifier = Modifier.fillMaxWidth().padding(32.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Icon(Icons.Default.Info, null, tint = MaterialTheme.colorScheme.outline)
+                            Spacer(Modifier.height(8.dp))
+                            Text("No posts found here yet.", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        }
+                    }
+                } else {
+                    items(displayedStories, key = { it.storyId }) { story ->
+                        StaggeredStoryItem(
+                            story = story,
+                            currentUserId = currentUserId,
+                            onLikeClick = { spaceViewModel.toggleLike(story) },
+                            onClick = { onCommentClick(story.storyId) }
+                        )
+                    }
+                }
+
         }
 
         VerticalDivider(thickness = 1.dp, color = MaterialTheme.colorScheme.outlineVariant)
@@ -533,7 +567,7 @@ private fun ProfileScreenExpanded(
                 fontWeight = FontWeight.Bold
             )
 
-            PulseBadgeCard(streak = 12)
+            PulseBadgeCard(totalPoints = stats.resiliencePoints)
 
             WellnessStatsRow(stats = stats)
 
@@ -547,32 +581,42 @@ private fun ProfileScreenExpanded(
                     Icon(Icons.Default.ShieldMoon, null, tint = MaterialTheme.colorScheme.primary)
                     Spacer(Modifier.width(12.dp))
                     Text(
-                        "Your spaces are end-to-end encrypted and AI-moderated for your safety.",
+                        "This is a safe space. Please be kind, supportive, and respectful to everyone in the Mindset Pulse community.",
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSecondaryContainer
                     )
                 }
             }
             AIPrivacyCard()
-            Spacer(Modifier.weight(1f))
-            OutlinedButton(
-                onClick = { /* Navigate to Security Rules Detail */ },
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(12.dp)
-            ) {
-                Icon(Icons.Default.Shield, null)
-                Spacer(Modifier.width(8.dp))
-                Text("Data Security Settings")
-            }
-            OutlinedButton(
-                onClick = {},
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(12.dp)
-            ) {
-                Icon(Icons.Default.Nightlife, null)
-                Spacer(Modifier.width(8.dp))
-                Text("Emergency Resources")
-            }
+            Spacer(Modifier.padding(vertical = 60.dp))
+        }
+    }
+
+}
+
+@Composable
+private fun SettingsItem(onClick: ()->Unit){
+    Card(
+        onClick = onClick,
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        shape = RoundedCornerShape(16.dp),
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Row(
+            modifier = Modifier.padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(
+                Icons.Default.Settings,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.primary
+            )
+            Spacer(Modifier.width(12.dp))
+            Text(
+                "Settings",
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onSurface
+            )
         }
     }
 }

@@ -57,7 +57,7 @@ fun SettingsScreen(
                 .fillMaxSize()
                 .padding(paddingValues)
         ) {
-            val contentModifier = if (maxWidth > 600.dp) {
+            val contentModifier = if (maxWidth > 800.dp) {
                 Modifier
                     .width(600.dp)
                     .align(Alignment.TopCenter)
@@ -70,11 +70,10 @@ fun SettingsScreen(
                 verticalArrangement = Arrangement.spacedBy(24.dp),
                 contentPadding = PaddingValues(bottom = 32.dp)
             ) {
-                // Section 1: Appearance
+
                 item {
                     SettingsSectionTitle("Appearance")
 
-                    // 1. Dark/Light Mode Selector
                     ThemeModeSelectorCard(
                         currentMode = state.themeMode,
                         onModeSelected = { viewModel.setThemeMode(it) }
@@ -82,14 +81,12 @@ fun SettingsScreen(
 
                     Spacer(Modifier.height(16.dp))
 
-                    // 2. Color Palette Selector
                     ColorPaletteSelectorCard(
                         currentPalette = state.themePalette,
                         onPaletteSelected = { viewModel.setThemePalette(it) }
                     )
                 }
 
-                // Section 2: Preferences
                 item {
                     SettingsSectionTitle("Preferences")
                     SettingsCard {
@@ -111,7 +108,6 @@ fun SettingsScreen(
                     }
                 }
 
-                // Section 3: Account Actions
                 item {
                     Spacer(Modifier.height(12.dp))
                     OutlinedButton(
@@ -135,8 +131,6 @@ fun SettingsScreen(
     }
 }
 
-// --- Cards & Selectors ---
-
 @Composable
 fun ThemeModeSelectorCard(
     currentMode: AppThemeMode,
@@ -149,9 +143,17 @@ fun ThemeModeSelectorCard(
     ) {
         Column(Modifier.padding(16.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(Icons.Default.Brightness4, null, tint = MaterialTheme.colorScheme.onSurface)
+                Icon(
+                    Icons.Default.Brightness4,
+                    null,
+                    tint = MaterialTheme.colorScheme.onSurface
+                )
                 Spacer(Modifier.width(12.dp))
-                Text("Theme Mode", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Medium)
+                Text(
+                    "Theme Mode",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Medium
+                )
             }
             Spacer(Modifier.height(16.dp))
             Row(
@@ -196,13 +198,20 @@ fun ColorPaletteSelectorCard(
     ) {
         Column(Modifier.padding(16.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(Icons.Default.Palette, null, tint = MaterialTheme.colorScheme.onSurface)
+                Icon(
+                    Icons.Default.Palette,
+                    null,
+                    tint = MaterialTheme.colorScheme.onSurface
+                )
                 Spacer(Modifier.width(12.dp))
-                Text("Color Palette", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Medium)
+                Text(
+                    "Color Palette",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Medium
+                )
             }
             Spacer(Modifier.height(16.dp))
 
-            // Palette Options
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 PaletteOptionRow(
                     palette = ThemePalette.NATURE,
@@ -282,8 +291,6 @@ fun PaletteOptionRow(
         }
     }
 }
-
-// --- Shared Helpers ---
 
 @Composable
 fun SettingsSectionTitle(text: String) {

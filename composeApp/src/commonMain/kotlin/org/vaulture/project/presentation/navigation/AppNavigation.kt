@@ -128,10 +128,13 @@ fun AppNavigation(
     val kmpAudioPlayer = rememberKmpAudioPlayer()
     val rhythmViewModel = remember { RhythmViewModel(kmpAudioPlayer) }
     val wellnessViewModel = remember { WellnessViewModel() }
+    val cbtViewModel: CBTViewModel = remember { CBTViewModel() }
+    val settingsViewModel = remember { SettingsViewModel() }
+
     val authState by loginViewModel.isAuthenticated.collectAsState(initial = null)
     val isFirstRun = remember { !OnboardingManager.hasCompletedOnboarding }
     val playerState by rhythmViewModel.uiState.collectAsState()
-
+    val settingsState by settingsViewModel.uiState.collectAsState()
 
     val startDestination: NavDestination? = when (authState) {
         true -> Routes.HOME
@@ -418,15 +421,12 @@ fun AppNavigation(
                             )
                         }
                         composable<Routes.CHECK_IN> {
-                            val cbtViewModel: CBTViewModel = remember { CBTViewModel() }
                             CBTScreen(
                                 navController = navController,
                                 viewModel = cbtViewModel
                             )
                         }
                         composable<Routes.SETTINGS> {
-                            val settingsViewModel =
-                                remember { SettingsViewModel() }
                             SettingsScreen(
                                 viewModel = settingsViewModel,
                                 onBack = { navController.popBackStack() },
@@ -596,7 +596,8 @@ fun AppNavigation(
                                     selectedStoryIdForComments =
                                         storyId
                                 },
-                                selectedFilter = selectedFilter
+                                selectedFilter = selectedFilter,
+                                onNavigateToSettings = {navController.navigate(Routes.SETTINGS)}
                             )
                         }
 
@@ -610,8 +611,7 @@ fun AppNavigation(
                 }
             }
         },
-        themeMode = AppThemeMode.DARK,
-        themePalette = ThemePalette.NATURE,
-        useDarkTheme = true,
+        themeMode = settingsState.themeMode,
+        themePalette = settingsState.themePalette
     )
 }

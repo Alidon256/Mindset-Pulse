@@ -39,6 +39,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import org.vaulture.project.domain.model.Story
+import org.vaulture.project.presentation.utils.formatTimestamp
 import org.vaulture.project.presentation.viewmodels.SpaceViewModel
 
 @Composable
@@ -133,7 +134,7 @@ fun CommentItem(comment: Story.Comment) {
             Text(comment.userName, style = MaterialTheme.typography.labelLarge, fontWeight = FontWeight.Bold)
             Text(comment.text, style = MaterialTheme.typography.bodyMedium)
             Text(
-                "Just now",
+                formatTimestamp(comment.timestamp),
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )

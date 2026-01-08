@@ -400,7 +400,7 @@ fun SpaceHomeScreenExpandable(
                             val memories by viewModel.filteredFeeds.collectAsState()
                             MemoriesScreen(
                                 modifier = Modifier.fillMaxSize(),
-                                stories = memories, // Pass filtered data
+                                stories = memories,
                                 viewModel = viewModel,
                                 onCommentClick = onCommentClick,
                                 onBookmarkClick = { storyId -> viewModel.toggleBookmark(memories.find { it.storyId == storyId }!!) }
@@ -427,7 +427,7 @@ fun SpaceHomeScreenExpandable(
                 fontWeight = FontWeight.Bold
             )
 
-            PulseBadgeCard(streak = 12)
+            PulseBadgeCard(totalPoints = statsState.stats.resiliencePoints)
 
             WellnessStatsRow(stats = statsState.stats)
 
@@ -448,28 +448,6 @@ fun SpaceHomeScreenExpandable(
                 }
             }
             AIPrivacyCard()
-
-            Spacer(Modifier.weight(1f))
-
-            // Helpful Resources shortcut
-            OutlinedButton(
-                onClick = { /* Navigate to Security Rules Detail */ },
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(12.dp)
-            ) {
-                Icon(Icons.Default.Shield, null)
-                Spacer(Modifier.width(8.dp))
-                Text("Data Security Settings")
-            }
-            OutlinedButton(
-                onClick = {},
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(12.dp)
-            ) {
-                Icon(Icons.Default.Nightlife, null)
-                Spacer(Modifier.width(8.dp))
-                Text("Emergency Resources")
-            }
         }
     }
 }

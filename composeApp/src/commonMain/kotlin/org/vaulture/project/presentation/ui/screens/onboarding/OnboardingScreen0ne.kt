@@ -1,23 +1,11 @@
 package org.vaulture.project.presentation.ui.screens.onboarding
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -37,119 +25,212 @@ fun OnboardingScreenOne(
     onNext: () -> Unit = {},
     onSkip: () -> Unit = {}
 ) {
+    val imageUrl = "https://images.pexels.com/photos/15286/pexels-photo.jpg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
+
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         containerColor = MaterialTheme.colorScheme.background
     ) { innerPadding ->
-        Column(
+        BoxWithConstraints(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(innerPadding),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.SpaceBetween
+                .padding(innerPadding)
         ) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 8.dp),
-                horizontalArrangement = Arrangement.End
-            ) {
-                TextButton(onClick = onSkip) {
-                    Text(
-                        "Skip",
-                        color = MaterialTheme.colorScheme.onSurfaceVariant, // Use theme color
-                        fontSize = 16.sp
-                    )
-                }
-            }
+            val isWideScreen = maxWidth > 800.dp
 
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center,
-                modifier = Modifier
-                    .weight(1f)
-                    .padding(horizontal = 24.dp)
-            ) {
-                Text(
-                    "Get Inspiration For Your New Day",
-                    fontSize = 28.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onBackground,
-                    textAlign = TextAlign.Center,
-                    lineHeight = 36.sp
-                )
-                Spacer(modifier = Modifier.height(24.dp))
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(300.dp)
-                        .clip(RoundedCornerShape(24.dp))
+            if (isWideScreen) {
+                Row(
+                    modifier = Modifier.fillMaxSize(),
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
                     AsyncImage(
-                        model = "https://images.pexels.com/photos/15286/pexels-photo.jpg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
-                        contentDescription = "Better Mindset",
+                        model = imageUrl,
+                        contentDescription = "Inspiration",
                         modifier = Modifier
-                            .fillMaxSize()
-                            .background(MaterialTheme.colorScheme.primary),
+                            .weight(1.2f)
+                            .fillMaxHeight(),
                         contentScale = ContentScale.Crop
                     )
+
+                    Column(
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxHeight()
+                            .padding(horizontal = 48.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 16.dp),
+                            horizontalArrangement = Arrangement.End
+                        ) {
+                            TextButton(onClick = onSkip) {
+                                Text(
+                                    "Skip",
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    fontSize = 16.sp
+                                )
+                            }
+                        }
+
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.Center,
+                            modifier = Modifier.weight(1f)
+                        ) {
+                            OnboardingOneContent(isWideScreen = true)
+                        }
+
+                        OnboardingOneNavigation(
+                            onNext = onNext,
+                            modifier = Modifier.padding(vertical = 24.dp)
+                        )
+                    }
                 }
-                Spacer(modifier = Modifier.height(24.dp))
-                Text(
-                    "Whether you’re seeking a quiet place to find your balance or the mental clarity to conquer the city grind, we’ve mapped out the best paths for your mindset.",
-                    fontSize = 18.sp,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    textAlign = TextAlign.Center,
-                    lineHeight = 26.sp
-                )
-            }
+            } else {
 
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 24.dp, vertical = 24.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-
-                Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                    Box(
-                        modifier = Modifier
-                            .height(8.dp)
-                            .width(32.dp)
-                            .background(Color(0xFF2E7D32), RoundedCornerShape(4.dp))
-                    )
-                    Box(
-                        modifier = Modifier
-                            .height(8.dp)
-                            .width(16.dp)
-                            .background(Color.Gray.copy(alpha = 0.3f), RoundedCornerShape(4.dp))
-                    )
-                    Box(
-                        modifier = Modifier
-                            .height(8.dp)
-                            .width(16.dp)
-                            .background(Color.Gray.copy(alpha = 0.3f), RoundedCornerShape(4.dp))
-                    )
-                }
-
-                Button(
-                    onClick = onNext,
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(0xFF2E7D32)
-                    ),
-                    shape = RoundedCornerShape(12.dp),
-                    modifier = Modifier.height(50.dp)
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize(),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.SpaceBetween
                 ) {
-                    Text(
-                        "Next",
-                        color = Color.White,
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.Medium,
-                        modifier = Modifier.padding(horizontal = 16.dp)
+
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp, vertical = 8.dp),
+                        horizontalArrangement = Arrangement.End
+                    ) {
+                        TextButton(onClick = onSkip) {
+                            Text(
+                                "Skip",
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                fontSize = 16.sp
+                            )
+                        }
+                    }
+
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center,
+                        modifier = Modifier
+                            .weight(1f)
+                            .padding(horizontal = 24.dp)
+                            .verticalScroll(rememberScrollState())
+                    ) {
+                        Text(
+                            "Get Inspiration For Your New Day",
+                            fontSize = 28.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.onBackground,
+                            textAlign = TextAlign.Center,
+                            lineHeight = 36.sp
+                        )
+                        Spacer(modifier = Modifier.height(24.dp))
+
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(300.dp)
+                                .clip(RoundedCornerShape(24.dp))
+                        ) {
+                            AsyncImage(
+                                model = imageUrl,
+                                contentDescription = "Better Mindset",
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .background(MaterialTheme.colorScheme.primary),
+                                contentScale = ContentScale.Crop
+                            )
+                        }
+                        Spacer(modifier = Modifier.height(24.dp))
+
+                        Text(
+                            "Whether you’re seeking a quiet place to find your balance or the mental clarity to conquer the city grind, we’ve mapped out the best paths for your mindset.",
+                            fontSize = 18.sp,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            textAlign = TextAlign.Center,
+                            lineHeight = 26.sp
+                        )
+                    }
+
+                    OnboardingOneNavigation(
+                        onNext = onNext,
+                        modifier = Modifier.padding(horizontal = 24.dp, vertical = 24.dp)
                     )
                 }
             }
+        }
+    }
+}
+
+@Composable
+private fun OnboardingOneContent(isWideScreen: Boolean) {
+    Text(
+        text = "Get Inspiration For Your New Day",
+        fontSize = if (isWideScreen) 36.sp else 28.sp,
+        fontWeight = FontWeight.Bold,
+        color = MaterialTheme.colorScheme.onBackground,
+        textAlign = TextAlign.Center,
+        lineHeight = if (isWideScreen) 44.sp else 36.sp
+    )
+    Spacer(modifier = Modifier.height(24.dp))
+    Text(
+        text = "Whether you’re seeking a quiet place to find your balance or the mental clarity to conquer the city grind, we’ve mapped out the best paths for your mindset.",
+        fontSize = 18.sp,
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
+        textAlign = TextAlign.Center,
+        lineHeight = 26.sp
+    )
+}
+
+@Composable
+private fun OnboardingOneNavigation(onNext: () -> Unit, modifier: Modifier = Modifier) {
+    Row(
+        modifier = modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        // Page Indicators
+        Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+            Box(
+                modifier = Modifier
+                    .height(8.dp)
+                    .width(32.dp)
+                    .background(MaterialTheme.colorScheme.primary, RoundedCornerShape(4.dp))
+            )
+            Box(
+                modifier = Modifier
+                    .height(8.dp)
+                    .width(16.dp)
+                    .background(Color.Gray.copy(alpha = 0.3f), RoundedCornerShape(4.dp))
+            )
+            Box(
+                modifier = Modifier
+                    .height(8.dp)
+                    .width(16.dp)
+                    .background(Color.Gray.copy(alpha = 0.3f), RoundedCornerShape(4.dp))
+            )
+        }
+
+        Button(
+            onClick = onNext,
+            colors = ButtonDefaults.buttonColors(
+                containerColor = MaterialTheme.colorScheme.primary
+            ),
+            shape = RoundedCornerShape(12.dp),
+            modifier = Modifier.height(50.dp)
+        ) {
+            Text(
+                "Next",
+                color = Color.White,
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Medium,
+                modifier = Modifier.padding(horizontal = 16.dp)
+            )
         }
     }
 }

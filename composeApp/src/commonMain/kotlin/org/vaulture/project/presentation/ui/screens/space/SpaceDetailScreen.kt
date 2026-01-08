@@ -33,6 +33,7 @@ import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
 import kotlinx.coroutines.launch
 import org.vaulture.project.domain.model.SpaceMessage
+import org.vaulture.project.presentation.ui.components.MemberAvatarStack
 import org.vaulture.project.presentation.ui.components.PostItem
 import org.vaulture.project.presentation.ui.screens.space.CommentSheetContentSpace
 import org.vaulture.project.presentation.ui.screens.space.SpacesListContent
@@ -102,7 +103,7 @@ fun SpaceDetailScreen(
     }
 
     BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
-        val isWideScreen = maxWidth > 920.dp
+        val isWideScreen = maxWidth > 1000.dp
 
         if (!isWideScreen) {
             Scaffold(
@@ -120,6 +121,7 @@ fun SpaceDetailScreen(
                                 Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back")
                             }
                         },
+                        
                         colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.background)
                     )
                 },
@@ -162,28 +164,9 @@ fun SpaceDetailScreen(
                 }
             }
         } else {
-            Row(modifier = Modifier
-                .fillMaxSize()
-                .background(MaterialTheme.colorScheme.background)
-            ) {
-                Box(modifier = Modifier.width(340.dp).padding(top = 24.dp)) {
-                    val spaces by viewModel.filteredSpaces.collectAsState()
-                    SpacesListContent(
-                        spaces = spaces,
-                        onSpaceClick = { newSpaceId ->
-                            println("[UI] User clicked space: $newSpaceId. Triggering Join...")
-                            viewModel.loadSpaceDetails(newSpaceId)
-                            viewModel.joinSpace(newSpaceId)
-                            onSpaceSelected(newSpaceId)
-                        },
-                        activeSpaceId = activeSpaceId
-                    )
-                }
-
-                VerticalDivider(thickness = 1.dp, color = MaterialTheme.colorScheme.outlineVariant)
-
-                Column(modifier = Modifier.weight(1f).fillMaxHeight()) {
-                    TopAppBar(
+            Scaffold(
+                topBar = {
+                    CenterAlignedTopAppBar(
                         title = {
                             Text(
                                 text = space?.name ?: "Loading...",
@@ -196,10 +179,50 @@ fun SpaceDetailScreen(
                                 Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back")
                             }
                         },
+                        actions = {
+                            Row(
+                                modifier = Modifier.padding(end = 16.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                MemberAvatarStack(
+                                    photos = space?.memberPhotoUrls ?: emptyList(),
+                                    totalCount = space?.memberIds?.size ?: 0
+                                )
+                            }
+                        },
                         colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.background)
                     )
-
-                    Column(Modifier.fillMaxSize().padding(horizontal = 24.dp)) {
+                },
+                floatingActionButton = {
+                    AnimatedVisibility(
+                        visible = selectedTab == SpaceDetailTab.POSTS,
+                        enter = scaleIn() + fadeIn(),
+                        exit = scaleOut() + fadeOut()
+                    ) {
+                        ExtendedFloatingActionButton(
+                            onClick = { showCreatePostDialog = true },
+                            containerColor = MaterialTheme.colorScheme.primary,
+                            contentColor = MaterialTheme.colorScheme.onPrimary,
+                            icon = { Icon(Icons.Default.Add, null) },
+                            text = { Text("Share Reflection") }
+                        )
+                    }
+                },
+                containerColor = MaterialTheme.colorScheme.background
+            ) { paddingValues ->
+                BoxWithConstraints(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(paddingValues)
+                ) {
+                    val contentModifier = if (maxWidth > 600.dp) {
+                        Modifier
+                            .width(600.dp)
+                            .align(Alignment.TopCenter)
+                    } else {
+                        Modifier.fillMaxWidth()
+                    }
+                    Column(contentModifier.padding(horizontal = 16.dp)) {
                         SpaceDetailTabs(
                             selectedTab,
                             { selectedTab = it })

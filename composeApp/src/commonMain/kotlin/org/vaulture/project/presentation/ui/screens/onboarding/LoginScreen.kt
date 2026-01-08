@@ -77,7 +77,7 @@ fun LoginScreen(
                     contentAlignment = Alignment.Center
                 ) {
                     AsyncImage(
-                        model = "https://images.pexels.com/photos/931007/pexels-photo-931007.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
+                        model = "https://images.pexels.com/photos/1001682/pexels-photo-1001682.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
                         contentDescription = "Decorative background",
                         contentScale = ContentScale.Crop,
                         modifier = Modifier.fillMaxSize()

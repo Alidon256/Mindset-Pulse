@@ -1,9 +1,10 @@
 package org.vaulture.project.presentation.ui.screens.onboarding
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -15,126 +16,124 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import org.jetbrains.compose.resources.painterResource
+import coil3.compose.AsyncImage
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.vaulture.project.presentation.theme.AppTheme
 import org.vaulture.project.presentation.theme.AppThemeMode
 import org.vaulture.project.presentation.theme.ThemePalette
-import vaulture.composeapp.generated.resources.*
 
 @Composable
-
 fun OnboardingScreenTwo(
     onNext: () -> Unit = {},
     onSkip: () -> Unit = {}
 ) {
+    val natureImageUrl = "https://images.pexels.com/photos/15286/pexels-photo.jpg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
+
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         containerColor = MaterialTheme.colorScheme.background
     ) { innerPadding ->
-        Column(
+        BoxWithConstraints(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(innerPadding),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.SpaceBetween
+                .padding(innerPadding)
         ) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 8.dp),
-                horizontalArrangement = Arrangement.End
-            ) {
-                TextButton(onClick = onSkip) {
-                    Text(
-                        "Skip",
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        fontSize = 16.sp
-                    )
-                }
-            }
+            val isWideScreen = maxWidth > 800.dp
 
-
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center,
-                modifier = Modifier.weight(1f).padding(horizontal = 24.dp)
-            ) {
-                Text(
-                    "Find Your inner peace",
-                    fontSize = 28.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onBackground,
-                    textAlign = TextAlign.Center
-                )
-                Spacer(modifier = Modifier.height(16.dp))
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(300.dp)
-                        .clip(RoundedCornerShape(24.dp)) // Added clipping for a softer look
+            if (isWideScreen) {
+                Row(
+                    modifier = Modifier.fillMaxSize(),
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Image(
-                        painter = painterResource(Res.drawable.val_2),
-                        contentDescription = "Mindset Image",
+                    AsyncImage(
+                        model = natureImageUrl,
+                        contentDescription = "Find your inner peace",
                         modifier = Modifier
-                            .fillMaxSize()
-                            .background(Color(0xFF1B5E20)),
+                            .weight(1.2f)
+                            .fillMaxHeight(),
                         contentScale = ContentScale.Crop
                     )
-                }
-                Spacer(modifier = Modifier.height(24.dp))
-                Text(
-                    "Discover more of what can improve on how you feel and react to the available environment.",
-                    fontSize = 18.sp,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    textAlign = TextAlign.Center,
-                    lineHeight = 26.sp
-                )
-            }
 
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 24.dp, vertical = 24.dp), // Consistent padding
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                 Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                    Box(
+                    Column(
                         modifier = Modifier
-                            .height(8.dp)
-                            .width(16.dp)
-                            .background(Color.Gray.copy(alpha = 0.3f), RoundedCornerShape(4.dp))
-                    )
-                    Box(
-                        modifier = Modifier
-                            .height(8.dp)
-                            .width(32.dp)
-                            .background(Color(0xFF2E7D32), RoundedCornerShape(4.dp))
-                    )
-                    Box(
-                        modifier = Modifier
-                            .height(8.dp)
-                            .width(16.dp)
-                            .background(Color.Gray.copy(alpha = 0.3f), RoundedCornerShape(4.dp))
-                    )
-                }
+                            .weight(1f)
+                            .fillMaxHeight()
+                            .padding(horizontal = 48.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.SpaceBetween
+                    ) {
 
-                Button(
-                    onClick = onNext,
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(0xFF2E7D32)
-                    ),
-                    shape = RoundedCornerShape(12.dp),
-                    modifier = Modifier.height(50.dp)
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 16.dp),
+                            horizontalArrangement = Arrangement.End
+                        ) {
+                            TextButton(onClick = onSkip) {
+                                Text("Skip", fontSize = 16.sp)
+                            }
+                        }
+
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.Center,
+                            modifier = Modifier.weight(1f)
+                        ) {
+                            OnboardingContent(isWideScreen = true)
+                        }
+
+                        OnboardingNavigation(
+                            onNext = onNext,
+                            modifier = Modifier.padding(vertical = 24.dp)
+                        )
+                    }
+                }
+            } else {
+                Column(
+                    modifier = Modifier.fillMaxSize(),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.SpaceBetween
                 ) {
-                    Text(
-                        "Next",
-                        color = Color.White,
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.Medium,
-                        modifier = Modifier.padding(horizontal = 16.dp)
+
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp, vertical = 8.dp),
+                        horizontalArrangement = Arrangement.End
+                    ) {
+                        TextButton(onClick = onSkip) {
+                            Text("Skip", fontSize = 16.sp)
+                        }
+                    }
+
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center,
+                        modifier = Modifier
+                            .weight(1f)
+                            .padding(horizontal = 24.dp)
+                            .verticalScroll(rememberScrollState())
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .aspectRatio(1f)
+                                .clip(RoundedCornerShape(24.dp))
+                        ) {
+                            AsyncImage(
+                                model = natureImageUrl,
+                                contentDescription = "Mindset Image",
+                                modifier = Modifier.fillMaxSize(),
+                                contentScale = ContentScale.Crop
+                            )
+                        }
+                        Spacer(modifier = Modifier.height(24.dp))
+                        OnboardingContent(isWideScreen = false)
+                    }
+
+                    OnboardingNavigation(
+                        onNext = onNext,
+                        modifier = Modifier.padding(horizontal = 24.dp, vertical = 24.dp)
                     )
                 }
             }
@@ -143,10 +142,76 @@ fun OnboardingScreenTwo(
 }
 
 @Composable
+private fun OnboardingContent(isWideScreen: Boolean) {
+    Text(
+        text = "Find Your Inner Peace",
+        fontSize = if (isWideScreen) 36.sp else 28.sp,
+        fontWeight = FontWeight.Bold,
+        color = MaterialTheme.colorScheme.onBackground,
+        textAlign = TextAlign.Center
+    )
+    Spacer(modifier = Modifier.height(16.dp))
+    Text(
+        text = "Discover tools and insights that help you understand and improve how you feel and react to the world around you.",
+        fontSize = 18.sp,
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
+        textAlign = TextAlign.Center,
+        lineHeight = 26.sp
+    )
+}
+
+
+@Composable
+private fun OnboardingNavigation(onNext: () -> Unit, modifier: Modifier = Modifier) {
+    Row(
+        modifier = modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+            Box(
+                modifier = Modifier
+                    .height(8.dp)
+                    .width(16.dp)
+                    .background(Color.Gray.copy(alpha = 0.3f), RoundedCornerShape(4.dp))
+            )
+            Box(
+                modifier = Modifier
+                    .height(8.dp)
+                    .width(32.dp)
+                    .background(MaterialTheme.colorScheme.primary, RoundedCornerShape(4.dp))
+            )
+            Box(
+                modifier = Modifier
+                    .height(8.dp)
+                    .width(16.dp)
+                    .background(Color.Gray.copy(alpha = 0.3f), RoundedCornerShape(4.dp))
+            )
+        }
+
+        Button(
+            onClick = onNext,
+            colors = ButtonDefaults.buttonColors(
+                containerColor = MaterialTheme.colorScheme.primary
+            ),
+            shape = RoundedCornerShape(12.dp),
+            modifier = Modifier.height(50.dp)
+        ) {
+            Text(
+                "Next",
+                color = Color.White,
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Medium,
+                modifier = Modifier.padding(horizontal = 16.dp)
+            )
+        }
+    }
+}
+
+@Composable
 @Preview
 fun OnboardingScreenTwoPreview() {
     AppTheme(
-        useDarkTheme = true,
         themeMode = AppThemeMode.DARK,
         themePalette = ThemePalette.NATURE,
         content = {

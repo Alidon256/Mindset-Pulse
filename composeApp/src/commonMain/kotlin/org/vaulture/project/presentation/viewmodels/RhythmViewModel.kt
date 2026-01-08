@@ -3,6 +3,7 @@ package org.vaulture.project.presentation.viewmodels
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.auth.auth
 import dev.gitlive.firebase.firestore.Direction
+import dev.gitlive.firebase.firestore.FieldValue
 import dev.gitlive.firebase.firestore.firestore
 import dev.icerock.moko.mvvm.viewmodel.ViewModel
 import kotlinx.coroutines.*
@@ -115,16 +116,29 @@ class RhythmViewModel(
 
     fun playTrack(track: RhythmTrack) {
         _uiState.update { it.copy(currentTrack = track) }
-        val url = if (track.previewUrl.isNotBlank()) track.previewUrl else track.previewUrl
 
+        val url = if (track.previewUrl.isNotBlank()) track.previewUrl else track.previewUrl
         if (url.isNotBlank()) {
             println(" RHYTHM: Attempting to play URL: $url")
             audioPlayer.play(url, track.title, track.artist)
+
+            incrementListenerCount(track.id)
         } else {
             println("RHYTHM: No valid URL found for track ${track.title}")
         }
     }
-
+    private fun incrementListenerCount(trackId: String) {
+        viewModelScope.launch {
+            try {
+                firestore.collection("tracks").document(trackId).update(
+                    "listenerCount" to FieldValue.increment(1)
+                )
+                println("Listener count incremented for $trackId")
+            } catch (e: Exception) {
+                println("Failed to increment listener count: ${e.message}")
+            }
+        }
+    }
 
     private fun loadTracks() {
         viewModelScope.launch {
@@ -142,7 +156,7 @@ class RhythmViewModel(
 
                         _uiState.update { it.copy(
                             tracks = tracks,
-                            isTracksLoading = false, // CRITICAL: Stop loading
+                            isTracksLoading = false,
                             error = null
                         ) }
                     }

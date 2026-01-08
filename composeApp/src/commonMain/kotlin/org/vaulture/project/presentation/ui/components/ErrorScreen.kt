@@ -96,7 +96,6 @@ fun ErrorScreenPreview() {
             ErrorScreen({}, {})
         },
         themeMode = AppThemeMode.DARK,
-        themePalette = ThemePalette.NATURE,
-        useDarkTheme = true,
+        themePalette = ThemePalette.NATURE
     )
 }
