@@ -134,6 +134,17 @@ Mindset Pulse leverages a rich ecosystem of libraries for cross-platform develop
 - **Kotlin Test** – Unit testing across platforms.
 ---
 
+## 👨‍💻 Developed By
+**Anthony Mugumya**  
+*Built with ❤️ using Kotlin Multiplatform, Compose Multiplatform, and Gemini AI.*
+
+---
+
+## 📜 License
+
+This project is licensed under the **MIT License** – you are free to use, modify, and distribute it with proper attribution.
+
+---
 ## 🔑 Configuring Your Own Gemini API Key
 
 By default, the `GeminiService` class includes a placeholder API key for demonstration.  
@@ -151,8 +162,5 @@ In `GeminiService.kt` (located under `package org.vaulture.project.data.remote`)
 ```kotlin
 // Replace this line with your own key
 private val apiKey = "YOUR_REAL_API_KEY_HERE"
+---
 
-
-## 👨‍💻 Developed By
-**Anthony Mugumya**  
-*Built with ❤️ using Kotlin Multiplatform, Compose Multiplatform, and Gemini AI.*
