@@ -61,7 +61,7 @@ Mindset Pulse is built using **Clean Architecture** to ensure maximum code reuse
 
 ---
 
-## 🧪 How to Judge Key Features
+## 🧪 How to Use Key Features
 1. **Onboarding** – Experience the responsive *Ocean* and *Nature* themed onboarding flow.  
 2. **The Pulse** – Tap the FAB on Home, answer questions. In the text field, type: *“I am feeling extremely exhausted and can't focus on work anymore.”*  
 3. **The Analysis** – Watch Gemini detect sentiment and the Risk Engine classify the state as **Burnout Risk**.  
@@ -133,6 +133,25 @@ Mindset Pulse leverages a rich ecosystem of libraries for cross-platform develop
 ### 🔹 Testing 
 - **Kotlin Test** – Unit testing across platforms.
 ---
+
+## 🔑 Configuring Your Own Gemini API Key
+
+By default, the `GeminiService` class includes a placeholder API key for demonstration.  
+If you want to use your own **Google Gemini API key**, follow these steps:
+
+### 1. Obtain an API Key
+- Go to the [Google AI Studio](https://ai.google.dev/) or your Google Cloud Console.
+- Create a new project (if you don’t already have one).
+- Enable the **Generative Language API**.
+- Generate an API key under **Credentials**.
+
+### 2. Update the Code
+In `GeminiService.kt` (located under `package org.vaulture.project.data.remote`), replace the placeholder key:
+
+```kotlin
+// Replace this line with your own key
+private val apiKey = "YOUR_REAL_API_KEY_HERE"
+
 
 ## 👨‍💻 Developed By
 **Anthony Mugumya**  
