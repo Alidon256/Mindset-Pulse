@@ -117,7 +117,6 @@ Mindset Pulse leverages a rich ecosystem of libraries for cross-platform develop
 - **Firebase BOM (Auth, Firestore, Storage)** – Unified backend services.
 - **Coil (OkHttp)** – Image loading and caching.
 - **Ktor CIO Client** – High-performance networking.
-- **Google Play Services Location** – Context-aware features.
 - **Media3 (ExoPlayer, UI, Session, DASH, HLS)** – Advanced audio/video playback.
 
 ### 🔹 Common Multiplatform 
