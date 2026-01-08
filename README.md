@@ -1,55 +1,140 @@
-This is a Kotlin Multiplatform project targeting Android, Web.
+# Mindset Pulse 🧠✨
+**Kotlin Multiplatform | Compose Multiplatform | Google Gemini AI**
 
-* [/composeApp](./composeApp/src) is for code that will be shared across your Compose Multiplatform applications.
-  It contains several subfolders:
-  - [commonMain](./composeApp/src/commonMain/kotlin) is for code that’s common for all targets.
-  - Other folders are for Kotlin code that will be compiled for only the platform indicated in the folder name.
-    For example, if you want to use Apple’s CoreCrypto for the iOS part of your Kotlin app,
-    the [iosMain](./composeApp/src/iosMain/kotlin) folder would be the right place for such calls.
-    Similarly, if you want to edit the Desktop (JVM) specific part, the [jvmMain](./composeApp/src/jvmMain/kotlin)
-    folder is the appropriate location.
+> **Mindset Pulse**  
+> An intelligent, empathetic early-warning system designed to combat burnout and stress, with a specific focus on the unique pressures facing the African youth and professional workforce.
 
-### Build and Run Android Application
-
-To build and run the development version of the Android app, use the run configuration from the run widget
-in your IDE’s toolbar or build it directly from the terminal:
-- on macOS/Linux
-  ```shell
-  ./gradlew :composeApp:assembleDebug
-  ```
-- on Windows
-  ```shell
-  .\gradlew.bat :composeApp:assembleDebug
-  ```
-
-### Build and Run Web Application
-
-To build and run the development version of the web app, use the run configuration from the run widget
-in your IDE's toolbar or run it directly from the terminal:
-- for the Wasm target (faster, modern browsers):
-  - on macOS/Linux
-    ```shell
-    ./gradlew :composeApp:wasmJsBrowserDevelopmentRun
-    ```
-  - on Windows
-    ```shell
-    .\gradlew.bat :composeApp:wasmJsBrowserDevelopmentRun
-    ```
-- for the JS target (slower, supports older browsers):
-  - on macOS/Linux
-    ```shell
-    ./gradlew :composeApp:jsBrowserDevelopmentRun
-    ```
-  - on Windows
-    ```shell
-    .\gradlew.bat :composeApp:jsBrowserDevelopmentRun
-    ```
+[![Kotlin](https://img.shields.io/badge/Kotlin-1.9.23-blue.svg?style=flat&logo=kotlin)](https://kotlinlang.org/)  
+[![Compose Multiplatform](https://img.shields.io/badge/Compose%20Multiplatform-1.6.1-purple.svg?style=flat&logo=jetpackcompose)](https://www.jetbrains.com/lp/compose-multiplatform/)  
+[![Firebase](https://img.shields.io/badge/Backend-Firebase-orange.svg?style=flat&logo=firebase)](https://firebase.google.com/)  
+[![Gemini AI](https://img.shields.io/badge/AI-Google%20Gemini-red.svg?style=flat&logo=google-gemini)](https://deepmind.google/technologies/gemini/)
 
 ---
 
-Learn more about [Kotlin Multiplatform](https://www.jetbrains.com/help/kotlin-multiplatform-dev/get-started.html),
-[Compose Multiplatform](https://github.com/JetBrains/compose-multiplatform/#compose-multiplatform),
-[Kotlin/Wasm](https://kotl.in/wasm/)…
+## 🌍 The Problem: The Hidden Burnout Epidemic
+In Africa's fast-growing tech and professional hubs, "hustle culture" often masks a serious mental health crisis. Burnout is frequently ignored until it results in severe clinical exhaustion. **Mindset Pulse** uses Kotlin Multiplatform to deliver an accessible, low-friction tool that acts as a mental health "check-engine" light.
 
-We would appreciate your feedback on Compose/Web and Kotlin/Wasm in the public Slack channel [#compose-web](https://slack-chats.kotlinlang.org/c/compose-web).
-If you face any issues, please report them on [YouTrack](https://youtrack.jetbrains.com/newIssue?project=CMP).
+---
+
+## 🚀 Key Features
+* **AI-Curated Daily Check-ins** – Gemini AI dynamically generates empathetic questions based on stress, sleep, and workload.  
+* **Responsible AI Engine** – Text responses are analyzed by Gemini for sentiment, but the final **Risk Score (0-100)** is calculated by a transparent, shared KMP Risk Engine.  
+* **Relaxation Rhythms** – A cross-platform audio player for focus and mindfulness, featuring an industry-standard floating mini-player. Recommendations adapt to the time of day.  
+* **Safe Spaces** – Real-time community hubs for peer support. Users can create spaces, upload images with metadata, chat, react to posts, and share memories. Important stories can be saved to profiles.  
+* **Mindful Actions** – Guided **Breathing, Yoga, and Meditation** sessions with real-time timers and animations. Users select durations, complete exercises, and earn streaks + XP points stored in the database.  
+* **Profile Tracking** – A personalized dashboard that logs all user activities: analytics, saved posts, uploaded posts, liked posts, and progression levels.  
+* **Settings & Personalization** – Switch between Dark/Light themes, choose immersive color schemes (Nature, Ocean, etc.), and manage account preferences including Sign Out.  
+* **Gamified Growth** – 20 levels of "Mindset Progression" (from Initiate to Pulse Master) to reward consistent mental health maintenance.  
+* **Responsive Master-Detail UI** – A high-performance web dashboard layout that adapts seamlessly to mobile devices.  
+
+---
+
+## 🏗️ Technical Architecture
+Mindset Pulse is built using **Clean Architecture** to ensure maximum code reuse (90%+) across Android and Web.
+
+### Shared Logic (`:composeApp:commonMain`)
+* **Domain Layer** – Rule-based `RiskEngine` and `TrendAnalyzer` written in pure Kotlin.  
+* **Data Layer** – Cloud-first approach using `GitLive Firebase KMP` for Firestore, Auth, and Storage.  
+* **Service Layer** – `GeminiService` using Ktor for high-speed, structured AI analysis.  
+* **Presentation Layer** – Shared `MVVM` using Moko ViewModels to drive identical UI state on all platforms.  
+
+---
+
+## 🛠️ Installation & Launch Instructions
+
+### Prerequisites
+* Android Studio Jellyfish+ or IntelliJ IDEA 2024.1+  
+* JDK 17  
+
+### 📱 Launching Android
+1. Open the project in Android Studio.  
+2. Ensure the `google-services.json` is located in the `composeApp` folder.  
+3. Select `composeApp` in run configurations.  
+4. Click **Run** on an Emulator or Physical Device (API 24+).  
+
+### 🌐 Launching Web (Browser)
+1. Open the terminal in the project root.  
+2. Run: `./gradlew :composeApp:jsBrowserDevelopmentRun`  
+3. The app will open at `http://localhost:8080`.  
+
+**Note:** On Web, users should **sign in using Email authentication only**. Google Sign-In is **not working for now**.  
+
+---
+
+## 🧪 How to Judge Key Features
+1. **Onboarding** – Experience the responsive *Ocean* and *Nature* themed onboarding flow.  
+2. **The Pulse** – Tap the FAB on Home, answer questions. In the text field, type: *“I am feeling extremely exhausted and can't focus on work anymore.”*  
+3. **The Analysis** – Watch Gemini detect sentiment and the Risk Engine classify the state as **Burnout Risk**.  
+4. **Analytics** – Visit the Analytics tab to see a full Markdown report generated by Gemini.  
+5. **Spaces** – Create a space, upload images, chat, post, react, and save important stories to profiles.  
+6. **Rhythms** – Test the audio player on Web + Android. Observe time-of-day recommendations and seamless playback.  
+7. **Mindful Actions** – Select durations for Breathing, Yoga, or Meditation. Complete sessions and verify streaks + XP updates.  
+8. **Profile** – Check the Profile screen to see logged activities: analytics, saved posts, uploaded posts, liked posts, and progression levels.  
+9. **Settings** – Switch between Dark/Light themes, try different color schemes (Nature, Ocean, etc.), and test the Sign Out feature.  
+
+---
+
+## 📸 Screenshots
+
+### Home
+![Home Screen](https://firebasestorage.googleapis.com/v0/b/tija-a7b75.firebasestorage.app/o/My%20videos%2FScreenshot%20(1366).png?alt=media&token=0184d16c-6761-432b-be05-ebfede36543c)
+
+### Spaces
+![Spaces Screen](https://firebasestorage.googleapis.com/v0/b/tija-a7b75.firebasestorage.app/o/My%20videos%2FScreenshot%20(1373).png?alt=media&token=b9e58251-b714-4e98-8f5e-a66f16174f6e)
+
+### Mindful Actions
+![Mindful Actions Screen](https://firebasestorage.googleapis.com/v0/b/tija-a7b75.firebasestorage.app/o/My%20videos%2FScreenshot%20(1372).png?alt=media&token=1d5fbfca-c768-43cf-a2ac-7f9a2953b38a)
+
+### Profile
+![Profile Screen](https://firebasestorage.googleapis.com/v0/b/tija-a7b75.firebasestorage.app/o/My%20videos%2FScreenshot%20(1365).png?alt=media&token=ab1bc094-e5fa-48ca-ad3a-286966cb693a)
+
+---
+
+## 🎥 Demo Video
+
+Watch the full demo of **Mindset Pulse** in action:  
+[▶️ Click here to view the demo](https://firebasestorage.googleapis.com/v0/b/tija-a7b75.firebasestorage.app/o/My%20videos%2FMindset%20Pulse%20Video.mp4?alt=media&token=ddb883f7-2374-4436-8199-a1ca996d2fa2)
+
+Or embed a thumbnail:
+
+[![Watch the Demo](https://firebasestorage.googleapis.com/v0/b/tija-a7b75.firebasestorage.app/o/My%20videos%2FScreenshot%20(1362).png?alt=media&token=f3dd592c-8b1d-4f83-8046-ca4df4545e41)](https://firebasestorage.googleapis.com/v0/b/tija-a7b75.firebasestorage.app/o/My%20videos%2FMindset%20Pulse%20Video.mp4?alt=media&token=ddb883f7-2374-4436-8199-a1ca996d2fa2)
+
+**Disclaimer:** The Windows recorder could not capture the **image picker** during recording. This feature **works correctly in the app**, even though it is not visible in the demo video. 
+---
+
+## 📚 Libraries & Dependencies 
+Mindset Pulse leverages a rich ecosystem of libraries for cross-platform development: 
+
+### 🔹 Core Plugins 
+- **Kotlin Multiplatform** – Enables shared logic across Android, Web, and (future) WASM.
+- **Compose Multiplatform** – Declarative UI framework for Android + Web.
+- **Compose Compiler** – Optimized compiler for Jetpack Compose.
+- **Kotlinx Serialization** – JSON serialization for structured data exchange.
+
+### 🔹 Android-Specific
+- **AndroidX Activity Compose** – Lifecycle-aware integration with Compose.
+- **Google Play Services Auth** – Secure authentication flows.
+- **Firebase BOM (Auth, Firestore, Storage)** – Unified backend services.
+- **Coil (OkHttp)** – Image loading and caching.
+- **Ktor CIO Client** – High-performance networking.
+- **Google Play Services Location** – Context-aware features.
+- **Media3 (ExoPlayer, UI, Session, DASH, HLS)** – Advanced audio/video playback.
+
+### 🔹 Common Multiplatform 
+- **Compose Runtime, Foundation, Material3, UI** – Core UI building blocks.
+- **Lifecycle ViewModel + Runtime Compose** – MVVM state management.
+- **Material Icons Extended** – Rich iconography.
+- **Coil Compose + Ktor** – Image loading across platforms.
+- **Navigation Compose** – Declarative navigation.
+- **MVVM Core** – Shared architecture for ViewModels.
+- **Firebase (Auth, Firestore, Storage, Database)** – Cloud-first data handling. - **Kotlinx Serialization Core + Datetime** – Data modeling and time utilities.
+- **Ktor (Core, Content Negotiation, JSON, Logging)** – Networking + structured API calls.
+- **Multiplatform Markdown Renderer (M3)** – Rich text rendering for analytics reports.
+  
+### 🔹 Testing 
+- **Kotlin Test** – Unit testing across platforms.
+---
+
+## 👨‍💻 Developed By
+**Anthony Mugumya**  
+*Built with ❤️ using Kotlin Multiplatform, Compose Multiplatform, and Gemini AI.*
