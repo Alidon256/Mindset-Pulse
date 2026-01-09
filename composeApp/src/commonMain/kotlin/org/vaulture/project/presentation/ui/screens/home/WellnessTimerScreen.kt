@@ -2,6 +2,7 @@ package org.vaulture.project.presentation.ui.screens.home
 
 import androidx.compose.animation.*
 import androidx.compose.animation.core.*
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -26,6 +27,7 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import org.vaulture.project.domain.model.WellnessType
 import org.vaulture.project.presentation.viewmodels.WellnessPhase
 import org.vaulture.project.presentation.viewmodels.WellnessUiState
 import org.vaulture.project.presentation.viewmodels.WellnessViewModel
@@ -215,45 +217,76 @@ private fun ExpandableInfoCard(title: String, description: String) {
 
 
 @Composable
-private fun ActiveTimerContent(modifier: Modifier, state: WellnessUiState, viewModel: WellnessViewModel) {
-    val infiniteTransition = rememberInfiniteTransition(label = "breathing_animation")
-    val breathScale by infiniteTransition.animateFloat(
-        initialValue = 1f, targetValue = 1.15f,
-        animationSpec = infiniteRepeatable(tween(4000, easing = EaseInOutSine), RepeatMode.Reverse),
-        label = "breathScale"
+private fun ActiveTimerContent(
+    modifier: Modifier,
+    state: WellnessUiState,
+    viewModel: WellnessViewModel
+) {
+    val currentType = state.currentActivity ?: WellnessType.BREATHING
+
+    val pulseConfig = when (currentType) {
+        WellnessType.BREATHING -> Pair(4000, 1.15f)
+        WellnessType.MEDITATION -> Pair(8000, 1.08f)
+        WellnessType.YOGA -> Pair(12000, 1.04f)
+    }
+
+    val infiniteTransition = rememberInfiniteTransition(label = "mindful_rhythm")
+    val animScale by infiniteTransition.animateFloat(
+        initialValue = 1f,
+        targetValue = pulseConfig.second,
+        animationSpec = infiniteRepeatable(
+            animation = tween(pulseConfig.first, easing = EaseInOutSine),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "pulseScale"
     )
+
     var showDialog by remember { mutableStateOf(false) }
 
     Column(
-        modifier.padding(24.dp),
+        modifier = modifier.padding(24.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        Text(
-            state.breathText,
-            style = MaterialTheme.typography.displaySmall,
+         Text(
+            text = state.breathText,
+            style = MaterialTheme.typography.headlineMedium,
             color = MaterialTheme.colorScheme.primary,
-            fontWeight = FontWeight.Black
+            fontWeight = FontWeight.Black,
+            textAlign = TextAlign.Center,
+            modifier = Modifier.height(80.dp).wrapContentHeight() // Prevents UI jump on long pose names
         )
-        Spacer(Modifier.height(48.dp))
 
+        Text(
+            text = currentType.name,
+            style = MaterialTheme.typography.labelLarge,
+            color = MaterialTheme.colorScheme.primary.copy(alpha = 0.6f),
+            modifier = Modifier.padding(top = 4.dp)
+        )
+
+        Spacer(Modifier.height(48.dp))
         Box(
             contentAlignment = Alignment.Center,
             modifier = Modifier
                 .size(300.dp)
-                .scale(breathScale)
+                .scale(animScale)
         ) {
             CircularProgressIndicator(
                 progress = { 1f },
                 modifier = Modifier.fillMaxSize(),
-                color = MaterialTheme.colorScheme.surfaceVariant,
-                strokeWidth = 12.dp,
+                color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+                strokeWidth = 10.dp,
                 strokeCap = StrokeCap.Round
             )
+
             val animatedProgress by animateFloatAsState(
-                targetValue = if (state.totalDurationSeconds > 0) state.timeLeftSeconds.toFloat() / state.totalDurationSeconds.toFloat() else 0f,
-                label = "timerProgress"
+                targetValue = if (state.totalDurationSeconds > 0)
+                    state.timeLeftSeconds.toFloat() / state.totalDurationSeconds.toFloat()
+                else 0f,
+                animationSpec = tween(1000, easing = LinearEasing),
+                label = "sessionProgress"
             )
+
             CircularProgressIndicator(
                 progress = { animatedProgress },
                 modifier = Modifier.fillMaxSize(),
@@ -262,34 +295,57 @@ private fun ActiveTimerContent(modifier: Modifier, state: WellnessUiState, viewM
                 strokeCap = StrokeCap.Round
             )
 
-            Text(
-                text = formatTime(state.timeLeftSeconds),
-                style = MaterialTheme.typography.displayMedium,
-                fontWeight = FontWeight.Bold
-            )
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Text(
+                    text = formatTime(state.timeLeftSeconds),
+                    style = MaterialTheme.typography.displayMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onBackground
+                )
+                Icon(
+                    imageVector = currentType.icon,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.3f),
+                    modifier = Modifier.size(32.dp)
+                )
+            }
         }
+
         Spacer(Modifier.height(64.dp))
 
         OutlinedButton(
-            onClick = { showDialog = true }
+            onClick = { showDialog = true },
+            shape = RoundedCornerShape(16.dp),
+            border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.5f))
         ) {
+            Icon(Icons.Default.Close, null, modifier = Modifier.size(18.dp))
+            Spacer(Modifier.width(8.dp))
             Text("End Session Early")
         }
 
         if (showDialog) {
             AlertDialog(
                 onDismissRequest = { showDialog = false },
-                title = { Text("End Session Early?") },
-                text = { Text("Are you sure you want to end your session? Every moment of mindfulness counts, but your progress for this session won't be saved.") },
+                title = { Text("End session early?") },
+                text = {
+                    Text("Every moment of mindfulness builds your Mindset Battery. Are you sure you want to pause your progress?")
+                },
                 confirmButton = {
-                    TextButton(onClick = {
-                        showDialog = false
-                        viewModel.resetToSetup()
-                    }) { Text("End Session") }
+                    Button(
+                        onClick = {
+                            showDialog = false
+                            viewModel.resetToSetup()
+                        },
+                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
+                    ) { Text("End Session") }
                 },
                 dismissButton = {
-                    TextButton(onClick = { showDialog = false }) { Text("Stay") }
-                }
+                    TextButton(onClick = { showDialog = false }) { Text("Stay Present") }
+                },
+                containerColor = MaterialTheme.colorScheme.surface,
+                textContentColor = MaterialTheme.colorScheme.onSurface,
+                titleContentColor = MaterialTheme.colorScheme.onSurface,
+                shape = RoundedCornerShape(28.dp)
             )
         }
     }

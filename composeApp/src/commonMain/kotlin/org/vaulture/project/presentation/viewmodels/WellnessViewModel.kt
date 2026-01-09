@@ -96,15 +96,14 @@ class WellnessViewModel : ViewModel() {
         val totalSeconds = durationMinutes * 60
         val type = _uiState.value.currentActivity ?: WellnessType.BREATHING
 
-        println("[BREADCRUMB] TIMER: Starting $type for $totalSeconds seconds")
-
         _uiState.update { it.copy(
             phase = WellnessPhase.ACTIVE,
             timeLeftSeconds = totalSeconds,
             totalDurationSeconds = totalSeconds,
             isTimerRunning = true,
             isCompleting = false,
-            sessionSaved = false
+            sessionSaved = false,
+            breathText = "Prepare"
         )}
 
         timerJob = viewModelScope.launch(Dispatchers.Main) {
@@ -113,24 +112,38 @@ class WellnessViewModel : ViewModel() {
                 while (isActive && _uiState.value.timeLeftSeconds > 0) {
                     delay(1000)
                     elapsed++
-                    val cycle = elapsed % 8
-                    val guide = if (cycle < 4) "BREATHE IN" else "BREATHE OUT"
+
+                    val newCue = when (type) {
+                        WellnessType.BREATHING -> {
+                            val cycle = elapsed % 8
+                            if (cycle < 4) "Inhale Deeply" else "Exhale Slowly"
+                        }
+                        WellnessType.MEDITATION -> {
+                            val cues = listOf("Observe your breath", "Let thoughts pass", "Be present", "Softly focus")
+                            cues[(elapsed / 30) % cues.size]
+                        }
+                        WellnessType.YOGA -> {
+                            val poses = listOf("Mountain Pose", "Forward Fold", "Cobra Stretch", "Child's Pose")
+                            poses[(elapsed / 45) % poses.size]
+                        }
+                        else -> "Stay Mindful"
+                    }
 
                     _uiState.update { it.copy(
                         timeLeftSeconds = it.timeLeftSeconds - 1,
-                        breathText = guide
+                        breathText = newCue
                     )}
                 }
 
                 if (isActive && _uiState.value.timeLeftSeconds == 0) {
-                    println("[BREADCRUMB] TIMER: Reached zero. Triggering database sync...")
                     completeActivity()
                 }
             } catch (e: Exception) {
-                println("[LOG] TIMER: Coroutine interrupted: ${e.message}")
+                println("[LOG] TIMER: ${e.message}")
             }
         }
     }
+
 
     private fun completeActivity() {
         val uid = auth.currentUser?.uid ?: return

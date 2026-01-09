@@ -7,7 +7,7 @@ import org.w3c.dom.HTMLAudioElement
 import kotlin.js.then
 
 class WebAudioPlayer : KmpAudioPlayer {
-    // Keep a reference to the single audio element
+
     private var audio: HTMLAudioElement? = window.document.createElement("audio") as HTMLAudioElement
 
     override val isPlaying = MutableStateFlow(false)
@@ -24,7 +24,7 @@ class WebAudioPlayer : KmpAudioPlayer {
         a.onpause = { isPlaying.value = false }
         a.ontimeupdate = { currentPosition.value = (a.currentTime * 1000).toLong() }
         a.onloadedmetadata = { duration.value = (a.duration * 1000).toLong() }
-        a.onended = { isPlaying.value = false } // Important for UI to update when song finishes
+        a.onended = { isPlaying.value = false }
     }
 
     override fun play(url: String, title: String, artist: String) {
@@ -54,7 +54,6 @@ class WebAudioPlayer : KmpAudioPlayer {
         audio?.currentTime = positionMs / 1000.0
     }
 
-    // New cleanup method to remove the element
     fun cleanup() {
         stop()
         audio?.src = ""
@@ -64,7 +63,7 @@ class WebAudioPlayer : KmpAudioPlayer {
 
 @Composable
 actual fun rememberKmpAudioPlayer(): KmpAudioPlayer {
-    // Use DisposableEffect to clean up when the screen is left
+
     val player = remember { WebAudioPlayer() }
 
     DisposableEffect(player) {
