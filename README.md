@@ -61,7 +61,7 @@ Mindset Pulse is built using **Clean Architecture** to ensure maximum code reuse
 
 ---
 
-## 🧪 How to Judge Key Features
+## 🧪 How to Use Key Features
 1. **Onboarding** – Experience the responsive *Ocean* and *Nature* themed onboarding flow.  
 2. **The Pulse** – Tap the FAB on Home, answer questions. In the text field, type: *“I am feeling extremely exhausted and can't focus on work anymore.”*  
 3. **The Analysis** – Watch Gemini detect sentiment and the Risk Engine classify the state as **Burnout Risk**.  
@@ -117,7 +117,6 @@ Mindset Pulse leverages a rich ecosystem of libraries for cross-platform develop
 - **Firebase BOM (Auth, Firestore, Storage)** – Unified backend services.
 - **Coil (OkHttp)** – Image loading and caching.
 - **Ktor CIO Client** – High-performance networking.
-- **Google Play Services Location** – Context-aware features.
 - **Media3 (ExoPlayer, UI, Session, DASH, HLS)** – Advanced audio/video playback.
 
 ### 🔹 Common Multiplatform 
@@ -138,3 +137,30 @@ Mindset Pulse leverages a rich ecosystem of libraries for cross-platform develop
 ## 👨‍💻 Developed By
 **Anthony Mugumya**  
 *Built with ❤️ using Kotlin Multiplatform, Compose Multiplatform, and Gemini AI.*
+
+---
+
+## 📜 License
+
+This project is licensed under the **MIT License** – you are free to use, modify, and distribute it with proper attribution.
+
+---
+## 🔑 Configuring Your Own Gemini API Key
+
+By default, the `GeminiService` class includes a placeholder API key for demonstration.  
+If you want to use your own **Google Gemini API key**, follow these steps:
+
+### 1. Obtain an API Key
+- Go to the [Google AI Studio](https://ai.google.dev/) or your Google Cloud Console.
+- Create a new project (if you don’t already have one).
+- Enable the **Generative Language API**.
+- Generate an API key under **Credentials**.
+
+### 2. Update the Code
+In `GeminiService.kt` (located under `package org.vaulture.project.data.remote`), replace the placeholder key:
+
+```kotlin
+// Replace this line with your own key
+private val apiKey = "YOUR_REAL_API_KEY_HERE"
+---
+
