@@ -354,12 +354,24 @@ open class SpaceViewModel(
         }
     }
 
+    // Inside SpaceViewModel.kt
+
     fun loadPublicProfile(userId: String) {
+
+        _targetUserProfile.value = null
         _isLoadingProfileData.value = true
+
         viewModelScope.launch {
             try {
                 val userDoc = firestore.collection("users").document(userId).get()
-                _targetUserProfile.value = userDoc.data<User>()
+
+                if (userDoc.exists) {
+                    val data = userDoc.data<User>()
+                    _targetUserProfile.value = data
+                    println("Profile Loaded: ${data.displayName}")
+                } else {
+                    _error.value = "Profile not found."
+                }
 
                 val storiesSnapshot = firestore.collection("stories")
                     .where { "userId" equalTo userId }
@@ -367,9 +379,12 @@ open class SpaceViewModel(
                     .orderBy("timestamp", Direction.DESCENDING)
                     .get()
 
-                _userStories.value = storiesSnapshot.documents.mapNotNull { it.data<Story>() }
+                _userStories.value = storiesSnapshot.documents.mapNotNull { doc ->
+                    try { doc.data<Story>().copy(storyId = doc.id) } catch (e: Exception) { null }
+                }
             } catch (e: Exception) {
-                _error.value = "Profile hidden or unavailable."
+                println("Profile Error: ${e.message}")
+                _error.value = "Connection to profile failed."
             } finally {
                 _isLoadingProfileData.value = false
             }

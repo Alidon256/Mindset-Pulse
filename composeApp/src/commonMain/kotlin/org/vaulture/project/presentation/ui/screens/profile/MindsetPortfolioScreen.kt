@@ -17,6 +17,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
+import org.vaulture.project.domain.model.User
 import org.vaulture.project.presentation.theme.PoppinsTypography
 import org.vaulture.project.presentation.ui.components.StaggeredStoryItem
 import org.vaulture.project.presentation.viewmodels.SpaceViewModel
@@ -66,8 +67,7 @@ fun MindsetPortfolioScreen(
             ) {
                 item(span = StaggeredGridItemSpan.FullLine) {
                     PortfolioHeader(
-                        name = userProfile?.displayName ?: "Unknown",
-                        photoUrl = userProfile?.photoUrl,
+                        user = userProfile,
                         isFollowing = isFollowing,
                         onConnectClick = { viewModel.toggleFollow(userId) }
                     )
@@ -97,8 +97,7 @@ fun MindsetPortfolioScreen(
 
 @Composable
 private fun PortfolioHeader(
-    name: String,
-    photoUrl: String?,
+    user: User?,
     isFollowing: Boolean,
     onConnectClick: () -> Unit
 ) {
@@ -110,7 +109,7 @@ private fun PortfolioHeader(
     ) {
         Box(contentAlignment = Alignment.BottomEnd) {
             AsyncImage(
-                model = photoUrl,
+                model = user?.photoUrl ?: "https://images.pexels.com/photos/1065084/pexels-photo-1065084.jpeg",
                 contentDescription = null,
                 modifier = Modifier
                     .size(120.dp)
@@ -135,11 +134,22 @@ private fun PortfolioHeader(
 
         Spacer(Modifier.height(16.dp))
 
-        Text(
-            name,
-            style = PoppinsTypography().headlineMedium,
-            fontWeight = FontWeight.Bold
-        )
+        if (user == null) {
+            Box(
+                modifier = Modifier
+                    .width(150.dp)
+                    .height(24.dp)
+                    .clip(RoundedCornerShape(4.dp))
+                    .background(MaterialTheme.colorScheme.surfaceVariant)
+            )
+        } else {
+            Text(
+                text = user.displayName ?: "Pulse Member",
+                style = PoppinsTypography().headlineMedium,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.onBackground
+            )
+        }
 
         Text(
             "Community Member",

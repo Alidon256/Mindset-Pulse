@@ -61,8 +61,7 @@ class GeminiService {
         }
     }
 
-    // private val apiKey = "YOUR_REAL_API_KEY_HERE"
-    private val apiKey = "AIzaSyB1zWHZRsnYW166zW6nG1CGE5IJentaCsQ"
+    private val apiKey = "YOUR_REAL_API_KEY_HERE"
     private val url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=$apiKey"
 
     private suspend fun <T> retryWithBackoff(
