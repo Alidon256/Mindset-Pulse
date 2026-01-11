@@ -25,6 +25,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import kotlinx.coroutines.launch
+import org.vaulture.project.presentation.theme.PoppinsTypography
 import org.vaulture.project.presentation.utils.ImagePicker
 import org.vaulture.project.presentation.viewmodels.SpaceViewModel
 
@@ -62,12 +63,15 @@ fun CreateSpaceScreen(
                     title = {
                         Text(
                             "Create Space",
-                            style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
+                            style = PoppinsTypography().titleMedium.copy(fontWeight = FontWeight.Bold)
                         )
                     },
                     navigationIcon = {
                         IconButton(onClick = onNavigateBack) {
-                            Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back")
+                            Icon(
+                                Icons.AutoMirrored.Filled.ArrowBack,
+                                "Back"
+                            )
                         }
                     },
                     colors = TopAppBarDefaults.topAppBarColors(
@@ -122,7 +126,10 @@ fun CreateSpaceScreen(
                                         modifier = Modifier.size(48.dp)
                                     )
                                     Spacer(Modifier.height(12.dp))
-                                    Text("Add a Calming Cover", style = MaterialTheme.typography.labelLarge)
+                                    Text(
+                                        "Add a Calming Cover",
+                                        style = PoppinsTypography().labelLarge
+                                    )
                                 }
                             }
                         }
@@ -130,8 +137,16 @@ fun CreateSpaceScreen(
                         OutlinedTextField(
                             value = viewModel.spaceName.value,
                             onValueChange = { viewModel.spaceName.value = it },
-                            label = { Text("Space Name") },
-                            placeholder = { Text("e.g., Morning Reflections") },
+                            label = { Text(
+                                "Space Name",
+                                style = PoppinsTypography().labelLarge
+                                )
+                            },
+                            placeholder = {
+                                Text("e.g., Morning Reflections",
+                                    style = PoppinsTypography().labelLarge
+                                )
+                            },
                             modifier = Modifier.fillMaxWidth(),
                             shape = RoundedCornerShape(16.dp),
                             singleLine = true,
@@ -141,8 +156,18 @@ fun CreateSpaceScreen(
                         OutlinedTextField(
                             value = viewModel.spaceDescription.value,
                             onValueChange = { viewModel.spaceDescription.value = it },
-                            label = { Text("Describe the Atmosphere") },
-                            placeholder = { Text("What is the intent of this space?") },
+                            label = {
+                                Text(
+                                "Describe the Atmosphere",
+                                    style = PoppinsTypography().labelLarge
+                                )
+                            },
+                            placeholder = {
+                                Text(
+                                    "What is the intent of this space?",
+                                    style = PoppinsTypography().labelLarge
+                                )
+                            },
                             modifier = Modifier.fillMaxWidth().height(160.dp),
                             shape = RoundedCornerShape(16.dp),
                             isError = viewModel.spaceDescription.value.isBlank() && isCreating
@@ -183,9 +208,15 @@ fun CreateSpaceScreen(
                         if (isCreating) {
                             CircularProgressIndicator(modifier = Modifier.size(24.dp), color = Color.White, strokeWidth = 2.dp)
                         } else {
-                            Icon(Icons.Default.AutoAwesome, null)
+                            Icon(
+                                Icons.Default.AutoAwesome,
+                                null
+                            )
                             Spacer(Modifier.width(12.dp))
-                            Text("Breathe Life into Space", fontWeight = FontWeight.Bold)
+                            Text(
+                                "Breathe Life into Space",
+                                fontWeight = FontWeight.Bold
+                            )
                         }
                     }
                 }

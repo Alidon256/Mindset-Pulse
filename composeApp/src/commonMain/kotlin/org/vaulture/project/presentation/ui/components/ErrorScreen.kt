@@ -16,6 +16,7 @@ import androidx.compose.ui.unit.sp
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.vaulture.project.presentation.theme.AppTheme
 import org.vaulture.project.presentation.theme.AppThemeMode
+import org.vaulture.project.presentation.theme.PoppinsTypography
 import org.vaulture.project.presentation.theme.ThemePalette
 
 
@@ -36,7 +37,6 @@ fun ErrorScreen(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Icon(
-                // painter = painterResource(Res.drawable.ic_error_refresh),
                 imageVector = Icons.Filled.Refresh,
                 contentDescription = "Error Refresh",
                 tint = MaterialTheme.colorScheme.primary,
@@ -47,7 +47,7 @@ fun ErrorScreen(
 
             Text(
                 "Ooops....",
-                style = MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.Bold),
+                style = PoppinsTypography().headlineMedium.copy(fontWeight = FontWeight.Bold),
                 color = MaterialTheme.colorScheme.onSurface
             )
 
@@ -55,7 +55,7 @@ fun ErrorScreen(
 
             Text(
                 "Something went wrong. We’re doing everything to fix it and it could be up and running soon.",
-                style = MaterialTheme.typography.bodyMedium,
+                style = PoppinsTypography().bodyMedium,
                 textAlign = TextAlign.Center,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 lineHeight = 22.sp

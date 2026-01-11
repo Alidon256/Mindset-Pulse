@@ -11,6 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import org.vaulture.project.domain.model.Space
+import org.vaulture.project.presentation.theme.PoppinsTypography
 import org.vaulture.project.presentation.ui.components.SpaceListItem
 
 @Composable
@@ -26,7 +27,7 @@ fun SpacesListContent(
         ) {
             Text(
                 "No spaces match your search. Try a different keyword or create a new community!",
-                style = MaterialTheme.typography.bodyLarge,
+                style = PoppinsTypography().bodyLarge,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.Center
             )

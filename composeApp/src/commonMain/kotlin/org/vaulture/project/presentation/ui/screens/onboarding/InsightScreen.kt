@@ -20,6 +20,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
 import org.vaulture.project.domain.model.PulseStory
+import org.vaulture.project.presentation.theme.PoppinsTypography
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -94,6 +95,7 @@ fun InsightScreen(onGetStarted: () -> Unit) {
                     Text(
                         "Start Pulse",
                         fontSize = 16.sp,
+                        style = PoppinsTypography().bodyMedium,
                         fontWeight = FontWeight.Medium,
                         modifier = Modifier.padding(horizontal = 16.dp)
                     )
@@ -102,7 +104,7 @@ fun InsightScreen(onGetStarted: () -> Unit) {
         }
     ) { paddingValues ->
         BoxWithConstraints(modifier = Modifier.padding(paddingValues)) {
-            val isWideScreen = maxWidth > 600.dp
+            val isWideScreen = maxWidth > 920.dp
             val gridColumns = if (isWideScreen) 4 else 2
 
             Column(
@@ -114,6 +116,7 @@ fun InsightScreen(onGetStarted: () -> Unit) {
                     "Discover Your Balance",
                     fontWeight = FontWeight.Bold,
                     fontSize = 28.sp,
+                    style = PoppinsTypography().bodyLarge,
                     color = MaterialTheme.colorScheme.onBackground,
                     modifier = Modifier.padding(start = 24.dp, end = 24.dp, top = 40.dp, bottom = 24.dp)
                 )
@@ -184,6 +187,7 @@ fun PulseStoryCard(story: PulseStory) {
                     text = story.category.uppercase(),
                     color = MaterialTheme.colorScheme.primaryContainer,
                     fontSize = 12.sp,
+                    style = PoppinsTypography().labelSmall,
                     fontWeight = FontWeight.Bold,
                     letterSpacing = 1.sp
                 )
@@ -191,6 +195,7 @@ fun PulseStoryCard(story: PulseStory) {
                 Text(
                     text = story.title,
                     color = Color.White,
+                    style = PoppinsTypography().bodyMedium,
                     fontSize = if (story.isLarge) 22.sp else 18.sp,
                     fontWeight = FontWeight.SemiBold,
                 )

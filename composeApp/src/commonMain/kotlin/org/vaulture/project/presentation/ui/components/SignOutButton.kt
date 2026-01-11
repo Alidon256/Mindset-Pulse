@@ -20,6 +20,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import org.vaulture.project.presentation.theme.PoppinsTypography
 
 @Composable
 fun SignOutButton(onSignOut: () -> Unit) {
@@ -37,7 +38,8 @@ fun SignOutButton(onSignOut: () -> Unit) {
         Spacer(Modifier.width(8.dp))
         Text(
             "Sign Out",
-            fontWeight = FontWeight.Bold
+            fontWeight = FontWeight.Bold,
+            style = PoppinsTypography().bodyMedium
         )
     }
 

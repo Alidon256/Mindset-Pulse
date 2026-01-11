@@ -13,7 +13,6 @@ import kotlinx.coroutines.launch
 import org.vaulture.project.data.remote.AuthService
 import org.vaulture.project.domain.model.User
 
-// EXPECT declarations for platform-specific Google Sign-In implementations
 internal expect suspend fun AuthServiceImpl.performGoogleSignIn()
 internal expect suspend fun AuthServiceImpl.signInWithGoogleIdToken(idToken: String)
 

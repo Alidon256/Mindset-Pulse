@@ -16,12 +16,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
+import mindsetpulse.composeapp.generated.resources.Res
+import mindsetpulse.composeapp.generated.resources.mindset_pulse_nobg_logo
 import org.jetbrains.compose.resources.painterResource
 import org.vaulture.project.presentation.theme.AppTheme
 import org.vaulture.project.presentation.theme.AppThemeMode
 import org.vaulture.project.presentation.theme.ThemePalette
-import vaulture.composeapp.generated.resources.Res
-import vaulture.composeapp.generated.resources.mindset_pulse_nobg_logo
 
 @Composable
 fun SplashScreen(onTimeout: () -> Unit) {
@@ -37,7 +37,11 @@ fun SplashScreen(onTimeout: () -> Unit) {
     }
     AppTheme(
         content = {
-            Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
+            Surface(
+                modifier = Modifier
+                    .fillMaxSize(),
+                color = MaterialTheme.colorScheme.background
+            ) {
                 Box(
                     contentAlignment = Alignment.Center,
                     modifier = Modifier.fillMaxSize()

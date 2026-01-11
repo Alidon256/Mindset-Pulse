@@ -46,6 +46,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import org.vaulture.project.presentation.theme.PoppinsTypography
 import org.vaulture.project.presentation.ui.components.ScaleButton
 import org.vaulture.project.presentation.viewmodels.CheckInViewModel
 
@@ -69,18 +70,18 @@ fun CheckInScreen(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
     ) {
-        val containerWidth = if (maxWidth > 800.dp) 800.dp else maxWidth
+        val containerWidth = if (maxWidth > 920.dp) 920.dp else maxWidth
         Box(
             modifier = Modifier
                 .width(containerWidth)
                 .fillMaxSize()
-                .padding(24.dp)
+                .padding(16.dp)
         ) {
             Column(
                 modifier = Modifier
-                    .widthIn(max = 600.dp) // Ensures it doesn't stretch too wide
-                    .fillMaxSize() // Fills height
-                    .padding(24.dp),
+                    .widthIn(max = 600.dp)
+                    .fillMaxSize()
+                    .padding(16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Row(
@@ -101,7 +102,7 @@ fun CheckInScreen(
                     if (!uiState.isLoadingQuestions && uiState.result == null) {
                         Text(
                             "Step ${uiState.step + 1} / ${uiState.questions.size + 1}",
-                            style = MaterialTheme.typography.labelLarge,
+                            style = PoppinsTypography().labelLarge,
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.primary
                         )
@@ -130,6 +131,7 @@ fun CheckInScreen(
                                 Text(
                                     "Curating questions with AI...",
                                     fontWeight = FontWeight.Medium,
+                                    style = PoppinsTypography().headlineSmall,
                                     color = MaterialTheme.colorScheme.onSurface
                                 )
                             }
@@ -142,12 +144,13 @@ fun CheckInScreen(
                                 Spacer(Modifier.height(24.dp))
                                 Text(
                                     "Gemini is analyzing...",
-                                    style = MaterialTheme.typography.headlineSmall,
+                                    style = PoppinsTypography().headlineSmall,
                                     fontWeight = FontWeight.Bold,
                                     color = MaterialTheme.colorScheme.onSurface
                                 )
                                 Text(
                                     "Detecting sentiment & calculating risk",
+                                    style = PoppinsTypography().bodyMedium,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
                             }
@@ -170,7 +173,7 @@ fun CheckInScreen(
                                 Spacer(Modifier.height(16.dp))
                                 Text(
                                     "Pulse Recorded",
-                                    style = MaterialTheme.typography.headlineMedium,
+                                    style = PoppinsTypography().headlineMedium,
                                     fontWeight = FontWeight.Bold,
                                     color = MaterialTheme.colorScheme.onSurface
                                 )
@@ -181,7 +184,10 @@ fun CheckInScreen(
                                     shape = RoundedCornerShape(16.dp),
                                     colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
                                 ) {
-                                    Text("See Insights")
+                                    Text(
+                                        "See Insights",
+                                        style = PoppinsTypography().labelLarge
+                                    )
                                 }
                             }
                             targetKey.startsWith("STEP_") && uiState.step < uiState.questions.size -> {
@@ -189,7 +195,7 @@ fun CheckInScreen(
                                     colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
                                     shape = RoundedCornerShape(24.dp),
                                     elevation = CardDefaults.cardElevation(8.dp),
-                                    modifier = Modifier.fillMaxWidth() // Fill container width
+                                    modifier = Modifier.fillMaxWidth()
                                 ) {
                                     Column(
                                         Modifier.padding(32.dp),
@@ -197,7 +203,7 @@ fun CheckInScreen(
                                     ) {
                                         Text(
                                             uiState.questions[uiState.step],
-                                            style = MaterialTheme.typography.headlineSmall,
+                                            style = PoppinsTypography().headlineSmall,
                                             fontWeight = FontWeight.Bold,
                                             textAlign = TextAlign.Center,
                                             color = MaterialTheme.colorScheme.onSurface
@@ -220,8 +226,16 @@ fun CheckInScreen(
                                             Modifier.fillMaxWidth(),
                                             horizontalArrangement = Arrangement.SpaceBetween
                                         ) {
-                                            Text("Positive", style = MaterialTheme.typography.bodySmall, color = ColorStable)
-                                            Text("Negative", style = MaterialTheme.typography.bodySmall, color = ColorBurnout)
+                                            Text(
+                                                "Positive",
+                                                style = PoppinsTypography().bodySmall,
+                                                color = ColorStable
+                                            )
+                                            Text(
+                                                "Negative",
+                                                style = PoppinsTypography().bodySmall,
+                                                color = ColorBurnout
+                                            )
                                         }
                                     }
                                 }
@@ -229,19 +243,30 @@ fun CheckInScreen(
                             else -> {
                                 Text(
                                     "In your own words...",
-                                    style = MaterialTheme.typography.headlineSmall,
+                                    style = PoppinsTypography().headlineSmall,
                                     fontWeight = FontWeight.Bold,
                                     color = MaterialTheme.colorScheme.onSurface
                                 )
+
                                 Spacer(Modifier.height(8.dp))
-                                Text("What's on your mind?", color = MaterialTheme.colorScheme.onSurfaceVariant)
+
+                                Text(
+                                    "What's on your mind?",
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+
                                 Spacer(Modifier.height(24.dp))
 
                                 OutlinedTextField(
                                     value = uiState.textResponse,
                                     onValueChange = { viewModel.onTextChange(it) },
                                     modifier = Modifier.fillMaxWidth().height(160.dp),
-                                    placeholder = { Text("I feel overwhelmed because...") },
+                                    placeholder = {
+                                        Text(
+                                            "I feel overwhelmed because...",
+                                            style = PoppinsTypography().bodyMedium
+                                            )
+                                    },
                                     shape = RoundedCornerShape(16.dp),
                                     colors = TextFieldDefaults.colors(
                                         focusedContainerColor = MaterialTheme.colorScheme.surface,
@@ -252,7 +277,9 @@ fun CheckInScreen(
                                         unfocusedTextColor = MaterialTheme.colorScheme.onSurface
                                     )
                                 )
+
                                 Spacer(Modifier.height(24.dp))
+
                                 Button(
                                     onClick = { viewModel.submitCheckIn() },
                                     modifier = Modifier.fillMaxWidth().height(56.dp),
@@ -260,7 +287,10 @@ fun CheckInScreen(
                                     enabled = uiState.textResponse.length > 3,
                                     colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
                                 ) {
-                                    Text("Analyze Pulse")
+                                    Text(
+                                        "Analyze Pulse",
+                                        style = PoppinsTypography().labelLarge
+                                    )
                                 }
                             }
                         }
@@ -269,6 +299,5 @@ fun CheckInScreen(
                 Spacer(Modifier.weight(1f))
             }
         }
-
     }
 }

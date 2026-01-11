@@ -24,6 +24,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import org.vaulture.project.presentation.theme.AppThemeMode
+import org.vaulture.project.presentation.theme.PoppinsTypography
 import org.vaulture.project.presentation.theme.ThemePalette
 import org.vaulture.project.presentation.viewmodels.SettingsViewModel
 
@@ -39,10 +40,19 @@ fun SettingsScreen(
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
-                title = { Text("Settings", fontWeight = FontWeight.SemiBold) },
+                title = {
+                    Text(
+                        "Settings",
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(
+                            Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = "Back"
+                        )
                     }
                 },
                 colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
@@ -120,9 +130,15 @@ fun SettingsScreen(
                             brush = androidx.compose.ui.graphics.SolidColor(MaterialTheme.colorScheme.error)
                         )
                     ) {
-                        Icon(Icons.AutoMirrored.Filled.Logout, null)
+                        Icon(
+                            Icons.AutoMirrored.Filled.Logout,
+                            null
+                        )
                         Spacer(Modifier.width(8.dp))
-                        Text("Sign Out")
+                        Text(
+                            "Sign Out",
+                            style = PoppinsTypography().titleMedium
+                        )
                     }
                     Spacer(Modifier.height(24.dp))
                 }
@@ -151,7 +167,7 @@ fun ThemeModeSelectorCard(
                 Spacer(Modifier.width(12.dp))
                 Text(
                     "Theme Mode",
-                    style = MaterialTheme.typography.titleMedium,
+                    style = PoppinsTypography().titleMedium,
                     fontWeight = FontWeight.Medium
                 )
             }
@@ -196,7 +212,10 @@ fun ColorPaletteSelectorCard(
         shape = RoundedCornerShape(24.dp),
         modifier = Modifier.fillMaxWidth()
     ) {
-        Column(Modifier.padding(16.dp)) {
+        Column(
+            modifier = Modifier
+                .padding(16.dp)
+        ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(
                     Icons.Default.Palette,
@@ -206,13 +225,15 @@ fun ColorPaletteSelectorCard(
                 Spacer(Modifier.width(12.dp))
                 Text(
                     "Color Palette",
-                    style = MaterialTheme.typography.titleMedium,
+                    style = PoppinsTypography().titleMedium,
                     fontWeight = FontWeight.Medium
                 )
             }
             Spacer(Modifier.height(16.dp))
 
-            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Column(
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
                 PaletteOptionRow(
                     palette = ThemePalette.NATURE,
                     currentPalette = currentPalette,
@@ -261,7 +282,6 @@ fun PaletteOptionRow(
             .padding(12.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        // Color Circle
         Box(
             modifier = Modifier
                 .size(24.dp)
@@ -274,7 +294,7 @@ fun PaletteOptionRow(
 
         Text(
             text = label,
-            style = MaterialTheme.typography.bodyMedium,
+            style = PoppinsTypography().bodyMedium,
             fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
             color = MaterialTheme.colorScheme.onSurface
         )
@@ -296,7 +316,7 @@ fun PaletteOptionRow(
 fun SettingsSectionTitle(text: String) {
     Text(
         text = text,
-        style = MaterialTheme.typography.titleMedium,
+        style = PoppinsTypography().titleMedium,
         color = MaterialTheme.colorScheme.primary,
         fontWeight = FontWeight.Bold,
         modifier = Modifier.padding(bottom = 8.dp, start = 4.dp)
@@ -351,9 +371,17 @@ fun ThemeOptionItem(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        Icon(imageVector = icon, contentDescription = null, tint = contentColor)
+        Icon(
+            imageVector = icon,
+            contentDescription = null,
+            tint = contentColor
+        )
         Spacer(Modifier.height(8.dp))
-        Text(text = label, style = MaterialTheme.typography.labelMedium, color = contentColor, fontWeight = FontWeight.Bold)
+        Text(
+            text = label,
+            style = MaterialTheme.typography.labelMedium,
+            color = contentColor, fontWeight = FontWeight.Bold
+        )
     }
 }
 
@@ -379,12 +407,18 @@ fun SettingsSwitchItem(
             modifier = Modifier.size(24.dp)
         )
         Spacer(Modifier.width(16.dp))
-        Column(modifier = Modifier.weight(1f)) {
-            Text(text = title, style = MaterialTheme.typography.bodyLarge)
+        Column(
+            modifier = Modifier
+                .weight(1f)
+        ) {
+            Text(
+                text = title,
+                style = PoppinsTypography().bodyLarge
+            )
             if (subtitle != null) {
                 Text(
                     text = subtitle,
-                    style = MaterialTheme.typography.bodySmall,
+                    style = PoppinsTypography().bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }

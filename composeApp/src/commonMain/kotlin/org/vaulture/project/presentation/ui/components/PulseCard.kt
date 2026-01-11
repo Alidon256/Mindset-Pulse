@@ -28,6 +28,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import kotlinx.coroutines.delay
 import org.vaulture.project.presentation.navigation.Routes
+import org.vaulture.project.presentation.theme.PoppinsTypography
 
 data class PulseActionItem(
     val title: String,
@@ -141,7 +142,7 @@ fun CardCarousel(
                                 Spacer(Modifier.width(8.dp))
                                 Text(
                                     text = action.title,
-                                    style = MaterialTheme.typography.titleMedium,
+                                    style = PoppinsTypography().titleMedium,
                                     fontWeight = FontWeight.ExtraBold,
                                     color = action.contentColor
                                 )
@@ -149,7 +150,7 @@ fun CardCarousel(
                             Spacer(Modifier.height(4.dp))
                             Text(
                                 text = action.description,
-                                style = MaterialTheme.typography.bodyMedium,
+                                style = PoppinsTypography().bodyMedium,
                                 color = action.contentColor.copy(alpha = 0.7f),
                                 maxLines = 2
                             )
@@ -164,7 +165,11 @@ fun CardCarousel(
                                 shape = RoundedCornerShape(14.dp),
                                 modifier = Modifier.height(36.dp)
                             ) {
-                                Text(action.buttonText, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                                Text(
+                                    action.buttonText,
+                                    fontSize = 12.sp,
+                                    fontWeight = FontWeight.Bold
+                                )
                             }
                         }
 

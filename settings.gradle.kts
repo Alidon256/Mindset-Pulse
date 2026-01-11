@@ -1,4 +1,4 @@
-rootProject.name = "Vaulture"
+rootProject.name = "MindsetPulse"
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 
 pluginManagement {

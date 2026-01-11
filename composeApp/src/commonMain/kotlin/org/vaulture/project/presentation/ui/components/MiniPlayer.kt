@@ -23,6 +23,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import org.vaulture.project.domain.model.RhythmTrack
+import org.vaulture.project.presentation.theme.PoppinsTypography
 
 @Composable
 fun MiniPlayer(
@@ -88,7 +89,7 @@ fun MiniPlayer(
                     ) {
                         Text(
                             text = track.title,
-                            style = MaterialTheme.typography.titleSmall,
+                            style = PoppinsTypography().titleSmall,
                             fontWeight = FontWeight.Bold,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
@@ -96,7 +97,7 @@ fun MiniPlayer(
                         )
                         Text(
                             text = track.artist,
-                            style = MaterialTheme.typography.bodySmall,
+                            style = PoppinsTypography().bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis

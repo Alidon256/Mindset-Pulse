@@ -14,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import org.vaulture.project.presentation.theme.PoppinsTypography
 
 @Composable
 fun ScaleButton(
@@ -32,7 +33,7 @@ fun ScaleButton(
         Text(
             text = score.toString(),
             fontWeight = FontWeight.Bold,
-            style = MaterialTheme.typography.titleMedium,
+            style = PoppinsTypography().titleMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
     }

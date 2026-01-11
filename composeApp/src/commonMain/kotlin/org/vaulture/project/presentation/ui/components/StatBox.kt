@@ -18,6 +18,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import org.vaulture.project.presentation.theme.PoppinsTypography
 
 @Composable
 fun StatBox(
@@ -49,12 +50,12 @@ fun StatBox(
             )
             Text(
                 value,
-                style = MaterialTheme.typography.titleLarge,
+                style = PoppinsTypography().titleLarge,
                 fontWeight = FontWeight.Bold
             )
             Text(
                 label,
-                style = MaterialTheme.typography.labelSmall,
+                style = PoppinsTypography().labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }

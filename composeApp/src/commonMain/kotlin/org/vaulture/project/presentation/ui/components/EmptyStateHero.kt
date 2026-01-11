@@ -34,6 +34,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import org.vaulture.project.presentation.theme.PoppinsTypography
 
 @Composable
 fun EmptyStateHero(onStartCheckIn: () -> Unit) {
@@ -88,13 +89,13 @@ fun EmptyStateHero(onStartCheckIn: () -> Unit) {
                 Spacer(Modifier.height(16.dp))
                 Text(
                     "Log your Pulse",
-                    style = MaterialTheme.typography.titleMedium,
+                    style = PoppinsTypography().titleMedium,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onSurface
                 )
                 Text(
                     "Get AI-powered insights for today",
-                    style = MaterialTheme.typography.bodySmall,
+                    style = PoppinsTypography().bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }

@@ -36,7 +36,7 @@ fun OnboardingScreenOne(
                 .fillMaxSize()
                 .padding(innerPadding)
         ) {
-            val isWideScreen = maxWidth > 800.dp
+            val isWideScreen = maxWidth > 920.dp
 
             if (isWideScreen) {
                 Row(
@@ -69,6 +69,7 @@ fun OnboardingScreenOne(
                             TextButton(onClick = onSkip) {
                                 Text(
                                     "Skip",
+                                    style = MaterialTheme.typography.bodyMedium,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                                     fontSize = 16.sp
                                 )
@@ -107,6 +108,7 @@ fun OnboardingScreenOne(
                         TextButton(onClick = onSkip) {
                             Text(
                                 "Skip",
+                                style = MaterialTheme.typography.bodyMedium,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 fontSize = 16.sp
                             )
@@ -125,6 +127,7 @@ fun OnboardingScreenOne(
                             "Get Inspiration For Your New Day",
                             fontSize = 28.sp,
                             fontWeight = FontWeight.Bold,
+                            style = MaterialTheme.typography.headlineLarge,
                             color = MaterialTheme.colorScheme.onBackground,
                             textAlign = TextAlign.Center,
                             lineHeight = 36.sp
@@ -151,6 +154,7 @@ fun OnboardingScreenOne(
                         Text(
                             "Whether you’re seeking a quiet place to find your balance or the mental clarity to conquer the city grind, we’ve mapped out the best paths for your mindset.",
                             fontSize = 18.sp,
+                            style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             textAlign = TextAlign.Center,
                             lineHeight = 26.sp
@@ -173,6 +177,7 @@ private fun OnboardingOneContent(isWideScreen: Boolean) {
         text = "Get Inspiration For Your New Day",
         fontSize = if (isWideScreen) 36.sp else 28.sp,
         fontWeight = FontWeight.Bold,
+        style = MaterialTheme.typography.headlineLarge,
         color = MaterialTheme.colorScheme.onBackground,
         textAlign = TextAlign.Center,
         lineHeight = if (isWideScreen) 44.sp else 36.sp
@@ -181,6 +186,7 @@ private fun OnboardingOneContent(isWideScreen: Boolean) {
     Text(
         text = "Whether you’re seeking a quiet place to find your balance or the mental clarity to conquer the city grind, we’ve mapped out the best paths for your mindset.",
         fontSize = 18.sp,
+        style = MaterialTheme.typography.bodyMedium,
         color = MaterialTheme.colorScheme.onSurfaceVariant,
         textAlign = TextAlign.Center,
         lineHeight = 26.sp
@@ -194,8 +200,10 @@ private fun OnboardingOneNavigation(onNext: () -> Unit, modifier: Modifier = Mod
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        // Page Indicators
-        Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(6.dp)
+        ) {
             Box(
                 modifier = Modifier
                     .height(8.dp)
@@ -228,6 +236,7 @@ private fun OnboardingOneNavigation(onNext: () -> Unit, modifier: Modifier = Mod
                 "Next",
                 color = Color.White,
                 fontSize = 16.sp,
+                style = MaterialTheme.typography.bodyMedium,
                 fontWeight = FontWeight.Medium,
                 modifier = Modifier.padding(horizontal = 16.dp)
             )

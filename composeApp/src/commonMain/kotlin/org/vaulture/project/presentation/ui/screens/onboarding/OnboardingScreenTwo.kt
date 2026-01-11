@@ -20,6 +20,7 @@ import coil3.compose.AsyncImage
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.vaulture.project.presentation.theme.AppTheme
 import org.vaulture.project.presentation.theme.AppThemeMode
+import org.vaulture.project.presentation.theme.PoppinsTypography
 import org.vaulture.project.presentation.theme.ThemePalette
 
 @Composable
@@ -38,7 +39,7 @@ fun OnboardingScreenTwo(
                 .fillMaxSize()
                 .padding(innerPadding)
         ) {
-            val isWideScreen = maxWidth > 800.dp
+            val isWideScreen = maxWidth > 920.dp
 
             if (isWideScreen) {
                 Row(
@@ -70,7 +71,11 @@ fun OnboardingScreenTwo(
                             horizontalArrangement = Arrangement.End
                         ) {
                             TextButton(onClick = onSkip) {
-                                Text("Skip", fontSize = 16.sp)
+                                Text(
+                                    "Skip",
+                                    fontSize = 16.sp,
+                                    style = MaterialTheme.typography.bodyMedium
+                                )
                             }
                         }
 
@@ -102,7 +107,11 @@ fun OnboardingScreenTwo(
                         horizontalArrangement = Arrangement.End
                     ) {
                         TextButton(onClick = onSkip) {
-                            Text("Skip", fontSize = 16.sp)
+                            Text(
+                                "Skip",
+                                fontSize = 16.sp,
+                                style = MaterialTheme.typography.bodyMedium,
+                            )
                         }
                     }
 
@@ -147,6 +156,7 @@ private fun OnboardingContent(isWideScreen: Boolean) {
         text = "Find Your Inner Peace",
         fontSize = if (isWideScreen) 36.sp else 28.sp,
         fontWeight = FontWeight.Bold,
+        style = PoppinsTypography().headlineLarge,
         color = MaterialTheme.colorScheme.onBackground,
         textAlign = TextAlign.Center
     )
@@ -154,6 +164,7 @@ private fun OnboardingContent(isWideScreen: Boolean) {
     Text(
         text = "Discover tools and insights that help you understand and improve how you feel and react to the world around you.",
         fontSize = 18.sp,
+        style = PoppinsTypography().bodyMedium,
         color = MaterialTheme.colorScheme.onSurfaceVariant,
         textAlign = TextAlign.Center,
         lineHeight = 26.sp
@@ -201,6 +212,7 @@ private fun OnboardingNavigation(onNext: () -> Unit, modifier: Modifier = Modifi
                 "Next",
                 color = Color.White,
                 fontSize = 16.sp,
+                style = PoppinsTypography().bodyMedium,
                 fontWeight = FontWeight.Medium,
                 modifier = Modifier.padding(horizontal = 16.dp)
             )

@@ -1,5 +1,4 @@
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
-import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
@@ -8,6 +7,7 @@ plugins {
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
     alias(libs.plugins.kotlinxSerialization)
+    alias(libs.plugins.composeHotReload)
 }
 
 kotlin {
@@ -21,12 +21,14 @@ kotlin {
         browser()
         binaries.executable()
     }
-    
-   /* @OptIn(ExperimentalWasmDsl::class)
-    wasmJs {
-        browser()
-        binaries.executable()
-    }*/
+
+    jvm()
+
+    /* @OptIn(ExperimentalWasmDsl::class)
+     wasmJs {
+         browser()
+         binaries.executable()
+     }*/
     
     sourceSets {
         androidMain.dependencies {
@@ -72,6 +74,7 @@ kotlin {
             implementation("io.ktor:ktor-client-logging:3.3.2")
             implementation("com.mikepenz:multiplatform-markdown-renderer-m3:0.27.0")
         }
+
         commonTest.dependencies {
             implementation(libs.kotlin.test)
         }
@@ -108,4 +111,5 @@ android {
 dependencies {
     debugImplementation(compose.uiTooling)
 }
+
 

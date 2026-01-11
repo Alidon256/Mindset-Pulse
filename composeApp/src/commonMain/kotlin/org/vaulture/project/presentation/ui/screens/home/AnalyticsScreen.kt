@@ -78,10 +78,20 @@ fun AnalyticsScreen(
         modifier = Modifier.fillMaxSize(),
         topBar = {
             TopAppBar(
-                title = { Text("Wellness Analytics", style = PoppinsTypography().headlineSmall) },
+                title = {
+                    Text(
+                        "Wellness Analytics",
+                        style = PoppinsTypography().headlineSmall
+                    )
+                },
                 navigationIcon = {
-                    IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                    IconButton(
+                        onClick = { navController.popBackStack() }
+                    ) {
+                        Icon(
+                            Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = "Back"
+                        )
                     }
                 },
                 actions = {
@@ -90,7 +100,10 @@ fun AnalyticsScreen(
                         onClick = { coroutineScope.launch { viewModel.refreshGeminiInsights() } },
                         enabled = !uiState.isLoadingGemini
                     ) {
-                        Icon(Icons.Filled.Refresh, contentDescription = "Refresh AI Insights")
+                        Icon(
+                            Icons.Filled.Refresh,
+                            contentDescription = "Refresh AI Insights"
+                        )
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -161,8 +174,8 @@ fun AnalyticsContent(
     isLoadingGemini: Boolean
 ) {
     BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
-        val isTablet = maxWidth >= 600.dp
-        val contentFraction = if (isTablet) 0.85f else 1f
+        val isLargeScreen = maxWidth >= 920.dp
+        val contentFraction = if (isLargeScreen) 0.80f else 1f
 
         LazyColumn(
             modifier = Modifier
@@ -171,7 +184,11 @@ fun AnalyticsContent(
             contentPadding = PaddingValues(bottom = 16.dp)
         ) {
             item {
-                Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    contentAlignment = Alignment.Center
+                ) {
                     Column(Modifier.fillMaxWidth(contentFraction)) {
                         AnalyticsHeader(
                             totalCheckIns = summary.totalCheckIns,
@@ -183,7 +200,11 @@ fun AnalyticsContent(
             }
 
             item {
-                Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    contentAlignment = Alignment.Center
+                ) {
                     Column(Modifier.fillMaxWidth(contentFraction)) {
                         GeminiInsightsSection(
                             insights = geminiInsights,
@@ -194,9 +215,13 @@ fun AnalyticsContent(
                 Spacer(modifier = Modifier.height(20.dp))
             }
 
-            if (isTablet) {
+            if (isLargeScreen) {
                 item {
-                    Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth(),
+                        contentAlignment = Alignment.Center
+                    ) {
                         Column(Modifier.fillMaxWidth(contentFraction)) {
                             Row(
                                 modifier = Modifier.fillMaxWidth(),
@@ -268,7 +293,11 @@ fun AnalyticsContent(
                 }
             } else {
                 item {
-                    Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth(),
+                        contentAlignment = Alignment.Center
+                    ) {
                         Column(Modifier.fillMaxWidth(contentFraction)) {
                             if (summary.overallMoodDistribution.isNotEmpty()) {
                                 AnalyticsSectionTitle(
@@ -288,7 +317,10 @@ fun AnalyticsContent(
                     }
                 }
                 item {
-                    Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+                    Box(
+                        modifier = Modifier.fillMaxWidth(),
+                        contentAlignment = Alignment.Center
+                    ) {
                         Column(Modifier.fillMaxWidth(contentFraction)) {
                             if (summary.mostFrequentEmotions.isNotEmpty()) {
                                 AnalyticsSectionTitle(
@@ -308,7 +340,10 @@ fun AnalyticsContent(
                     }
                 }
                 item {
-                    Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+                    Box(
+                        modifier = Modifier.fillMaxWidth(),
+                        contentAlignment = Alignment.Center
+                    ) {
                         Column(Modifier.fillMaxWidth(contentFraction)) {
                             if (summary.cbtExerciseUsage.isNotEmpty()) {
                                 AnalyticsSectionTitle(
@@ -328,7 +363,10 @@ fun AnalyticsContent(
                     }
                 }
                 item {
-                    Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+                    Box(
+                        modifier = Modifier.fillMaxWidth(),
+                        contentAlignment = Alignment.Center
+                    ) {
                         Column(Modifier.fillMaxWidth(contentFraction)) {
                             ConditionalInsightsCard(
                                 summary
@@ -340,7 +378,11 @@ fun AnalyticsContent(
 
             if (summary.selfCareActivityFrequency.isNotEmpty()) {
                 item {
-                    Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth(),
+                        contentAlignment = Alignment.Center
+                    ) {
                         Column(Modifier.fillMaxWidth(contentFraction)) {
                             AnalyticsSectionTitle(
                                 "Top Self-Care Activities",

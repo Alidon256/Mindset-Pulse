@@ -23,6 +23,7 @@ import coil3.compose.AsyncImage
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.vaulture.project.presentation.theme.AppTheme
 import org.vaulture.project.presentation.theme.AppThemeMode
+import org.vaulture.project.presentation.theme.PoppinsTypography
 import org.vaulture.project.presentation.theme.ThemePalette
 
 @Composable
@@ -41,7 +42,7 @@ fun ConnectScreen(
                         .fillMaxSize()
                         .padding(paddingValues)
                 ) {
-                    val isWideScreen = maxWidth > 800.dp
+                    val isWideScreen = maxWidth > 920.dp
 
                     if (isWideScreen) {
 
@@ -75,7 +76,7 @@ fun ConnectScreen(
                                     .weight(1f)
                                     .fillMaxHeight()
                                     .padding(48.dp)
-                                    .verticalScroll(rememberScrollState()), // Allow scrolling if height is small
+                                    .verticalScroll(rememberScrollState()),
                                 verticalArrangement = Arrangement.Center,
                                 horizontalAlignment = Alignment.CenterHorizontally
                             ) {
@@ -106,12 +107,14 @@ fun ConnectScreen(
                                     text = "Build Your Mindset",
                                     fontSize = 28.sp,
                                     fontWeight = FontWeight.Bold,
+                                    style = PoppinsTypography().titleLarge,
                                     color = MaterialTheme.colorScheme.onBackground,
                                     textAlign = TextAlign.Center
                                 )
                                 Text(
                                     text = "Find calm in the chaos.",
                                     fontSize = 16.sp,
+                                    style = PoppinsTypography().bodyMedium,
                                     color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f),
                                     textAlign = TextAlign.Center,
                                     modifier = Modifier.padding(top = 8.dp)
@@ -175,6 +178,7 @@ private fun ConnectContent(
                 text = "Build Your Mindset",
                 fontSize = 36.sp,
                 fontWeight = FontWeight.Bold,
+                style = PoppinsTypography().bodyLarge,
                 color = MaterialTheme.colorScheme.onBackground,
                 textAlign = TextAlign.Center
             )
@@ -182,6 +186,7 @@ private fun ConnectContent(
             Text(
                 text = "Connect with like-minded people and find your inner calm.",
                 fontSize = 18.sp,
+                style = PoppinsTypography().bodyMedium,
                 color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f),
                 textAlign = TextAlign.Center,
                 modifier = Modifier.padding(bottom = 48.dp)
@@ -201,6 +206,7 @@ private fun ConnectContent(
             Text(
                 text = "Log In",
                 fontSize = 16.sp,
+                style = PoppinsTypography().bodyMedium,
                 fontWeight = FontWeight.Medium,
                 color = Color.White
             )
@@ -222,6 +228,7 @@ private fun ConnectContent(
             Text(
                 text = "Create account",
                 fontSize = 16.sp,
+                style = PoppinsTypography().bodyMedium,
                 fontWeight = FontWeight.Medium,
                 color = MaterialTheme.colorScheme.onSurface
             )

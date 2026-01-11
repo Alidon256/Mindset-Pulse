@@ -29,6 +29,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import org.vaulture.project.domain.engine.CheckInResult
+import org.vaulture.project.presentation.theme.PoppinsTypography
 import org.vaulture.project.presentation.ui.screens.home.ColorBurnout
 import org.vaulture.project.presentation.ui.screens.home.ColorHigh
 import org.vaulture.project.presentation.ui.screens.home.ColorMild
@@ -77,13 +78,13 @@ fun InsightHeroCard(result: CheckInResult) {
                         text = result.state.label.uppercase(),
                         color = stateColor,
                         fontWeight = FontWeight.Bold,
-                        style = MaterialTheme.typography.labelSmall,
+                        style = PoppinsTypography().labelSmall,
                         letterSpacing = 1.sp
                     )
                     Spacer(Modifier.weight(1f))
                     Text(
                         "Today",
-                        style = MaterialTheme.typography.bodySmall,
+                        style = PoppinsTypography().bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
@@ -93,20 +94,20 @@ fun InsightHeroCard(result: CheckInResult) {
                 Row(verticalAlignment = Alignment.Bottom) {
                     Text(
                         text = "${result.score}",
-                        style = MaterialTheme.typography.displayLarge,
+                        style = PoppinsTypography().displayLarge,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.onSurface
                     )
                     Text(
                         "/100",
-                        style = MaterialTheme.typography.titleMedium,
+                        style = PoppinsTypography().titleMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier.padding(bottom = 8.dp, start = 4.dp)
                     )
                 }
                 Text(
                     "Risk Score",
-                    style = MaterialTheme.typography.bodySmall,
+                    style = PoppinsTypography().bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
 
@@ -128,7 +129,7 @@ fun InsightHeroCard(result: CheckInResult) {
                         Spacer(Modifier.width(8.dp))
                         Text(
                             "Gemini Insight",
-                            style = MaterialTheme.typography.labelSmall,
+                            style = PoppinsTypography().labelSmall,
                             fontWeight = FontWeight.Bold,
                             color = stateColor
                         )
@@ -136,7 +137,7 @@ fun InsightHeroCard(result: CheckInResult) {
                     Spacer(Modifier.height(8.dp))
                     Text(
                         result.aiInsight,
-                        style = MaterialTheme.typography.bodyMedium,
+                        style = PoppinsTypography().bodyMedium,
                         color = MaterialTheme.colorScheme.onSurface,
                         lineHeight = 20.sp
                     )

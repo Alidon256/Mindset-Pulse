@@ -3,12 +3,9 @@ package org.vaulture.project.presentation.ui.screens.profile
 import androidx.compose.animation.*
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridItemSpan
@@ -18,6 +15,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Article
 import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.outlined.*
@@ -29,20 +27,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.lerp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import coil3.compose.AsyncImage
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
-import org.jetbrains.compose.resources.painterResource
 import org.vaulture.project.data.remote.AuthService
 import org.vaulture.project.domain.model.Story
 import org.vaulture.project.presentation.viewmodels.WellnessViewModel
@@ -51,11 +44,9 @@ import org.vaulture.project.domain.model.WellnessType
 import org.vaulture.project.presentation.navigation.Routes
 import org.vaulture.project.presentation.theme.PoppinsTypography
 import org.vaulture.project.presentation.ui.components.AIPrivacyCard
-import org.vaulture.project.presentation.ui.components.PostItem
 import org.vaulture.project.presentation.ui.components.ProfileAvatar
 import org.vaulture.project.presentation.ui.components.PulseBadgeCard
 import org.vaulture.project.presentation.ui.components.SectionHeader
-import org.vaulture.project.presentation.ui.components.SignOutButton
 import org.vaulture.project.presentation.ui.components.StaggeredStoryItem
 import org.vaulture.project.presentation.ui.components.StatBox
 import org.vaulture.project.presentation.ui.components.StreakBanner
@@ -63,7 +54,6 @@ import org.vaulture.project.presentation.ui.components.WellnessActionItem
 import org.vaulture.project.presentation.ui.components.WellnessStatsRow
 import org.vaulture.project.presentation.viewmodels.ProfileFilter
 import org.vaulture.project.presentation.viewmodels.SpaceViewModel
-import vaulture.composeapp.generated.resources.*
 import kotlin.time.Clock
 
 @Composable
@@ -170,17 +160,31 @@ private fun ProfileScreenCompact(
             contentPadding = PaddingValues(horizontal = 8.dp)
         ) {
             item(span = StaggeredGridItemSpan.FullLine) {
-                Box(modifier = Modifier.fillMaxWidth().height(bannerHeight + avatarInitialSize / 2)) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(bannerHeight + avatarInitialSize / 2)
+                ) {
                     AsyncImage(
                         model = "https://images.pexels.com/photos/1231265/pexels-photo-1231265.jpeg",
                         contentDescription = "Wellness banner",
                         contentScale = ContentScale.Crop,
                         modifier = Modifier.fillMaxWidth().height(bannerHeight)
                     )
-                    Box(modifier = Modifier.matchParentSize().background(Brush.verticalGradient(listOf(Color.Black.copy(0.3f), Color.Transparent))))
+                    Box(
+                        modifier = Modifier
+                            .matchParentSize()
+                            .background(Brush.verticalGradient(listOf(Color.Black.copy(0.3f), Color.Transparent)))
+                    )
 
                     val avatarY = (bannerHeight - (avatarInitialSize / 2))
-                    Box(Modifier.padding(top = avatarY).size(110.dp).align(Alignment.TopCenter)) {
+
+                    Box(
+                        modifier = Modifier
+                            .padding(top = avatarY)
+                            .size(110.dp)
+                            .align(Alignment.TopCenter)
+                    ) {
                         ProfileAvatar(
                             user?.photoUrl,
                             "Profile"
@@ -190,9 +194,21 @@ private fun ProfileScreenCompact(
             }
 
             item(span = StaggeredGridItemSpan.FullLine) {
-                Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.padding(top = 8.dp)) {
-                    Text(user?.displayName ?: "Guest User", style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
-                    Text(user?.email ?: "", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier
+                        .padding(top = 8.dp)
+                ) {
+                    Text(
+                        user?.displayName ?: "Guest User",
+                        style = PoppinsTypography().headlineSmall,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Text(
+                        user?.email ?: "",
+                        style = PoppinsTypography().bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
                     Spacer(Modifier.height(24.dp))
                 }
             }
@@ -249,9 +265,16 @@ private fun ProfileScreenCompact(
                         modifier = Modifier.fillMaxWidth().padding(32.dp),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        Icon(Icons.Default.Info, null, tint = MaterialTheme.colorScheme.outline)
+                        Icon(
+                            Icons.Default.Info,
+                            null,
+                            tint = MaterialTheme.colorScheme.outline
+                        )
                         Spacer(Modifier.height(8.dp))
-                        Text("No posts found here yet.", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        Text(
+                            "No posts found here yet.",
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
                     }
                 }
             } else {
@@ -266,7 +289,11 @@ private fun ProfileScreenCompact(
             }
 
             item(span = StaggeredGridItemSpan.FullLine) {
-                Column(Modifier.padding(horizontal = 8.dp, vertical = 32.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                Column(
+                    modifier = Modifier
+                        .padding(horizontal = 8.dp, vertical = 32.dp),
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
                     PulseBadgeCard(totalPoints = stats.resiliencePoints)
                     AIPrivacyCard()
                     SettingsItem(onClick = onNavigateToSettings )
@@ -302,11 +329,15 @@ private fun ProfileScreenExpanded(
         else -> "Good Evening 🌙,"
     }
 
-    Row(modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) {
+    Row(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background)
+    ) {
         LazyColumn(
             modifier = Modifier
                 .fillMaxHeight()
-                .width(340.dp)
+                .weight(0.3f)
                 .padding(vertical =8.dp, horizontal = 16.dp)
                 .background(MaterialTheme.colorScheme.background),
             verticalArrangement = Arrangement.spacedBy(24.dp)
@@ -331,6 +362,7 @@ private fun ProfileScreenExpanded(
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.onSurface
                         ),
+                        maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
                 }
@@ -395,14 +427,17 @@ private fun ProfileScreenExpanded(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Icon(
-                            if (selectedRailItem == "Profile") Icons.Filled.Person else Icons.Outlined.Person,
+                            if (selectedRailItem == "Profile")
+                                Icons.Filled.Person
+                            else
+                                Icons.Outlined.Person,
                             contentDescription = null,
                             tint = MaterialTheme.colorScheme.primary
                         )
                         Spacer(Modifier.width(12.dp))
                         Text(
                             "Profile",
-                            style = MaterialTheme.typography.bodyLarge,
+                            style = PoppinsTypography().bodyLarge,
                             color = MaterialTheme.colorScheme.onSurface
                         )
                     }
@@ -429,7 +464,7 @@ private fun ProfileScreenExpanded(
                         Spacer(Modifier.width(12.dp))
                         Text(
                             "Settings",
-                            style = MaterialTheme.typography.bodyLarge,
+                            style = PoppinsTypography().bodyLarge,
                             color = MaterialTheme.colorScheme.onSurface
                         )
                     }
@@ -448,7 +483,11 @@ private fun ProfileScreenExpanded(
                         tint = MaterialTheme.colorScheme.error
                     )
                     Spacer(Modifier.width(8.dp))
-                    Text("SignOut")
+                    Text(
+                        "SignOut",
+                        style = PoppinsTypography().bodyLarge,
+                        color = MaterialTheme.colorScheme.error
+                    )
                 }
             }
         }
@@ -459,7 +498,7 @@ private fun ProfileScreenExpanded(
         LazyVerticalStaggeredGrid(
                 columns = StaggeredGridCells.Fixed(2),
                 modifier = Modifier
-                    .weight(1f).padding(start = 48.dp,end = 48.dp) ,
+                    .weight(0.4f).padding(start = 16.dp,end = 16.dp) ,
                 state = gridState,
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                 verticalItemSpacing = 8.dp,
@@ -476,8 +515,20 @@ private fun ProfileScreenExpanded(
                         )
                         Spacer(Modifier.width(32.dp))
                         Column {
-                            Text(user?.displayName ?: "User", style = MaterialTheme.typography.displaySmall, fontWeight = FontWeight.Bold)
-                            Text(user?.email ?: "", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            Text(
+                                user?.displayName ?: "User",
+                                style = PoppinsTypography().displaySmall,
+                                fontWeight = FontWeight.Bold,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
+                            )
+                            Text(
+                                user?.email ?: "",
+                                style = PoppinsTypography().titleMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
+                            )
                         }
                     }
                 }
@@ -506,7 +557,7 @@ private fun ProfileScreenExpanded(
                                     leadingIcon = {
                                         Icon(
                                             imageVector = when(filter) {
-                                                ProfileFilter.MY_POSTS -> Icons.Default.Article
+                                                ProfileFilter.MY_POSTS -> Icons.AutoMirrored.Filled.Article
                                                 ProfileFilter.LIKED -> Icons.Default.Favorite
                                                 ProfileFilter.BOOKMARKED -> Icons.Default.Bookmark
                                             },
@@ -533,9 +584,16 @@ private fun ProfileScreenExpanded(
                             modifier = Modifier.fillMaxWidth().padding(32.dp),
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
-                            Icon(Icons.Default.Info, null, tint = MaterialTheme.colorScheme.outline)
+                            Icon(
+                                Icons.Default.Info,
+                                null,
+                                tint = MaterialTheme.colorScheme.outline
+                            )
                             Spacer(Modifier.height(8.dp))
-                            Text("No posts found here yet.", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            Text(
+                                "No posts found here yet.",
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
                         }
                     }
                 } else {
@@ -555,7 +613,7 @@ private fun ProfileScreenExpanded(
         Column(
             modifier = Modifier
                 .fillMaxHeight()
-                .width(340.dp)
+                .weight(0.3f)
                 .verticalScroll(rememberScrollState())
                 .background(MaterialTheme.colorScheme.background)
                 .padding(24.dp),
@@ -563,7 +621,7 @@ private fun ProfileScreenExpanded(
         ) {
             Text(
                 "Your Wellness Vault",
-                style = MaterialTheme.typography.titleLarge,
+                style = PoppinsTypography().titleLarge,
                 fontWeight = FontWeight.Bold
             )
 
@@ -577,12 +635,20 @@ private fun ProfileScreenExpanded(
                 ),
                 shape = RoundedCornerShape(16.dp)
             ) {
-                Row(Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
-                    Icon(Icons.Default.ShieldMoon, null, tint = MaterialTheme.colorScheme.primary)
+                Row(
+                    modifier = Modifier
+                        .padding(16.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        Icons.Default.ShieldMoon,
+                        null,
+                        tint = MaterialTheme.colorScheme.primary
+                    )
                     Spacer(Modifier.width(12.dp))
                     Text(
                         "This is a safe space. Please be kind, supportive, and respectful to everyone in the Mindset Pulse community.",
-                        style = MaterialTheme.typography.bodySmall,
+                        style = PoppinsTypography().bodySmall,
                         color = MaterialTheme.colorScheme.onSecondaryContainer
                     )
                 }
@@ -614,7 +680,7 @@ private fun SettingsItem(onClick: ()->Unit){
             Spacer(Modifier.width(12.dp))
             Text(
                 "Settings",
-                style = MaterialTheme.typography.bodyLarge,
+                style = PoppinsTypography().bodyLarge,
                 color = MaterialTheme.colorScheme.onSurface
             )
         }

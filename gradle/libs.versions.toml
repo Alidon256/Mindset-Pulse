@@ -10,8 +10,10 @@ androidx-espresso = "3.7.0"
 androidx-lifecycle = "2.9.6"
 androidx-testExt = "1.3.0"
 composeMultiplatform = "1.9.3"
+composeHotReload = "1.0.0"
 junit = "4.13.2"
 kotlin = "2.3.0"
+kotlinxCoroutinesSwing = "1.10.2"
 kotlinxDatetime = "0.7.1"
 firebaseAuth = "2.3.0"
 mvvmCore = "0.16.1"
@@ -21,9 +23,11 @@ materialIconsExtendedVersion = "1.7.3"
 coilCompose = "3.3.0"
 kotlinxSerialization = "2.2.20"
 kotlinxSerializationCore = "1.6.3"
+mediaPlayerKMP = "2.0.9"
 
 [libraries]
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
+alert-kmp = { module = "io.github.khubaibkhan4:mediaplayer-kmp", version.ref = "mediaPlayerKMP" }
 kotlin-testJunit = { module = "org.jetbrains.kotlin:kotlin-test-junit", version.ref = "kotlin" }
 junit = { module = "junit:junit", version.ref = "junit" }
 androidx-core-ktx = { module = "androidx.core:core-ktx", version.ref = "androidx-core" }
@@ -41,6 +45,7 @@ firebase-firestore = { module = "dev.gitlive:firebase-firestore", version.ref = 
 firebase-auth = { module = "dev.gitlive:firebase-auth", version.ref = "firebaseAuth" }
 firebase-storage = { module = "dev.gitlive:firebase-storage", version.ref = "firebaseAuth" }
 google-firebase-auth = { module = "com.google.firebase:firebase-auth" }
+kotlinx-coroutines-swing = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-swing", version.ref = "kotlinxCoroutinesSwing" }
 kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlinxDatetime" }
 material-icons-extended = { module = "org.jetbrains.compose.material:material-icons-extended", version.ref = "materialIconsExtendedVersion" }
 
@@ -52,6 +57,7 @@ kotlinx-serialization-core = { module = "org.jetbrains.kotlinx:kotlinx-serializa
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
 androidLibrary = { id = "com.android.library", version.ref = "agp" }
+composeHotReload = { id = "org.jetbrains.compose.hot-reload", version.ref = "composeHotReload" }
 composeMultiplatform = { id = "org.jetbrains.compose", version.ref = "composeMultiplatform" }
 composeCompiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }

@@ -66,6 +66,7 @@ import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.vaulture.project.data.repos.ItemType
 import org.vaulture.project.data.repos.SearchableItem
+import org.vaulture.project.presentation.theme.PoppinsTypography
 
 @Composable
 fun SearchBar(
@@ -164,7 +165,9 @@ fun SearchBar(
                                     placeholderText,
                                     maxLines = 1,
                                     overflow = TextOverflow.Ellipsis,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    style = PoppinsTypography().bodyLarge.copy(
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
                                 )
                             },
                             singleLine = true,
@@ -185,7 +188,7 @@ fun SearchBar(
                                 unfocusedIndicatorColor = Color.Transparent,
                                 cursorColor = MaterialTheme.colorScheme.primary
                             ),
-                            textStyle = MaterialTheme.typography.bodyLarge.copy(
+                            textStyle = PoppinsTypography().bodyLarge.copy(
                                 color = MaterialTheme.colorScheme.onSurface
                             )
                         )
@@ -196,7 +199,7 @@ fun SearchBar(
                                 .padding(start = 12.dp, end = 12.dp)
                                 .align(Alignment.CenterStart),
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            style = MaterialTheme.typography.bodyLarge,
+                            style = PoppinsTypography().bodyLarge,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis
                         )
@@ -245,17 +248,17 @@ fun SearchBar(
                     if (query.isEmpty() && recentSearches.isNotEmpty()) {
                         Text(
                             "Recent Searches",
-                            style = MaterialTheme.typography.titleSmall,
+                            style = PoppinsTypography().titleSmall,
                             modifier = Modifier.padding(16.dp)
                         )
                         recentSearches.forEach { recent ->
                             SuggestionRow(
                                 icon = Icons.Default.History,
                                 text = recent,
-                                highlight = "", // No highlight for recent searches
+                                highlight = "",
                                 onClick = {
-                                    onQueryChange(recent) // Set query to recent
-                                    onRecentSearchClick(recent) // Specific callback
+                                    onQueryChange(recent)
+                                    onRecentSearchClick(recent)
                                 }
                             )
                             HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.2f))
@@ -265,7 +268,7 @@ fun SearchBar(
                             SuggestionRow(
                                 icon = Icons.Default.Search,
                                 text = query,
-                                highlight = query, // Highlight the typed query within itself
+                                highlight = query,
                                 onClick = {
                                     onSearch(query)
                                     focusManager.clearFocus()
@@ -351,7 +354,7 @@ private fun SuggestionRow(
         Spacer(Modifier.width(16.dp))
         Text(
             text = annotatedText,
-            style = MaterialTheme.typography.bodyMedium,
+            style = PoppinsTypography().bodyMedium,
             color = MaterialTheme.colorScheme.onSurface
         )
     }

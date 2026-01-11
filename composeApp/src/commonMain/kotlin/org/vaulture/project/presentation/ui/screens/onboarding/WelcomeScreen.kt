@@ -13,11 +13,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import mindsetpulse.composeapp.generated.resources.Res
+import mindsetpulse.composeapp.generated.resources.ic_img1
+import mindsetpulse.composeapp.generated.resources.mindset_pulse_nobg_logo
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
-import vaulture.composeapp.generated.resources.Res
-import vaulture.composeapp.generated.resources.ic_img1
-import vaulture.composeapp.generated.resources.mindset_pulse_nobg_logo
+import org.vaulture.project.presentation.theme.PoppinsTypography
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -60,6 +61,7 @@ fun WelcomeScreen(
                 Text(
                     text = "Master your mind, elevate your life.",
                     fontSize = 16.sp,
+                    style = PoppinsTypography().bodyMedium,
                     color = Color.White.copy(alpha = 0.9f),
                     textAlign = TextAlign.Center,
                     modifier = Modifier.padding(top = 8.dp, start = 32.dp, end = 32.dp)
@@ -84,6 +86,7 @@ fun WelcomeScreen(
                     Text(
                         text = "Get started Now",
                         fontSize = 16.sp,
+                        style = PoppinsTypography().bodyMedium,
                         fontWeight = FontWeight.Medium,
                         color = MaterialTheme.colorScheme.onPrimary
                     )
@@ -97,6 +100,7 @@ fun WelcomeScreen(
                 ) {
                     Text(
                         text = "Already have an account? ",
+                        style = PoppinsTypography().bodyMedium,
                         color = Color.White.copy(alpha = 0.8f),
                         fontSize = 14.sp
                     )
@@ -107,6 +111,7 @@ fun WelcomeScreen(
                         Text(
                             text = "Log in",
                             color = Color.White,
+                            style = PoppinsTypography().bodyMedium,
                             fontSize = 14.sp,
                             fontWeight = FontWeight.Medium
                         )

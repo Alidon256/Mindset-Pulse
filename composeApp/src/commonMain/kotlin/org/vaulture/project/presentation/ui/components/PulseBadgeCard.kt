@@ -24,6 +24,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import org.vaulture.project.domain.model.Level
+import org.vaulture.project.presentation.theme.PoppinsTypography
 
 private val mindsetLevels = listOf(
     Level("Initiate", Icons.Default.Brightness1, Color(0xFFB0BEC5), Color(0xFF78909C), 0),
@@ -122,13 +123,13 @@ fun PulseBadgeCard(
                 Column {
                     Text(
                         text = currentLevel.name,
-                        style = MaterialTheme.typography.titleLarge,
+                        style = PoppinsTypography().titleLarge,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.onSurface
                     )
                     Text(
                         text = "Mindset Level ${mindsetLevels.indexOf(currentLevel) + 1}",
-                        style = MaterialTheme.typography.bodySmall,
+                        style = PoppinsTypography().bodySmall,
                         color = currentLevel.color2,
                         fontWeight = FontWeight.Medium
                     )
@@ -155,21 +156,21 @@ fun PulseBadgeCard(
                 ) {
                     Text(
                         text = "$totalPoints XP",
-                        style = MaterialTheme.typography.labelSmall,
+                        style = PoppinsTypography().labelSmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         fontWeight = FontWeight.Bold
                     )
                     if (nextLevel != null) {
                         Text(
                             text = "${nextLevel.threshold} XP to next level",
-                            style = MaterialTheme.typography.labelSmall,
+                            style = PoppinsTypography().labelSmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             fontWeight = FontWeight.Medium
                         )
                     } else {
                         Text(
                             "Max Level Reached!",
-                            style = MaterialTheme.typography.labelSmall,
+                            style = PoppinsTypography().labelSmall,
                             color = currentLevel.color2,
                             fontWeight = FontWeight.Bold
                         )

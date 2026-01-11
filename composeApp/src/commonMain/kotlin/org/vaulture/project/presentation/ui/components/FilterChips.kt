@@ -10,7 +10,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import org.vaulture.project.presentation.theme.PoppinsTypography
 
 @Composable
 fun FilterChips(
@@ -30,7 +32,13 @@ fun FilterChips(
            FilterChip(
                selected = selectedCategory == category,
                onClick = {onFilterSelected(category)},
-               label = { Text(category) },
+               label = {
+                   Text(
+                   category,
+                       style = PoppinsTypography().bodyMedium,
+                       maxLines = 1,
+                       overflow = TextOverflow.Ellipsis
+                   ) },
                colors = FilterChipDefaults.filterChipColors(
                    selectedContainerColor = MaterialTheme.colorScheme.primary,
                    selectedLabelColor = MaterialTheme.colorScheme.onPrimary

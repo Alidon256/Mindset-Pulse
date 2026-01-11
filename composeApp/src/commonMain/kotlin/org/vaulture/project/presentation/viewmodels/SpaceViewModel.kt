@@ -78,8 +78,6 @@ open class SpaceViewModel(
     val spaceDescription = mutableStateOf("")
     private val _isCreatingSpace = MutableStateFlow(false)
     val isCreatingSpace: StateFlow<Boolean> = _isCreatingSpace.asStateFlow()
-    val initialPulse = mutableStateOf("")
-    val selectedAtmosphere = mutableStateOf("Rain")
 
     private val _currentSpace = MutableStateFlow<Space?>(null)
     val currentSpace: StateFlow<Space?> = _currentSpace.asStateFlow()
@@ -120,6 +118,11 @@ open class SpaceViewModel(
     private val _isLoadingProfileData = MutableStateFlow(false)
     val isLoadingProfileData: StateFlow<Boolean> = _isLoadingProfileData.asStateFlow()
 
+    private val _isFollowing = MutableStateFlow<Map<String, Boolean>>(emptyMap())
+    val isFollowing = _isFollowing.asStateFlow()
+
+    private val _targetUserProfile = MutableStateFlow<User?>(null)
+    val targetUserProfile = _targetUserProfile.asStateFlow()
 
     init {
         viewModelScope.launch {
@@ -227,6 +230,7 @@ open class SpaceViewModel(
         contentType: Story.ContentType,
         isFeed: Boolean,
         aspectRatio: Float,
+        visibility: Story.Visibility = Story.Visibility.PUBLIC,
         onProgress: (String) -> Unit,
         onSuccess: () -> Unit,
         onError: (String) -> Unit
@@ -273,6 +277,7 @@ open class SpaceViewModel(
                     thumbnailUrl = finalThumbnailUrl,
                     textContent = textContent,
                     aspectRatio = aspectRatio,
+                    visibility = visibility,
                     isFeed = isFeed,
                     timestamp = Timestamp.now()
                 )
@@ -289,27 +294,90 @@ open class SpaceViewModel(
             }
         }
     }
+
     private fun listenForFeeds() {
-        feedsListenerJob?.cancel() // Clear existing
+        val currentUserId = auth.currentUser?.uid ?: return
+        feedsListenerJob?.cancel()
+
         feedsListenerJob = viewModelScope.launch {
             try {
+                val userDocRef = firestore.collection("users").document(currentUserId)
+
+                val followingList = try {
+                    val snapshot = userDocRef.get()
+                    if (snapshot.exists) {
+                        snapshot.get<List<String>?>("following") ?: emptyList()
+                    } else {
+                        emptyList()
+                    }
+                } catch (e: Exception) {
+                    if (e is kotlinx.coroutines.CancellationException) throw e
+                    emptyList()
+                }
+
+                _error.value = null
+
                 firestore.collection("stories")
                     .where { "isFeed" equalTo true }
                     .orderBy("timestamp", Direction.DESCENDING)
                     .snapshots
                     .collect { snapshot ->
-                        val storiesList = snapshot.documents.mapNotNull { doc ->
-                            try { doc.data<Story>().copy(storyId = doc.id) } catch (e: Exception) { null }
+                        val allStories = snapshot.documents.mapNotNull { doc ->
+                            try {
+                                doc.data<Story>().copy(storyId = doc.id)
+                            } catch (e: Exception) {
+                                null
+                            }
                         }
-                        _feeds.value = storiesList
-                        if (!_isSearching.value) _filteredFeeds.value = storiesList
+
+                        val authorizedStories = allStories.filter { story ->
+                            when (story.visibility) {
+                                Story.Visibility.PUBLIC -> true
+                                Story.Visibility.CONNECTS_ONLY -> {
+                                    story.userId == currentUserId || followingList.contains(story.userId)
+                                }
+                                Story.Visibility.PRIVATE -> story.userId == currentUserId
+                            }
+                        }
+
+                        _feeds.value = authorizedStories
+                        if (!_isSearching.value) _filteredFeeds.value = authorizedStories
                         _isLoading.value = false
                     }
             } catch (e: Exception) {
-                println("SpaceVM: Feeds Listener Blocked (Safe during sign-out)")
+                if (e is kotlinx.coroutines.CancellationException) return@launch
+
+                _error.value = "Failed to load feed: ${e.message}"
+                _isLoading.value = false
+                println("SpaceVM: listenForFeeds Fatal - ${e.message}")
             }
         }
     }
+
+    fun loadPublicProfile(userId: String) {
+        _isLoadingProfileData.value = true
+        viewModelScope.launch {
+            try {
+                val userDoc = firestore.collection("users").document(userId).get()
+                _targetUserProfile.value = userDoc.data<User>()
+
+                val storiesSnapshot = firestore.collection("stories")
+                    .where { "userId" equalTo userId }
+                    .where { "visibility" equalTo "PUBLIC" }
+                    .orderBy("timestamp", Direction.DESCENDING)
+                    .get()
+
+                _userStories.value = storiesSnapshot.documents.mapNotNull { it.data<Story>() }
+            } catch (e: Exception) {
+                _error.value = "Profile hidden or unavailable."
+            } finally {
+                _isLoadingProfileData.value = false
+            }
+        }
+    }
+
+
+
     fun createSpace(coverImageBytes: ByteArray?, onSuccess: (String) -> Unit, onError: (String) -> Unit) {
         viewModelScope.launch {
             _isCreatingSpace.value = true
@@ -334,10 +402,8 @@ open class SpaceViewModel(
                     "description" to spaceDescription.value,
                     "ownerId" to currentUser.uid,
                     "memberIds" to listOf(currentUser.uid),
-                    "atmosphere" to selectedAtmosphere.value,
                     "coverImageUrl" to coverImageUrl,
                     "createdAt" to FieldValue.serverTimestamp,
-                    "initialPulse" to initialPulse.value
                 )
 
                 firestore.collection("spaces").document(spaceId).set(spaceData)
@@ -719,6 +785,30 @@ open class SpaceViewModel(
                 }
             } catch (e: Exception) {
                 println("Bookmark Error: ${e.message}")
+            }
+        }
+    }
+    fun toggleFollow(targetUserId: String) {
+        val currentUserId = auth.currentUser?.uid ?: return
+
+        viewModelScope.launch {
+            val currentUserRef = firestore.collection("users").document(currentUserId)
+            val targetUserRef = firestore.collection("users").document(targetUserId)
+
+            val isCurrentlyFollowing = _isFollowing.value[targetUserId] ?: false
+
+            try {
+                if (isCurrentlyFollowing) {
+                    currentUserRef.update("following" to FieldValue.arrayRemove(targetUserId))
+                    targetUserRef.update("followers" to FieldValue.arrayRemove(currentUserId))
+                } else {
+                    currentUserRef.update("following" to FieldValue.arrayUnion(targetUserId))
+                    targetUserRef.update("followers" to FieldValue.arrayUnion(currentUserId))
+                }
+
+                _isFollowing.value = _isFollowing.value + (targetUserId to !isCurrentlyFollowing)
+            } catch (e: Exception) {
+                _error.value = "Failed to update connection: ${e.message}"
             }
         }
     }

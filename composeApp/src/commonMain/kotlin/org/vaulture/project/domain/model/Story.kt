@@ -15,18 +15,14 @@ data class Story @OptIn(ExperimentalSerializationApi::class) constructor(
     val contentUrl: String? = null,
     val thumbnailUrl: String? = null,
     val textContent: String? = null,
-    val duration: Int = 5,
 
-   val timestamp: Timestamp? = null,
-    val expiryTimestamp: Timestamp? = null,
-    val isViewed: Boolean = false,
+    val timestamp: Timestamp? = null,
     val viewCount: Int = 0,
-    val musicTrack: String? = null,
     val aspectRatio: Float = 1.0f,
-    val privacySetting: PrivacySetting = PrivacySetting.PUBLIC,
+    val visibility: Visibility = Visibility.PUBLIC,
+    val authorizedViewers: List<String> = emptyList(),
     val isArchived: Boolean = false,
     val tags: List<String> = emptyList(),
-    val linkUrl: String? = null,
     val likeCount: Int = 0,
     val likedBy: List<String> = emptyList(),
     val bookmarkedBy: List<String> = emptyList(),
@@ -39,9 +35,7 @@ data class Story @OptIn(ExperimentalSerializationApi::class) constructor(
         PHOTO, VIDEO, TEXT, AUDIO, GIF
     }
 
-    enum class PrivacySetting {
-        PUBLIC, FRIENDS, CUSTOM
-    }
+    enum class Visibility { PUBLIC, CONNECTS_ONLY, PRIVATE }
 
     @Serializable
     data class Comment @OptIn(ExperimentalSerializationApi::class) constructor(

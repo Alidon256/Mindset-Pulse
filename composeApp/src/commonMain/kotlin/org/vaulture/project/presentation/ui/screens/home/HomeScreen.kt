@@ -49,7 +49,6 @@ import org.vaulture.project.presentation.ui.components.RhythmItem
 import org.vaulture.project.presentation.ui.components.SectionHeader
 import org.vaulture.project.presentation.ui.components.ShimmerRhythmItem
 import org.vaulture.project.presentation.ui.components.StreakBanner
-import org.vaulture.project.presentation.ui.components.StressTrendChart
 import org.vaulture.project.presentation.ui.components.WellnessActionItem
 import org.vaulture.project.presentation.ui.components.WellnessStatsRow
 import org.vaulture.project.presentation.utils.rememberKmpAudioPlayer
@@ -72,13 +71,11 @@ fun HomeScreen(
     wellnessViewModel: WellnessViewModel,
     onSignOut: () -> Unit
 ) {
-    val user by authService.currentUser.collectAsState(null)
     val checkInViewModel = remember { CheckInViewModel() }
     val kmpAudioPlayer = rememberKmpAudioPlayer()
     val rhythmViewModel = remember(kmpAudioPlayer) {
         RhythmViewModel(audioPlayer = kmpAudioPlayer)
     }
-    //val wellnessViewModel = remember { WellnessViewModel() }
     var showCheckInModal by remember { mutableStateOf(false) }
     val checkInState by checkInViewModel.uiState.collectAsState()
     val latestPersistentResult by checkInViewModel.latestResult.collectAsState()
@@ -117,7 +114,7 @@ fun HomeScreen(
                 .background(MaterialTheme.colorScheme.background)
                 .padding(padding)
         ) {
-            val isWideScreen = maxWidth > 800.dp
+            val isWideScreen = maxWidth > 920.dp
 
             AnimatedContent(
                 targetState = showCheckInModal,
@@ -565,7 +562,7 @@ fun DashboardWebLayout(
         LazyColumn(
             modifier = Modifier
                 .fillMaxHeight()
-                .width(340.dp)
+                .weight(0.3f)
                 .padding(vertical =8.dp, horizontal = 16.dp)
                 .background(MaterialTheme.colorScheme.background),
             verticalArrangement = Arrangement.spacedBy(24.dp)
@@ -590,6 +587,7 @@ fun DashboardWebLayout(
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.onSurface
                         ),
+                        maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
                 }
@@ -717,10 +715,11 @@ fun DashboardWebLayout(
                 }
             }
         }
+
         VerticalDivider(thickness = 1.dp, color = MaterialTheme.colorScheme.outlineVariant)
 
         LazyColumn(
-            modifier = Modifier.weight(1f),
+            modifier = Modifier.weight(0.4f),
             verticalArrangement = Arrangement.spacedBy(24.dp)
         ) {
 
@@ -759,7 +758,7 @@ fun DashboardWebLayout(
         Column(
             modifier = Modifier
                 .fillMaxHeight()
-                .width(340.dp)
+                .weight(0.3f)
                 .verticalScroll(rememberScrollState())
                 .background(MaterialTheme.colorScheme.background)
                 .padding(24.dp),
@@ -767,7 +766,7 @@ fun DashboardWebLayout(
         ) {
             Text(
                 "Your Wellness Vault",
-                style = MaterialTheme.typography.titleLarge,
+                style = PoppinsTypography().titleLarge,
                 fontWeight = FontWeight.Bold
             )
 
@@ -781,12 +780,20 @@ fun DashboardWebLayout(
                 ),
                 shape = RoundedCornerShape(16.dp)
             ) {
-                Row(Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
-                    Icon(Icons.Default.ShieldMoon, null, tint = MaterialTheme.colorScheme.primary)
+                Row(
+                    modifier = Modifier
+                        .padding(16.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        Icons.Default.ShieldMoon,
+                        null,
+                        tint = MaterialTheme.colorScheme.primary
+                    )
                     Spacer(Modifier.width(12.dp))
                     Text(
                         "This is a safe space. Please be kind, supportive, and respectful to everyone in the Mindset Pulse community.",
-                        style = MaterialTheme.typography.bodySmall,
+                        style = PoppinsTypography().bodySmall,
                         color = MaterialTheme.colorScheme.onSecondaryContainer
                     )
                 }

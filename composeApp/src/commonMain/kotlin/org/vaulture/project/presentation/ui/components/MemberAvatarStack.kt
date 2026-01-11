@@ -23,6 +23,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.times
 import androidx.compose.ui.zIndex
 import coil3.compose.AsyncImage
+import org.vaulture.project.presentation.theme.PoppinsTypography
 
 @Composable
 fun MemberAvatarStack(
@@ -68,7 +69,7 @@ fun MemberAvatarStack(
                 ) {
                     Text(
                         text = "+$remainingCount",
-                        style = MaterialTheme.typography.labelSmall.copy(
+                        style = PoppinsTypography().labelSmall.copy(
                             fontSize = 9.sp,
                             fontWeight = FontWeight.ExtraBold,
                             color = MaterialTheme.colorScheme.onPrimaryContainer
@@ -82,7 +83,7 @@ fun MemberAvatarStack(
 
         Text(
             text = if (totalCount > 0) "Active Support" else "Be the first to join",
-            style = MaterialTheme.typography.labelSmall.copy(
+            style = PoppinsTypography().labelSmall.copy(
                 letterSpacing = 0.5.sp,
                 fontWeight = FontWeight.Medium
             ),

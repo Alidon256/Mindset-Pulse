@@ -36,8 +36,6 @@ import org.vaulture.project.presentation.utils.AuthServiceImpl
 import org.vaulture.project.presentation.viewmodels.LoginViewModel
 import org.vaulture.project.data.local.OnboardingManager
 import org.vaulture.project.presentation.theme.AppTheme
-import org.vaulture.project.presentation.theme.AppThemeMode
-import org.vaulture.project.presentation.theme.ThemePalette
 import org.vaulture.project.presentation.ui.components.MiniPlayer
 import org.vaulture.project.presentation.ui.screens.home.AnalyticsScreen
 import org.vaulture.project.presentation.ui.screens.home.CBTScreen
@@ -52,6 +50,7 @@ import org.vaulture.project.presentation.ui.screens.onboarding.OnboardingScreenO
 import org.vaulture.project.presentation.ui.screens.onboarding.OnboardingScreenTwo
 import org.vaulture.project.presentation.ui.screens.onboarding.SplashScreen
 import org.vaulture.project.presentation.ui.screens.onboarding.WelcomeScreen
+import org.vaulture.project.presentation.ui.screens.profile.MindsetPortfolioScreen
 import org.vaulture.project.presentation.ui.screens.profile.ProfileScreen
 import org.vaulture.project.presentation.ui.screens.profile.SettingsScreen
 import org.vaulture.project.presentation.ui.screens.space.AddStoryScreen
@@ -100,7 +99,9 @@ object Routes {
     @Serializable data object WELLNESS_TIMER: NavDestination { override val routePattern: String = "WELLNESS_TIMER" }
     @Serializable data object SPACES_HOME: NavDestination { override val routePattern: String = "COMMUNITY" }
     @Serializable data object SETTINGS : NavDestination { override val routePattern: String = "SETTINGS" }
-
+    @Serializable data class PORTFOLIO(val userId: String) : NavDestination {
+        override val routePattern: String = "PORTFOLIO"
+    }
     @Serializable data object CREATE_SPACE : NavDestination { override val routePattern: String = "CREATE_SPACE" }
 }
 
@@ -139,7 +140,7 @@ fun AppNavigation(
     val startDestination: NavDestination? = when (authState) {
         true -> Routes.HOME
         false -> if (isFirstRun) Routes.SPLASH else Routes.LOGIN
-        null -> null // Loading state
+        null -> null
     }
 
     val bottomNavItems = listOf(
@@ -243,6 +244,7 @@ fun AppNavigation(
                                             Text(
                                                 item.label,
                                                 fontSize = 11.sp,
+                                                style = MaterialTheme.typography.labelSmall,
                                                 modifier = Modifier.padding(top = 0.dp)
                                             )
                                         },
@@ -359,13 +361,21 @@ fun AppNavigation(
                                 },
                                 onNavigateToSignUp = {
                                     OnboardingManager.completeOnboarding()
-                                    // Navigate to SIGN_UP route
                                     navController.navigate(Routes.SIGN_UP) {
                                         popUpTo(navController.graph.findStartDestination().id) {
                                             inclusive = true
                                         }
                                     }
                                 })
+                        }
+
+                        composable<Routes.PORTFOLIO> { backStackEntry ->
+                            val args = backStackEntry.toRoute<Routes.PORTFOLIO>()
+                            MindsetPortfolioScreen(
+                                userId = args.userId,
+                                viewModel = spaceViewModel,
+                                onBack = { navController.popBackStack() }
+                            )
                         }
 
                         composable<Routes.LOGIN> {

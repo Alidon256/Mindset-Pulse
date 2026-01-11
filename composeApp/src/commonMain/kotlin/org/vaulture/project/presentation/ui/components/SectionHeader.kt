@@ -14,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import org.vaulture.project.presentation.theme.PoppinsTypography
 
 @Composable
 fun SectionHeader(
@@ -22,7 +23,7 @@ fun SectionHeader(
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier.padding(horizontal = 16.dp)
+        modifier = Modifier.padding(horizontal = 16.dp,vertical = 8.dp)
     ) {
         Icon(
             icon,
@@ -33,7 +34,7 @@ fun SectionHeader(
         Spacer(Modifier.width(8.dp))
         Text(
             title,
-            style = MaterialTheme.typography.titleMedium,
+            style = PoppinsTypography().titleMedium,
             fontWeight = FontWeight.Bold,
             color = MaterialTheme.colorScheme.onSurface
         )

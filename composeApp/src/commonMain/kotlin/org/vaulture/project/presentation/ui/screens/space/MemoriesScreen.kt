@@ -14,7 +14,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
+import androidx.navigation.NavHostController
 import org.vaulture.project.domain.model.Story
+import org.vaulture.project.presentation.navigation.Routes
+import org.vaulture.project.presentation.theme.PoppinsTypography
 import org.vaulture.project.presentation.ui.components.PostItem
 import org.vaulture.project.presentation.viewmodels.SpaceViewModel
 
@@ -24,9 +28,10 @@ fun MemoriesScreen(
     viewModel: SpaceViewModel,
     modifier: Modifier = Modifier,
     onCommentClick: (String) -> Unit,
-    onBookmarkClick: (String) -> Unit
+    onBookmarkClick: (String) -> Unit,
+    navController: NavController
 ) {
-
+    val followingMap by viewModel.isFollowing.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
     val error by viewModel.error.collectAsState()
     val isSearching by viewModel.isSearching.collectAsState()
@@ -68,9 +73,13 @@ fun MemoriesScreen(
                        PostItem(
                             post = post,
                             currentUserId = currentUserId,
+                            isFollowing = followingMap[post.userId] ?: false,
+                            onFollowClick = { targetId -> viewModel.toggleFollow(targetId) },
                             onLikeClick = { viewModel.toggleLike(post) },
                             onCommentClick = { onCommentClick(post.storyId) },
-                            onProfileClick = { /* Navigate to Profile */ },
+                           onProfileClick = { userId ->
+                               navController.navigate(Routes.PORTFOLIO(userId))
+                           },
                             onBookmarkClick = { viewModel.toggleBookmark(post) },
                             onOptionClick = {}
                         )
@@ -105,13 +114,13 @@ private fun EmptySearchPlaceholder() {
         Spacer(Modifier.height(16.dp))
         Text(
             "No Reflections Found",
-            style = MaterialTheme.typography.headlineSmall,
+            style = PoppinsTypography().headlineSmall,
             fontWeight = FontWeight.Bold
         )
         Text(
             "Try a different keyword or check your spelling.",
             textAlign = TextAlign.Center,
-            style = MaterialTheme.typography.bodyMedium,
+            style = PoppinsTypography().bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
     }
@@ -133,13 +142,13 @@ private fun ErrorPlaceholder(errorMessage: String) {
         )
         Text(
             text = "Connection Interrupted",
-            style = MaterialTheme.typography.headlineSmall,
+            style = PoppinsTypography().headlineSmall,
             fontWeight = FontWeight.Bold,
             color = MaterialTheme.colorScheme.error
         )
         Text(
             text = errorMessage,
-            style = MaterialTheme.typography.bodyMedium,
+            style = PoppinsTypography().bodyMedium,
             textAlign = TextAlign.Center,
             modifier = Modifier.padding(top = 8.dp)
         )

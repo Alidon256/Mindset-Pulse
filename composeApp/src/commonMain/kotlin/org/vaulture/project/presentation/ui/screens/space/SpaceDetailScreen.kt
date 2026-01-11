@@ -33,6 +33,7 @@ import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
 import kotlinx.coroutines.launch
 import org.vaulture.project.domain.model.SpaceMessage
+import org.vaulture.project.presentation.theme.PoppinsTypography
 import org.vaulture.project.presentation.ui.components.MemberAvatarStack
 import org.vaulture.project.presentation.ui.components.PostItem
 import org.vaulture.project.presentation.ui.screens.space.CommentSheetContentSpace
@@ -112,13 +113,16 @@ fun SpaceDetailScreen(
                         title = {
                             Text(
                                 text = space?.name ?: "Loading...",
-                                style = MaterialTheme.typography.titleLarge,
+                                style = PoppinsTypography().titleLarge,
                                 fontWeight = FontWeight.Bold
                             )
                         },
                         navigationIcon = {
                             IconButton(onClick = onNavigateBack) {
-                                Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back")
+                                Icon(
+                                    Icons.AutoMirrored.Filled.ArrowBack,
+                                    "Back"
+                                )
                             }
                         },
                         
@@ -136,7 +140,12 @@ fun SpaceDetailScreen(
                             containerColor = MaterialTheme.colorScheme.primary,
                             contentColor = MaterialTheme.colorScheme.onPrimary,
                             icon = { Icon(Icons.Default.Add, null) },
-                            text = { Text("Share Reflection") }
+                            text = {
+                                Text(
+                                    "Share Reflection",
+                                    style = PoppinsTypography().labelLarge
+                                )
+                            }
                         )
                     }
                 },
@@ -170,13 +179,16 @@ fun SpaceDetailScreen(
                         title = {
                             Text(
                                 text = space?.name ?: "Loading...",
-                                style = MaterialTheme.typography.titleLarge,
+                                style = PoppinsTypography().titleLarge,
                                 fontWeight = FontWeight.Bold
                             )
                         },
                         navigationIcon = {
                             IconButton(onClick = onNavigateBack) {
-                                Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back")
+                                Icon(
+                                    Icons.AutoMirrored.Filled.ArrowBack,
+                                    "Back"
+                                )
                             }
                         },
                         actions = {
@@ -275,13 +287,13 @@ private fun SpaceDetailHeader(coverImageUrl: String?, spaceName: String?, isWide
         ) {
             Text(
                 text = spaceName ?: "Loading...",
-                style = MaterialTheme.typography.headlineMedium,
+                style = PoppinsTypography().headlineMedium,
                 color = Color.White,
                 fontWeight = FontWeight.Bold
             )
             Text(
                 text = "Safe Space",
-                style = MaterialTheme.typography.labelMedium,
+                style = PoppinsTypography().labelMedium,
                 color = MaterialTheme.colorScheme.primaryContainer
             )
         }
@@ -318,9 +330,19 @@ private fun SpaceDetailTabs(selectedTab: SpaceDetailTab, onTabSelected: (SpaceDe
                 contentAlignment = Alignment.Center
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(tab.icon, null, modifier = Modifier.size(18.dp), tint = contentColor)
+                    Icon(
+                        tab.icon,
+                        null,
+                        modifier = Modifier.size(18.dp),
+                        tint = contentColor
+                    )
                     Spacer(Modifier.width(8.dp))
-                    Text(tab.title, color = contentColor, style = MaterialTheme.typography.labelLarge, fontWeight = FontWeight.Bold)
+                    Text(
+                        tab.title,
+                        color = contentColor,
+                        style = PoppinsTypography().labelLarge,
+                        fontWeight = FontWeight.Bold
+                    )
                 }
             }
         }
@@ -358,6 +380,7 @@ private fun TabContent(
 
 @Composable
 fun SpacePostsContent(viewModel: SpaceViewModel, onCommentClick: (String) -> Unit,spaceId: String) {
+    val followingMap by viewModel.isFollowing.collectAsState()
     val posts by viewModel.spacePosts.collectAsState()
     val isLoading by viewModel.isLoadingPosts.collectAsState()
     val currentUserId = viewModel.auth.currentUser?.uid ?: ""
@@ -381,6 +404,7 @@ fun SpacePostsContent(viewModel: SpaceViewModel, onCommentClick: (String) -> Uni
             Spacer(Modifier.height(8.dp))
             Text(
                 "No posts yet. Be the first to share something!",
+                style = PoppinsTypography().bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.Center
             )
@@ -398,9 +422,15 @@ fun SpacePostsContent(viewModel: SpaceViewModel, onCommentClick: (String) -> Uni
                     onCommentClick = { onCommentClick(post.storyId) },
                     onBookmarkClick = { viewModel.toggleBookmarkSpace(post, spaceId) },
                     onProfileClick = {},
-                    onOptionClick = {}
+                    onOptionClick = {},
+                    isFollowing = followingMap[post.userId] ?: false,
+                    onFollowClick = { targetId -> viewModel.toggleFollow(targetId) }
                 )
-                HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp), color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f))
+                HorizontalDivider(
+                    modifier = Modifier
+                        .padding(horizontal = 16.dp),
+                    color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
+                )
             }
         }
     }
@@ -445,6 +475,7 @@ fun SpaceChatContent(viewModel: SpaceViewModel, spaceId: String) {
                 Spacer(Modifier.height(8.dp))
                 Text(
                     "No messages yet. Start the conversation!",
+                    style = PoppinsTypography().bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.padding(16.dp),
                     textAlign = TextAlign.Center
@@ -489,10 +520,20 @@ private fun CreatePostDialog(
             OutlinedTextField(
                 value = postContent,
                 onValueChange = { postContent = it },
-                label = { Text("What's on your mind?") },
+                label = {
+                    Text(
+                        "What's on your mind?",
+                        style = PoppinsTypography().labelLarge
+                    )
+                },
                 modifier = Modifier.fillMaxWidth().heightIn(150.dp),
                 shape = RoundedCornerShape(16.dp),
-                placeholder = { Text("Share something with the space...") }
+                placeholder = {
+                    Text(
+                        "Share something with the space...",
+                        style = PoppinsTypography().labelLarge
+                    )
+                }
             )
         },
         confirmButton = {
@@ -500,12 +541,18 @@ private fun CreatePostDialog(
                 onClick = { onSubmit(postContent) },
                 enabled = isSubmitEnabled
             ) {
-                Text("Post")
+                Text(
+                    "Post",
+                    style = PoppinsTypography().labelLarge
+                )
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text("Cancel")
+                Text(
+                    "Cancel",
+                    style = PoppinsTypography().labelLarge
+                )
             }
         }
     )
@@ -537,7 +584,7 @@ fun ChatMessageBubble(message: SpaceMessage, isFromMe: Boolean) {
                 if (!isFromMe) {
                     Text(
                         message.authorName,
-                        style = MaterialTheme.typography.labelMedium,
+                        style = PoppinsTypography().labelMedium,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.primary
                     )
@@ -549,12 +596,12 @@ fun ChatMessageBubble(message: SpaceMessage, isFromMe: Boolean) {
                     ) {
                         Text(
                             text = message.text,
-                            style = MaterialTheme.typography.bodyLarge,
+                            style = PoppinsTypography().bodyLarge,
                             modifier = Modifier.weight(1f, fill = false).padding(end = 8.dp)
                         )
                         Text(
                             text = message.timestamp?.let { formatTimestamp2(it, "h:mm a") } ?: "",
-                            style = MaterialTheme.typography.bodySmall.copy(fontSize = 10.sp),
+                            style = PoppinsTypography().bodySmall.copy(fontSize = 10.sp),
                             color = LocalContentColor.current.copy(alpha = 0.7f)
                         )
                     }
@@ -578,7 +625,12 @@ fun MessageInputRow(
             value = value,
             onValueChange = onValueChange,
             modifier = Modifier.weight(1f),
-            placeholder = { Text("Type a message...") },
+            placeholder = {
+                Text(
+                    "Type a message...",
+                    style = PoppinsTypography().labelLarge
+                )
+            },
             shape = RoundedCornerShape(24.dp),
             colors = OutlinedTextFieldDefaults.colors(
                 focusedBorderColor = MaterialTheme.colorScheme.primary,
@@ -590,7 +642,10 @@ fun MessageInputRow(
             Icon(
                 Icons.AutoMirrored.Filled.Send,
                 contentDescription = "Send",
-                tint = if (value.isNotBlank()) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f)
+                tint = if (value.isNotBlank())
+                    MaterialTheme.colorScheme.primary
+                else
+                    MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f)
             )
         }
     }

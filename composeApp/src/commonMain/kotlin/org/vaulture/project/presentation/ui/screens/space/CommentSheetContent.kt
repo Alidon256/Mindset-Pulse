@@ -39,6 +39,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import org.vaulture.project.domain.model.Story
+import org.vaulture.project.presentation.theme.PoppinsTypography
 import org.vaulture.project.presentation.utils.formatTimestamp
 import org.vaulture.project.presentation.viewmodels.SpaceViewModel
 
@@ -58,7 +59,7 @@ fun CommentSheetContent(
     ) {
         Text(
             text = "Support Hub",
-            style = MaterialTheme.typography.titleLarge,
+            style = PoppinsTypography().titleLarge,
             fontWeight = FontWeight.Bold,
             modifier = Modifier.padding(bottom = 16.dp)
         )
@@ -68,10 +69,13 @@ fun CommentSheetContent(
                 Text(
                     "Be the first to offer support.",
                     modifier = Modifier.align(Alignment.Center),
+                    style = PoppinsTypography().bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             } else {
-                LazyColumn(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                LazyColumn(
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
                     items(comments) { comment ->
                         CommentItem(
                             comment
@@ -93,7 +97,12 @@ fun CommentSheetContent(
                 TextField(
                     value = commentText,
                     onValueChange = { commentText = it },
-                    placeholder = { Text("Write a supportive reply...") },
+                    placeholder = {
+                        Text(
+                            "Write a supportive reply...",
+                            style = PoppinsTypography().bodyMedium
+                        )
+                    },
                     modifier = Modifier.weight(1f),
                     colors = TextFieldDefaults.colors(
                         focusedContainerColor = Color.Transparent,
@@ -113,7 +122,10 @@ fun CommentSheetContent(
                         contentColor = MaterialTheme.colorScheme.primary
                     )
                 ) {
-                    Icon(Icons.AutoMirrored.Filled.Send, contentDescription = "Send")
+                    Icon(
+                        Icons.AutoMirrored.Filled.Send,
+                        contentDescription = "Send"
+                    )
                 }
             }
         }
@@ -131,11 +143,18 @@ fun CommentItem(comment: Story.Comment) {
         )
         Spacer(Modifier.width(12.dp))
         Column {
-            Text(comment.userName, style = MaterialTheme.typography.labelLarge, fontWeight = FontWeight.Bold)
-            Text(comment.text, style = MaterialTheme.typography.bodyMedium)
+            Text(
+                comment.userName,
+                style = PoppinsTypography().labelLarge,
+                fontWeight = FontWeight.Bold
+            )
+            Text(
+                comment.text,
+                style = PoppinsTypography().bodyMedium
+            )
             Text(
                 formatTimestamp(comment.timestamp),
-                style = MaterialTheme.typography.labelSmall,
+                style = PoppinsTypography().labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }

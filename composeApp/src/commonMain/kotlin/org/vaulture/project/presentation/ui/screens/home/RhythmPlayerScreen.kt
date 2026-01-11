@@ -21,6 +21,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
 import org.vaulture.project.domain.model.RhythmTrack
+import org.vaulture.project.presentation.theme.PoppinsTypography
 import org.vaulture.project.presentation.viewmodels.RhythmUiState
 import org.vaulture.project.presentation.viewmodels.RhythmViewModel
 
@@ -34,6 +35,7 @@ fun RhythmPlayerScreen(trackId: String?, viewModel: RhythmViewModel, onBack: () 
             viewModel.incrementListenerCount(track.id)
         }
     }*/
+
     LaunchedEffect(trackId) {
         if (trackId != null && state.currentTrack?.id != trackId) {
             viewModel.loadTrackById(trackId)
@@ -70,7 +72,11 @@ fun RhythmPlayerScreen(trackId: String?, viewModel: RhythmViewModel, onBack: () 
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 IconButton(onClick = onBack) {
-                    Icon(Icons.AutoMirrored.Filled.ArrowBack, null, tint = Color.White)
+                    Icon(
+                        Icons.AutoMirrored.Filled.ArrowBack,
+                        null,
+                        tint = Color.White
+                    )
                 }
                 Text(
                     text = "Relaxation Rhythm",
@@ -142,7 +148,7 @@ private fun PlayerContent(
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Text(
                 text = track?.title ?: "Select a Track",
-                style = MaterialTheme.typography.headlineMedium,
+                style = PoppinsTypography().headlineMedium,
                 color = Color.White,
                 fontWeight = FontWeight.Bold,
                 maxLines = 1,
@@ -150,7 +156,7 @@ private fun PlayerContent(
             )
             Text(
                 text = track?.artist ?: "Mindset Pulse",
-                style = MaterialTheme.typography.bodyLarge,
+                style = PoppinsTypography().bodyLarge,
                 color = Color.White.copy(0.7f),
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
@@ -178,12 +184,12 @@ private fun PlayerContent(
                 Text(
                     formatMillis(state.progress),
                     color = Color.White,
-                    style = MaterialTheme.typography.labelSmall
+                    style = PoppinsTypography().labelSmall
                 )
                 Text(
                     formatMillis(state.duration),
                     color = Color.White,
-                    style = MaterialTheme.typography.labelSmall
+                    style = PoppinsTypography().labelSmall
                 )
             }
         }

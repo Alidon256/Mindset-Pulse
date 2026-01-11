@@ -62,7 +62,7 @@ class GeminiService {
     }
 
     // private val apiKey = "YOUR_REAL_API_KEY_HERE"
-    private val apiKey = "AIzaSyD7EIi4wCBL_JLWgi8RZ6qO5E8dT7hvxqQ"
+    private val apiKey = "AIzaSyB1zWHZRsnYW166zW6nG1CGE5IJentaCsQ"
     private val url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=$apiKey"
 
     private suspend fun <T> retryWithBackoff(
@@ -97,7 +97,7 @@ class GeminiService {
 
         return try {
             retryWithBackoff {
-                println("🚀 GeminiService: Requesting questions...")
+                println("GeminiService: Requesting questions...")
 
                 val response: GeminiResponse = client.post(url) {
                     contentType(ContentType.Application.Json)
@@ -119,7 +119,7 @@ class GeminiService {
                 questions.take(5)
             }
         } catch (e: Exception) {
-            println("❌ GeminiService: All retries failed. Falling back to defaults. Error: ${e.message}")
+            println("GeminiService: All retries failed. Falling back to defaults. Error: ${e.message}")
             getDefaultQuestions()
         }
     }

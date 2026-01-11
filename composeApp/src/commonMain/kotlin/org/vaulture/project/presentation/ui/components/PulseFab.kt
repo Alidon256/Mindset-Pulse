@@ -22,6 +22,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import org.vaulture.project.presentation.theme.PoppinsTypography
 
 @Composable
 fun PulseFab(onClick: () -> Unit) {
@@ -43,8 +44,15 @@ fun PulseFab(onClick: () -> Unit) {
         shape = RoundedCornerShape(16.dp),
         modifier = Modifier.height(56.dp)
     ) {
-        Icon(Icons.Default.Add, null)
+        Icon(
+            Icons.Default.Add,
+            null
+        )
         Spacer(Modifier.width(8.dp))
-        Text("Daily Check-In", fontWeight = FontWeight.Bold)
+        Text(
+            "Daily Check-In",
+            fontWeight = FontWeight.Bold,
+            style = PoppinsTypography().titleMedium
+        )
     }
 }

@@ -27,12 +27,15 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
 import org.vaulture.project.domain.model.Story
+import org.vaulture.project.presentation.theme.PoppinsTypography
 import org.vaulture.project.presentation.utils.formatTimestamp
 
 @Composable
 fun PostItem(
     post: Story,
     currentUserId: String,
+    isFollowing: Boolean,
+    onFollowClick: (String) -> Unit,
     onLikeClick: (String) -> Unit,
     onCommentClick: (String) -> Unit,
     onBookmarkClick: (String) -> Unit,
@@ -69,17 +72,36 @@ fun PostItem(
             Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = post.userName,
-                    style = MaterialTheme.typography.titleSmall,
+                    style = PoppinsTypography().titleSmall,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onSurface,
                     modifier = Modifier.clickable { onProfileClick(post.userId) }
                 )
                 Text(
                     text = formatTimestamp(post.timestamp),
-                    style = MaterialTheme.typography.bodySmall,
+                    style = PoppinsTypography().bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
+
+            if (post.userId != currentUserId) {
+                TextButton(
+                    onClick = { onFollowClick(post.userId) },
+                    colors = ButtonDefaults.textButtonColors(
+                        contentColor = if (isFollowing) MaterialTheme.colorScheme.outline
+                        else MaterialTheme.colorScheme.primary
+                    )
+                ) {
+                    Icon(
+                        imageVector = if (isFollowing) Icons.Default.Check else Icons.Default.Add,
+                        modifier = Modifier.size(16.dp),
+                        contentDescription = null
+                    )
+                    Spacer(Modifier.width(4.dp))
+                    Text(if (isFollowing) "Connected" else "Connect")
+                }
+            }
+
             IconButton(onClick = { onOptionClick(post.storyId) }) {
                 Icon(
                     Icons.Default.MoreVert,
@@ -125,7 +147,7 @@ fun PostItem(
 
                 Text(
                     text = annotatedText,
-                    style = MaterialTheme.typography.bodyMedium,
+                    style = PoppinsTypography().bodyMedium,
                     lineHeight = 20.sp,
                     modifier = Modifier.clickable {
                         if (post.textContent.length > textLimit) isExpanded = !isExpanded
@@ -177,13 +199,13 @@ fun PostItem(
             Spacer(Modifier.width(4.dp))
             Text(
                 "${post.likeCount}",
-                style = MaterialTheme.typography.labelSmall,
+                style = PoppinsTypography().labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
             Spacer(Modifier.weight(1f))
             Text(
                 "${post.commentCount} comments",
-                style = MaterialTheme.typography.labelSmall,
+                style = PoppinsTypography().labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
@@ -234,9 +256,18 @@ fun PostActionButton(
         modifier = Modifier.height(40.dp),
         colors = ButtonDefaults.textButtonColors(contentColor = color)
     ) {
-        Icon(icon, contentDescription = null, modifier = Modifier.size(20.dp))
+        Icon(
+            icon,
+            contentDescription = null,
+            modifier = Modifier
+                .size(20.dp)
+        )
         Spacer(Modifier.width(6.dp))
-        Text(text, style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.SemiBold)
+        Text(
+            text,
+            style = PoppinsTypography().labelMedium,
+            fontWeight = FontWeight.SemiBold
+        )
     }
 }
 

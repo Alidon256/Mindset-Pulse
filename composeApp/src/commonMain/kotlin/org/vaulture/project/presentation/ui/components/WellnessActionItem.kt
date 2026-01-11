@@ -34,6 +34,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import org.vaulture.project.presentation.theme.PoppinsTypography
 
 @Composable
 fun WellnessActionItem(
@@ -101,7 +102,7 @@ fun WellnessActionItem(
 
         Text(
             text = title,
-            style = MaterialTheme.typography.bodySmall.copy(
+            style = PoppinsTypography().bodySmall.copy(
                 fontSize = titleFontSize,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onSurface

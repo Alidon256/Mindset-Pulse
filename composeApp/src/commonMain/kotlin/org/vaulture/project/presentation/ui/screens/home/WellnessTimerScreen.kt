@@ -28,6 +28,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import org.vaulture.project.domain.model.WellnessType
+import org.vaulture.project.presentation.theme.PoppinsTypography
 import org.vaulture.project.presentation.viewmodels.WellnessPhase
 import org.vaulture.project.presentation.viewmodels.WellnessUiState
 import org.vaulture.project.presentation.viewmodels.WellnessViewModel
@@ -50,7 +51,7 @@ fun WellnessTimerScreen(viewModel: WellnessViewModel, onBack: () -> Unit) {
             .background(backgroundBrush),
         contentAlignment = Alignment.Center
     ) {
-        val contentModifier = if (maxWidth > 800.dp) {
+        val contentModifier = if (maxWidth > 920.dp) {
             Modifier
                 .width(500.dp)
                 .align(Alignment.Center)
@@ -64,7 +65,10 @@ fun WellnessTimerScreen(viewModel: WellnessViewModel, onBack: () -> Unit) {
                 .align(Alignment.TopStart)
                 .padding(16.dp)
         ) {
-            Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back")
+            Icon(
+                Icons.AutoMirrored.Filled.ArrowBack,
+                "Back"
+            )
         }
 
         AnimatedContent(
@@ -133,7 +137,7 @@ private fun SetupContent(modifier: Modifier, viewModel: WellnessViewModel, onBac
 
         Text(
             "Prepare for ${activity.label}",
-            style = MaterialTheme.typography.headlineMedium,
+            style = PoppinsTypography().headlineMedium,
             fontWeight = FontWeight.Bold,
             textAlign = TextAlign.Center
         )
@@ -149,7 +153,7 @@ private fun SetupContent(modifier: Modifier, viewModel: WellnessViewModel, onBac
 
         Text(
             "Select duration",
-            style = MaterialTheme.typography.titleMedium,
+            style = PoppinsTypography().titleMedium,
             fontWeight = FontWeight.SemiBold,
             modifier = Modifier.padding(bottom = 16.dp)
         )
@@ -164,14 +168,24 @@ private fun SetupContent(modifier: Modifier, viewModel: WellnessViewModel, onBac
                     modifier = Modifier.weight(1f).height(50.dp),
                     shape = RoundedCornerShape(12.dp)
                 ) {
-                    Text("$mins min")
+                    Text(
+                        "$mins min",
+                        style = PoppinsTypography().titleMedium,
+                        fontWeight = FontWeight.SemiBold
+                    )
                 }
             }
         }
 
         Spacer(Modifier.height(24.dp))
 
-        TextButton(onClick = onBack) { Text("Maybe later") }
+        TextButton(onClick = onBack) {
+            Text(
+                "Maybe later",
+                style = PoppinsTypography().titleMedium,
+                fontWeight = FontWeight.SemiBold
+            )
+        }
 
         Spacer(Modifier.weight(0.2f))
     }
@@ -189,13 +203,18 @@ private fun ExpandableInfoCard(title: String, description: String) {
         onClick = { isExpanded = !isExpanded }
     ) {
         Column(
-            modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp)
+            modifier = Modifier
+                .padding(horizontal = 16.dp, vertical = 12.dp)
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text(title, style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.SemiBold)
+                Text(
+                    title,
+                    style = PoppinsTypography().titleSmall,
+                    fontWeight = FontWeight.SemiBold
+                )
                 Spacer(Modifier.weight(1f))
                 Icon(
                     imageVector = Icons.Default.ExpandMore,
@@ -207,7 +226,7 @@ private fun ExpandableInfoCard(title: String, description: String) {
             AnimatedVisibility(visible = isExpanded) {
                 Text(
                     text = description,
-                    style = MaterialTheme.typography.bodyMedium,
+                    style = PoppinsTypography().bodyMedium,
                     modifier = Modifier.padding(top = 8.dp)
                 )
             }
@@ -250,16 +269,16 @@ private fun ActiveTimerContent(
     ) {
          Text(
             text = state.breathText,
-            style = MaterialTheme.typography.headlineMedium,
+            style = PoppinsTypography().headlineMedium,
             color = MaterialTheme.colorScheme.primary,
             fontWeight = FontWeight.Black,
             textAlign = TextAlign.Center,
-            modifier = Modifier.height(80.dp).wrapContentHeight() // Prevents UI jump on long pose names
+            modifier = Modifier.height(80.dp).wrapContentHeight()
         )
 
         Text(
             text = currentType.name,
-            style = MaterialTheme.typography.labelLarge,
+            style = PoppinsTypography().labelLarge,
             color = MaterialTheme.colorScheme.primary.copy(alpha = 0.6f),
             modifier = Modifier.padding(top = 4.dp)
         )
@@ -295,10 +314,12 @@ private fun ActiveTimerContent(
                 strokeCap = StrokeCap.Round
             )
 
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
                 Text(
                     text = formatTime(state.timeLeftSeconds),
-                    style = MaterialTheme.typography.displayMedium,
+                    style = PoppinsTypography().displayMedium,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onBackground
                 )
@@ -318,17 +339,34 @@ private fun ActiveTimerContent(
             shape = RoundedCornerShape(16.dp),
             border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.5f))
         ) {
-            Icon(Icons.Default.Close, null, modifier = Modifier.size(18.dp))
+            Icon(
+                Icons.Default.Close,
+                null,
+                modifier = Modifier.size(18.dp)
+            )
             Spacer(Modifier.width(8.dp))
-            Text("End Session Early")
+            Text(
+                "End Session Early",
+                style = PoppinsTypography().titleMedium,
+                fontWeight = FontWeight.SemiBold
+            )
         }
 
         if (showDialog) {
             AlertDialog(
                 onDismissRequest = { showDialog = false },
-                title = { Text("End session early?") },
+                title = {
+                   Text(
+                    "End session early?",
+                    style = PoppinsTypography().titleMedium,
+                    fontWeight = FontWeight.SemiBold
+                   )
+                },
                 text = {
-                    Text("Every moment of mindfulness builds your Mindset Battery. Are you sure you want to pause your progress?")
+                    Text(
+                        "Every moment of mindfulness builds your Mindset Battery. Are you sure you want to pause your progress?",
+                        style = PoppinsTypography().bodyMedium
+                    )
                 },
                 confirmButton = {
                     Button(
@@ -337,10 +375,22 @@ private fun ActiveTimerContent(
                             viewModel.resetToSetup()
                         },
                         colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
-                    ) { Text("End Session") }
+                    ) {
+                      Text(
+                        "End Session",
+                        style = PoppinsTypography().titleMedium,
+                        fontWeight = FontWeight.SemiBold
+                      )
+                    }
                 },
                 dismissButton = {
-                    TextButton(onClick = { showDialog = false }) { Text("Stay Present") }
+                    TextButton(onClick = { showDialog = false }) {
+                      Text(
+                        "Stay Present",
+                        style = PoppinsTypography().titleMedium,
+                        fontWeight = FontWeight.SemiBold
+                      )
+                    }
                 },
                 containerColor = MaterialTheme.colorScheme.surface,
                 textContentColor = MaterialTheme.colorScheme.onSurface,
@@ -353,29 +403,61 @@ private fun ActiveTimerContent(
 
 @Composable
 private fun SummaryContent(modifier: Modifier, state: WellnessUiState, onBack: () -> Unit) {
-    Column(modifier.padding(24.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
-
+    Column(
+        modifier.padding(24.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
         // XP Badge
         Box(contentAlignment = Alignment.Center) {
-            Icon(Icons.Default.AutoAwesome, null, modifier = Modifier.size(120.dp), tint = MaterialTheme.colorScheme.primary.copy(0.1f))
+            Icon(
+                Icons.Default.AutoAwesome,
+                null,
+                modifier = Modifier.size(120.dp),
+                tint = MaterialTheme.colorScheme.primary.copy(0.1f)
+            )
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Text("RQ POINTS", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.primary)
-                Text("+${state.stats.resiliencePoints}", style = MaterialTheme.typography.displaySmall, fontWeight = FontWeight.Black)
+                Text(
+                    "RQ POINTS",
+                    style = PoppinsTypography().labelSmall,
+                    color = MaterialTheme.colorScheme.primary
+                )
+                Text(
+                    "+${state.stats.resiliencePoints}",
+                    style = PoppinsTypography().displaySmall,
+                    fontWeight = FontWeight.Black
+                )
             }
         }
 
         Spacer(Modifier.height(32.dp))
-        Text("Your Mindset Battery is refilling!", style = MaterialTheme.typography.titleMedium, textAlign = TextAlign.Center)
-        Text("Great job on completing your session.", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
 
+        Text(
+            "Your Mindset Battery is refilling!",
+            style = PoppinsTypography().titleMedium,
+            textAlign = TextAlign.Center
+        )
+        Text(
+            "Great job on completing your session.",
+            style = PoppinsTypography().bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
 
-        Row(Modifier.padding(vertical = 24.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        Row(
+            modifier = Modifier
+                .padding(vertical = 24.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
             repeat(5) { index ->
                 val isActive = index < state.stats.sessionsToday
                 Box(
                     Modifier.size(width = 40.dp, height = 8.dp)
                         .clip(CircleShape)
-                        .background(if (isActive) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant)
+                        .background(
+                            if (isActive)
+                                MaterialTheme.colorScheme.primary
+                            else
+                                MaterialTheme.colorScheme.surfaceVariant)
                 )
             }
         }
@@ -385,23 +467,46 @@ private fun SummaryContent(modifier: Modifier, state: WellnessUiState, onBack: (
             shape = RoundedCornerShape(24.dp),
             colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
         ) {
-            Row(Modifier.padding(24.dp), verticalAlignment = Alignment.CenterVertically) {
-                Icon(Icons.Default.LocalFireDepartment, null, tint = Color(0xFFFF5722), modifier = Modifier.size(40.dp))
+            Row(
+                modifier = Modifier
+                    .padding(24.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    Icons.Default.LocalFireDepartment,
+                    null,
+                    tint = Color(0xFFFF5722),
+                    modifier = Modifier.size(40.dp)
+                )
+
                 Spacer(Modifier.width(16.dp))
+
                 Column {
-                    Text("${state.stats.currentStreak} Day Streak!", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
-                    Text("Consistency is the key to clarity.", style = MaterialTheme.typography.bodySmall)
+                    Text(
+                        "${state.stats.currentStreak} Day Streak!",
+                        style = PoppinsTypography().titleLarge,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Text(
+                        "Consistency is the key to clarity.",
+                        style = PoppinsTypography().bodySmall
+                    )
                 }
             }
         }
 
         Spacer(Modifier.height(48.dp))
+
         Button(
             onClick = onBack,
             modifier = Modifier.fillMaxWidth().height(56.dp),
             shape = RoundedCornerShape(16.dp)
         ) {
-            Text("Return to Dashboard")
+            Text(
+                "Return to Dashboard",
+                style = PoppinsTypography().titleMedium,
+                fontWeight = FontWeight.SemiBold
+            )
         }
     }
 }

@@ -50,10 +50,10 @@ fun RhythmItem(
 
     BoxWithConstraints(modifier = modifier) {
         val screenWidthDp = maxWidth
-        val isTablet = screenWidthDp >= 600.dp
-        val size = if (isTablet) androidx.compose.ui.unit.DpSize(220.dp, 160.dp) else androidx.compose.ui.unit.DpSize(190.dp, 140.dp)
+        val isLargeScreen = screenWidthDp >= 920.dp
+        val size = if (isLargeScreen) androidx.compose.ui.unit.DpSize(220.dp, 160.dp) else androidx.compose.ui.unit.DpSize(190.dp, 140.dp)
         val horizontalPadding = 8.dp
-        val width = if (isTablet) 230.dp else 210.dp
+        val width = if (isLargeScreen) 230.dp else 210.dp
 
         Column(
             modifier = Modifier
@@ -71,7 +71,6 @@ fun RhythmItem(
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        //.size(size)
                         .size(size.width, size.height)
                         .background(cardColor.copy(alpha = 0.07f))
                         .clip(RoundedCornerShape(8.dp))

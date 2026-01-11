@@ -26,7 +26,7 @@ data class RhythmUiState(
 )
 
 class RhythmViewModel(
-    private val audioPlayer: KmpAudioPlayer
+    val audioPlayer: KmpAudioPlayer
 ) : ViewModel() {
 
     private val firestore = Firebase.firestore

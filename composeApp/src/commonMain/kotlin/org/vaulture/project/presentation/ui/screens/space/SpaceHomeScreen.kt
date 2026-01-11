@@ -4,13 +4,11 @@ import androidx.compose.foundation.background
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
-
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.togetherWith
-import androidx.compose.foundation.border
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -25,10 +23,8 @@ import androidx.compose.material.icons.filled.Air
 import androidx.compose.material.icons.filled.Analytics
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Groups
-import androidx.compose.material.icons.filled.Nightlife
 import androidx.compose.material.icons.filled.SelfImprovement
 import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material.icons.filled.Shield
 import androidx.compose.material.icons.filled.ShieldMoon
 import androidx.compose.material.icons.filled.Spa
 import androidx.compose.material.icons.outlined.*
@@ -44,9 +40,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
-import org.jetbrains.compose.resources.painterResource
 import org.vaulture.project.data.remote.AuthService
-import org.vaulture.project.domain.model.WellnessStats
 import org.vaulture.project.domain.model.WellnessType
 import org.vaulture.project.presentation.navigation.Routes
 import org.vaulture.project.presentation.theme.PoppinsTypography
@@ -60,8 +54,6 @@ import org.vaulture.project.presentation.ui.components.WellnessActionItem
 import org.vaulture.project.presentation.ui.components.WellnessStatsRow
 import org.vaulture.project.presentation.viewmodels.SpaceViewModel
 import org.vaulture.project.presentation.viewmodels.WellnessViewModel
-import vaulture.composeapp.generated.resources.Res
-import vaulture.composeapp.generated.resources.mindset_pulse_nobg_logo
 import kotlin.time.Clock
 
 
@@ -109,7 +101,8 @@ fun SpacesHomeScreen(
                     onSpaceClick = onSpaceClick,
                     onCreateSpaceClick = onCreateSpaceClick,
                     onAddStoryClick = onAddStoryClick,
-                    onCommentClick = onCommentClick
+                    onCommentClick = onCommentClick,
+                    navController = navController
                 )
             }
         }
@@ -153,7 +146,7 @@ fun SpaceHomeScreenExpandable(
         LazyColumn(
             modifier = Modifier
                 .fillMaxHeight()
-                .width(340.dp)
+                .weight(0.3f)
                 .padding(vertical =8.dp, horizontal = 16.dp)
                 .background(MaterialTheme.colorScheme.background),
             verticalArrangement = Arrangement.spacedBy(24.dp)
@@ -178,6 +171,7 @@ fun SpaceHomeScreenExpandable(
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.onSurface
                         ),
+                        maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
                 }
@@ -242,14 +236,17 @@ fun SpaceHomeScreenExpandable(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Icon(
-                            if (selectedRailItem == "Spaces") Icons.Filled.Groups else Icons.Outlined.Groups,
+                            if (selectedRailItem == "Spaces")
+                                Icons.Filled.Groups
+                            else
+                                Icons.Outlined.Groups,
                             contentDescription = null,
                             tint = MaterialTheme.colorScheme.primary
                         )
                         Spacer(Modifier.width(12.dp))
                         Text(
                             "Spaces",
-                            style = MaterialTheme.typography.bodyLarge,
+                            style = PoppinsTypography().bodyLarge,
                             color = MaterialTheme.colorScheme.onSurface
                         )
                     }
@@ -259,7 +256,10 @@ fun SpaceHomeScreenExpandable(
                 Card(
                     onClick = { selectedRailItem = "Insights" },
                     colors = CardDefaults.cardColors(
-                        containerColor = if (selectedRailItem == "Insights") MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surface
+                        containerColor = if (selectedRailItem == "Insights")
+                            MaterialTheme.colorScheme.primaryContainer
+                        else
+                            MaterialTheme.colorScheme.surface
                     ),
                     shape = RoundedCornerShape(16.dp),
                     modifier = Modifier.fillMaxWidth()
@@ -276,7 +276,7 @@ fun SpaceHomeScreenExpandable(
                         Spacer(Modifier.width(12.dp))
                         Text(
                             "Insights",
-                            style = MaterialTheme.typography.bodyLarge,
+                            style = PoppinsTypography().bodyLarge,
                             color = MaterialTheme.colorScheme.onSurface
                         )
                     }
@@ -286,7 +286,10 @@ fun SpaceHomeScreenExpandable(
                 Card(
                     onClick = { selectedRailItem = "Settings" },
                     colors = CardDefaults.cardColors(
-                        containerColor = if (selectedRailItem == "Settings") MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surface
+                        containerColor = if (selectedRailItem == "Settings")
+                            MaterialTheme.colorScheme.primaryContainer
+                        else
+                            MaterialTheme.colorScheme.surface
                     ),
                     shape = RoundedCornerShape(16.dp),
                     modifier = Modifier.fillMaxWidth()
@@ -303,7 +306,7 @@ fun SpaceHomeScreenExpandable(
                         Spacer(Modifier.width(12.dp))
                         Text(
                             "Settings",
-                            style = MaterialTheme.typography.bodyLarge,
+                            style = PoppinsTypography().bodyLarge,
                             color = MaterialTheme.colorScheme.onSurface
                         )
                     }
@@ -322,7 +325,11 @@ fun SpaceHomeScreenExpandable(
                         tint = MaterialTheme.colorScheme.error
                     )
                     Spacer(Modifier.width(8.dp))
-                    Text("SignOut")
+                    Text(
+                        "SignOut",
+                        style = PoppinsTypography().bodyLarge,
+                        color = MaterialTheme.colorScheme.error
+                    )
                 }
             }
         }
@@ -374,7 +381,7 @@ fun SpaceHomeScreenExpandable(
                     )
                 }
             },
-            modifier = Modifier.weight(1f)
+            modifier = Modifier.weight(0.4f)
         ) { paddingValues ->
             Box(modifier = Modifier.padding(paddingValues).fillMaxSize()) {
                 AnimatedContent(
@@ -389,7 +396,6 @@ fun SpaceHomeScreenExpandable(
                                 spaces = spaces,
                                 onSpaceClick = { spaceId ->
                                     println("[UI] User clicked space: $spaceId. Triggering Join...")
-
                                     viewModel.joinSpace(spaceId)
                                     onSpaceClick(spaceId)
                                 },
@@ -403,7 +409,8 @@ fun SpaceHomeScreenExpandable(
                                 stories = memories,
                                 viewModel = viewModel,
                                 onCommentClick = onCommentClick,
-                                onBookmarkClick = { storyId -> viewModel.toggleBookmark(memories.find { it.storyId == storyId }!!) }
+                                onBookmarkClick = { storyId -> viewModel.toggleBookmark(memories.find { it.storyId == storyId }!!) },
+                                navController = navController
                             )
                         }
                     }
@@ -415,7 +422,7 @@ fun SpaceHomeScreenExpandable(
         Column(
             modifier = Modifier
                 .fillMaxHeight()
-                .width(340.dp)
+                .weight(0.3f)
                 .verticalScroll(rememberScrollState())
                 .background(MaterialTheme.colorScheme.background)
                 .padding(24.dp),
@@ -423,7 +430,7 @@ fun SpaceHomeScreenExpandable(
         ) {
             Text(
                 "Your Wellness Vault",
-                style = MaterialTheme.typography.titleLarge,
+                style = PoppinsTypography().titleLarge,
                 fontWeight = FontWeight.Bold
             )
 
@@ -437,12 +444,20 @@ fun SpaceHomeScreenExpandable(
                 ),
                 shape = RoundedCornerShape(16.dp)
             ) {
-                Row(Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
-                    Icon(Icons.Default.ShieldMoon, null, tint = MaterialTheme.colorScheme.primary)
+                Row(
+                    modifier = Modifier
+                        .padding(16.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        Icons.Default.ShieldMoon,
+                        null,
+                        tint = MaterialTheme.colorScheme.primary
+                    )
                     Spacer(Modifier.width(12.dp))
                     Text(
                         "Your spaces are end-to-end encrypted and AI-moderated for your safety.",
-                        style = MaterialTheme.typography.bodySmall,
+                        style = PoppinsTypography().bodySmall,
                         color = MaterialTheme.colorScheme.onSecondaryContainer
                     )
                 }
@@ -463,7 +478,8 @@ fun SpacesHomeScreenCompat(
     onSpaceClick: (spaceId: String) -> Unit,
     onCreateSpaceClick: () -> Unit,
     onAddStoryClick: () -> Unit,
-    onCommentClick: (String) -> Unit
+    onCommentClick: (String) -> Unit,
+    navController: NavController
 ) {
     val activeId by viewModel.activeSpaceId.collectAsState()
     var searchQuery by remember { mutableStateOf("") }
@@ -533,12 +549,11 @@ fun SpacesHomeScreenCompat(
         ) { filter ->
             when (filter) {
                 SpaceFilter.Spaces -> {
-                    // Use filteredSpaces instead of spaces
                     val spaces by viewModel.filteredSpaces.collectAsState()
                     SpacesListContent(
                         spaces = spaces,
                         onSpaceClick = { spaceId ->
-                            println("🖱️ [UI] User clicked space: $spaceId. Triggering Join...")
+                            println("[UI] User clicked space: $spaceId. Triggering Join...")
                             viewModel.joinSpace(spaceId)
                             onSpaceClick(spaceId)
                         },
@@ -552,7 +567,8 @@ fun SpacesHomeScreenCompat(
                         stories = memories,
                         viewModel = viewModel,
                         onCommentClick = onCommentClick,
-                        onBookmarkClick = {}
+                        onBookmarkClick = {},
+                        navController = navController
                     )
                 }
             }

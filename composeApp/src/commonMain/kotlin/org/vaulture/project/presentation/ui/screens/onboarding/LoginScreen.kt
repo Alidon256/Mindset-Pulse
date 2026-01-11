@@ -37,6 +37,7 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
+import org.vaulture.project.presentation.theme.PoppinsTypography
 import org.vaulture.project.presentation.viewmodels.LoginUiState
 import org.vaulture.project.presentation.viewmodels.LoginViewModel
 import org.vaulture.project.presentation.utils.ImagePicker
@@ -51,8 +52,6 @@ fun LoginScreen(
     val uiState by viewModel.uiState.collectAsState()
     var isSignUpMode by remember(initialSignUpMode) { mutableStateOf(initialSignUpMode) }
     var showImagePicker by remember { mutableStateOf(false) }
-
-    val focusManager = LocalFocusManager.current
 
     ImagePicker(
         show = showImagePicker,
@@ -70,7 +69,7 @@ fun LoginScreen(
             .background(MaterialTheme.colorScheme.background)
             .systemBarsPadding()
     ) {
-        if (maxWidth > 700.dp) {
+        if (maxWidth > 920.dp) {
             Row(modifier = Modifier.fillMaxSize()) {
                 Box(
                     modifier = Modifier.weight(1f).fillMaxHeight(),
@@ -82,21 +81,27 @@ fun LoginScreen(
                         contentScale = ContentScale.Crop,
                         modifier = Modifier.fillMaxSize()
                     )
-                    Box(modifier = Modifier.matchParentSize().background(Color.Black.copy(0.3f)))
+
+                    Box(
+                        modifier = Modifier
+                            .matchParentSize()
+                            .background(Color.Black.copy(0.3f))
+                    )
+
                     Column(
                         Modifier.padding(48.dp),
                         horizontalAlignment = Alignment.Start
                     ) {
                         Text(
                             "Mindset Pulse",
-                            style = MaterialTheme.typography.headlineLarge,
+                            style = PoppinsTypography().headlineLarge,
                             fontWeight = FontWeight.Bold,
                             color = Color.White
                         )
                         Spacer(Modifier.height(8.dp))
                         Text(
                             "Listen,talk and Improve your mindset",
-                            style = MaterialTheme.typography.titleLarge,
+                            style = PoppinsTypography().titleLarge,
                             color = Color.White.copy(alpha = 0.8f)
                         )
                     }
@@ -180,13 +185,13 @@ private fun AuthForm(
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Text(
                     text = if (isSignUp) "Create Account" else "Welcome Back",
-                    style = MaterialTheme.typography.headlineLarge,
+                    style = PoppinsTypography().headlineLarge,
                     fontWeight = FontWeight.Bold
                 )
                 Spacer(Modifier.height(4.dp))
                 Text(
                     text = if (isSignUp) "Join us to improve your mindset" else "Sign in to continue your journey",
-                    style = MaterialTheme.typography.bodyLarge,
+                    style = PoppinsTypography().bodyLarge,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     textAlign = TextAlign.Center
                 )
@@ -196,7 +201,9 @@ private fun AuthForm(
         Spacer(Modifier.height(48.dp))
 
         AnimatedVisibility(visible = isSignUpMode) {
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
                 Box(
                     modifier = Modifier
                         .size(120.dp)
@@ -246,8 +253,18 @@ private fun AuthForm(
             value = uiState.email,
             onValueChange = onEmailChange,
             modifier = Modifier.fillMaxWidth(),
-            label = { Text("Email Address") },
-            leadingIcon = { Icon(Icons.Outlined.Email, contentDescription = "Email Icon") },
+            label = {
+                Text(
+                "Email Address",
+                    style = PoppinsTypography().bodyMedium,
+                    )
+            },
+            leadingIcon = {
+                Icon(
+                    Icons.Outlined.Email,
+                    contentDescription = "Email Icon"
+                )
+            },
             isError = uiState.error != null,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email, imeAction = ImeAction.Next),
             singleLine = true,
@@ -259,8 +276,18 @@ private fun AuthForm(
             value = uiState.password,
             onValueChange = onPasswordChange,
             modifier = Modifier.fillMaxWidth(),
-            label = { Text("Password") },
-            leadingIcon = { Icon(Icons.Outlined.Lock, contentDescription = "Password Icon") },
+            label = {
+                Text(
+                    "Password",
+                    style = PoppinsTypography().bodyMedium,
+                    )
+            },
+            leadingIcon = {
+                Icon(
+                    Icons.Outlined.Lock,
+                    contentDescription = "Password Icon"
+                )
+            },
             isError = uiState.error != null,
             visualTransformation = PasswordVisualTransformation(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Done),
@@ -278,6 +305,7 @@ private fun AuthForm(
                 text = uiState.error ?: "An unknown error occurred",
                 color = MaterialTheme.colorScheme.error,
                 textAlign = TextAlign.Center,
+                style = PoppinsTypography().bodyMedium,
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp)
@@ -304,13 +332,20 @@ private fun AuthForm(
                     shape = RoundedCornerShape(16.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
                 ) {
-                    Text(buttonText, fontWeight = FontWeight.Bold, style = MaterialTheme.typography.bodyLarge)
+                    Text(
+                        buttonText,
+                        fontWeight = FontWeight.Bold,
+                        style = PoppinsTypography().bodyLarge
+                    )
                 }
             }
         }
         Spacer(Modifier.height(16.dp))
 
-        Text("or continue with")
+        Text(
+            "or continue with",
+            style = PoppinsTypography().bodyMedium,
+        )
         Spacer(Modifier.height(16.dp))
 
         OutlinedButton(
@@ -322,14 +357,28 @@ private fun AuthForm(
             border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline)
         ) {
 
-            Text("SIGN IN WITH GOOGLE", fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface)
+            Text(
+                "SIGN IN WITH GOOGLE",
+                fontWeight = FontWeight.Bold,
+                style = PoppinsTypography().bodyLarge,
+                color = MaterialTheme.colorScheme.onSurface
+            )
         }
 
         Spacer(Modifier.height(24.dp))
 
-        val toggleText = if (isSignUpMode) "Already have an account? Sign In" else "New here? Create an Account"
+        val toggleText = if (isSignUpMode)
+            "Already have an account? Sign In"
+        else
+            "New here? Create an Account"
+
         TextButton(onClick = onToggleMode) {
-            Text(toggleText, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
+            Text(
+                toggleText,
+                fontWeight = FontWeight.Bold,
+                style = PoppinsTypography().bodyMedium,
+                color = MaterialTheme.colorScheme.primary
+            )
         }
 
         Spacer(Modifier.height(32.dp))

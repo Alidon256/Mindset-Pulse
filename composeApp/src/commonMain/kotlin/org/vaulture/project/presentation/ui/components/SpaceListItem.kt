@@ -21,14 +21,13 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import androidx.compose.ui.unit.times
-import androidx.compose.ui.zIndex
+
 import coil3.compose.AsyncImage
+import mindsetpulse.composeapp.generated.resources.Res
+import mindsetpulse.composeapp.generated.resources.mindset_pulse_logo
 import org.jetbrains.compose.resources.painterResource
 import org.vaulture.project.domain.model.Space
-import vaulture.composeapp.generated.resources.Res
-import vaulture.composeapp.generated.resources.mindset_pulse_logo
+import org.vaulture.project.presentation.theme.PoppinsTypography
 
 @Composable
 fun SpaceListItem(
@@ -108,7 +107,7 @@ fun SpaceListItem(
                 )
                 Text(
                     text = space.description,
-                    style = MaterialTheme.typography.bodySmall,
+                    style = PoppinsTypography().bodySmall,
                     color = contentColor.copy(alpha = 0.8f),
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis

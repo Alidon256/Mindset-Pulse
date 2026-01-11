@@ -75,6 +75,7 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.vaulture.project.domain.model.CbtExerciseType
+import org.vaulture.project.domain.model.MoodData
 import org.vaulture.project.domain.model.cognitiveDistortionsList
 import org.vaulture.project.domain.model.commonEmotions
 import org.vaulture.project.presentation.navigation.Routes
@@ -134,14 +135,21 @@ fun CBTScreen(
                             "Daily CBT",
                             style = PoppinsTypography().headlineMedium
                         )
-                    }, // Adjusted style
+                    },
                     navigationIcon = {
-                        IconButton(onClick = { navController.popBackStack() }) {
-                            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        IconButton(
+                            onClick = { navController.popBackStack() }
+                        ) {
+                            Icon(
+                                Icons.AutoMirrored.Filled.ArrowBack,
+                                contentDescription = "Back"
+                            )
                         }
                     },
                     actions = {
-                        IconButton(onClick = { navController.navigate(Routes.ANALYTICS) }) {
+                        IconButton(
+                            onClick = { navController.navigate(Routes.ANALYTICS) }
+                        ) {
                             Icon(
                                 Icons.Filled.BarChart,
                                 contentDescription = "Analytics",
@@ -158,13 +166,18 @@ fun CBTScreen(
             floatingActionButton = {
                 ExtendedFloatingActionButton(
                     onClick = { viewModel.submitCheckIn() },
-                    icon = { Icon(Icons.Filled.Done, "Submit Check-in") },
+                    icon = {
+                        Icon(
+                            Icons.Filled.Done,
+                            "Submit Check-in"
+                        )
+                    },
                     text = {
                         Text(
                             "Submit",
                             style = PoppinsTypography().labelLarge
                         )
-                    }, // Applied Poppins
+                    },
                     expanded = !uiState.isLoading,
                     containerColor = MaterialTheme.colorScheme.primary,
                     contentColor = MaterialTheme.colorScheme.onPrimary
@@ -297,7 +310,7 @@ fun CBTScreen(
                                 CbtExerciseType.NONE -> { /* Handled by AnimatedVisibility */
                                 }
                             }
-                            // "Learned from CBT" field (visible if any exercise is selected)
+
                             StyledTextField(
                                 value = uiState.learnedFromCbt,
                                 onValueChange = viewModel::onLearnedFromCbtChange,
@@ -311,7 +324,7 @@ fun CBTScreen(
                 }
             }
         }
-            }
+      }
     }
 }
 
@@ -399,13 +412,6 @@ fun ExplainerText(text: String, modifier: Modifier = Modifier) {
         )
     }
 }
-
-data class MoodData(
-    val name: String,
-    val icon: ImageVector,
-    val selectedColor: Color,
-    val contentColor: Color
-)
 
 @Composable
 fun OverallMoodSelector(
@@ -503,11 +509,7 @@ private fun MoodItem(
         animationSpec = spring(dampingRatio = 0.4f, stiffness = 200f),
         label = "MoodItemScale"
     )
-    val elevation by animateDpAsState(
-        targetValue = if (isSelected) 8.dp else 2.dp,
-        animationSpec = tween(durationMillis = 200),
-        label = "MoodItemElevation"
-    )
+
     val backgroundAlpha by animateFloatAsState(
         targetValue = if (isSelected) 1f else 0f,
         animationSpec = tween(durationMillis = 250),
@@ -550,7 +552,7 @@ private fun MoodItem(
     }
 }
 
-// --- Bubble Animation Components ---
+
 data class FlyingBubbleState(
     val id: Long,
     val color: Color,
@@ -667,7 +669,7 @@ fun <T> MultiSelectChipGroup(
         if (title.isNotBlank()){
             Text(
                 title,
-                style =PoppinsTypography().labelLarge.copy(fontWeight = FontWeight.Medium), // Use Poppins, adjust style as needed
+                style =PoppinsTypography().labelLarge.copy(fontWeight = FontWeight.Medium),
                 modifier = Modifier.padding(bottom = 8.dp)
             )
         }
@@ -724,7 +726,12 @@ fun ActivityInputSection(
         OutlinedTextField(
             value = textState,
             onValueChange = { textState = it },
-            label = { Text("Add $title (e.g., Read)", style =PoppinsTypography().bodySmall) },
+            label = {
+                Text(
+                    "Add $title (e.g., Read)",
+                    style =PoppinsTypography().bodySmall
+                )
+            },
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(12.dp),
             trailingIcon = {
@@ -734,7 +741,11 @@ fun ActivityInputSection(
                         textState = ""
                     }
                 }) {
-                    Icon(Icons.Filled.Add, contentDescription = "Add Activity", tint = MaterialTheme.colorScheme.primary)
+                    Icon(
+                        Icons.Filled.Add,
+                        contentDescription = "Add Activity",
+                        tint = MaterialTheme.colorScheme.primary
+                    )
                 }
             },
             keyboardOptions = KeyboardOptions.Default.copy(
@@ -768,7 +779,12 @@ fun ActivityInputSection(
                     InputChip(
                         selected = false,
                         onClick = { /* Could be used for editing in the future */ },
-                        label = { Text(activity, style = PoppinsTypography().bodySmall) }, // Use Poppins
+                        label = {
+                            Text(
+                                activity,
+                                style = PoppinsTypography().bodySmall
+                            )
+                        },
                         colors = InputChipDefaults.inputChipColors(
                             containerColor = MaterialTheme.colorScheme.tertiaryContainer,
                             labelColor = MaterialTheme.colorScheme.onTertiaryContainer,
@@ -819,7 +835,12 @@ fun CbtExerciseTypeSelector(
                 value = selectedType.displayName,
                 onValueChange = {},
                 readOnly = true,
-                label = { Text("Select CBT Exercise", style = PoppinsTypography().bodySmall) }, // Use Poppins
+                label = {
+                    Text(
+                        "Select CBT Exercise",
+                        style = PoppinsTypography().bodySmall
+                    )
+                },
                 trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
                 modifier = Modifier
                     .fillMaxWidth()
@@ -841,7 +862,12 @@ fun CbtExerciseTypeSelector(
             ) {
                 CbtExerciseType.values().forEach { type ->
                     DropdownMenuItem(
-                        text = { Text(type.displayName, style = PoppinsTypography().bodyMedium) },
+                        text = {
+                            Text(
+                                type.displayName,
+                                style = PoppinsTypography().bodyMedium
+                            )
+                        },
                         onClick = {
                             onTypeSelected(type)
                             expanded = false

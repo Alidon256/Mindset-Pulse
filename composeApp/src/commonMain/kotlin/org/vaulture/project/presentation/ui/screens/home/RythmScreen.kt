@@ -51,9 +51,9 @@ fun RhythmHomeScreen(
 
     BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
         val screenWidth = maxWidth
-        val isTablet = screenWidth >= 600.dp
-        val padding = if (isTablet) 32.dp else 16.dp
-        val searchBarWidthFraction = if (isTablet) 0.7f else 1f
+        val isLargeScreen = screenWidth >= 920.dp
+        val padding = if (isLargeScreen) 32.dp else 16.dp
+        val searchBarWidthFraction = if (isLargeScreen) 0.7f else 1f
 
         Column(
             modifier = modifier
@@ -243,10 +243,13 @@ fun RhythmHomeContent(
 
             AnimatedContent(targetState = finalTracks, label = "GridTransition") { tracksToShow ->
                 if (tracksToShow.isEmpty()) {
-                    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
                         Text(
                             text = if (searchQuery.isNotBlank()) "No matches for '$searchQuery'" else "Empty category",
-                            style = MaterialTheme.typography.bodyLarge,
+                            style = PoppinsTypography().bodyLarge,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }

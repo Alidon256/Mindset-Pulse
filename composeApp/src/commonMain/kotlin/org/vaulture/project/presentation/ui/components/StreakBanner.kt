@@ -25,8 +25,10 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import org.vaulture.project.presentation.theme.PoppinsTypography
 
 
 @Composable
@@ -76,17 +78,17 @@ fun StreakBanner(
                 Column(Modifier.weight(1f)) {
                     Text(
                         "Resilience Streak",
-                        style = MaterialTheme.typography.labelLarge.copy(
+                        style = PoppinsTypography().labelLarge.copy(
                             fontSize = titleFontSize,
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.8f)
                         ),
                         maxLines = 1,
-                        overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
+                        overflow = TextOverflow.Ellipsis
                     )
                     Text(
                         "$streak Days",
-                        style = MaterialTheme.typography.headlineMedium,
+                        style = PoppinsTypography().headlineMedium,
                         fontWeight = FontWeight.ExtraBold,
                         color = MaterialTheme.colorScheme.onPrimaryContainer
                     )

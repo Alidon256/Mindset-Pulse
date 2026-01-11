@@ -10,15 +10,12 @@ data class Space(
     val name: String = "",
     val description: String = "",
     val coverImageUrl: String = "",
-    val atmosphere: String = "Neutral",
     val ownerId: String = "",
     val memberIds: List<String> = emptyList(),
     @Serializable(with = TimestampSerializer::class)
     val createdAt: Timestamp? = null,
     val memberPhotoUrls: List<String> = emptyList(),
     val unreadCount: Int = 0,
-    val aiModerationEnabled: Boolean = true,
-    val initialPulse: String = "",
 )
 
 @Serializable

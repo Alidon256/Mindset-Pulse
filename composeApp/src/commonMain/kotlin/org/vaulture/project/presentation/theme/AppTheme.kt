@@ -11,11 +11,12 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
+import mindsetpulse.composeapp.generated.resources.Res
+import mindsetpulse.composeapp.generated.resources.poppins_bold
+import mindsetpulse.composeapp.generated.resources.poppins_medium
+import mindsetpulse.composeapp.generated.resources.poppins_regular
 import org.jetbrains.compose.resources.Font
-import vaulture.composeapp.generated.resources.Res
-import vaulture.composeapp.generated.resources.poppins_bold
-import vaulture.composeapp.generated.resources.poppins_medium
-import vaulture.composeapp.generated.resources.poppins_regular
+
 
 @Composable
 fun PoppinsFontFamily(): FontFamily = FontFamily(

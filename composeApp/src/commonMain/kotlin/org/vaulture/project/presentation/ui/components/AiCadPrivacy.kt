@@ -20,6 +20,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import org.vaulture.project.presentation.theme.PoppinsTypography
 
 @Composable
 fun AIPrivacyCard() {
@@ -43,12 +44,12 @@ fun AIPrivacyCard() {
             Column {
                 Text(
                     "Responsible AI",
-                    style = MaterialTheme.typography.titleMedium,
+                    style = PoppinsTypography().titleMedium,
                     fontWeight = FontWeight.Bold
                 )
                 Text(
                     "Your data is used only for sentiment analysis. We never store raw journal text.",
-                    style = MaterialTheme.typography.bodySmall
+                    style = PoppinsTypography().bodySmall
                 )
             }
         }

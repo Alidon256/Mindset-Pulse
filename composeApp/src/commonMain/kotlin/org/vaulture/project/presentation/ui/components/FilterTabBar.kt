@@ -27,6 +27,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import org.vaulture.project.presentation.theme.PoppinsTypography
 import org.vaulture.project.presentation.ui.screens.space.SpaceFilter
 
 @Composable
@@ -78,7 +79,7 @@ fun FilterTabBar(
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
                     text = "Spaces",
-                    style = MaterialTheme.typography.bodySmall.copy(
+                    style = PoppinsTypography().bodySmall.copy(
                         fontWeight = if (isSpaces) FontWeight.SemiBold else FontWeight.Medium,
                         color = spacesContent
                     ),
@@ -111,7 +112,7 @@ fun FilterTabBar(
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
                     text = "Memories",
-                    style = MaterialTheme.typography.bodySmall.copy(
+                    style = PoppinsTypography().bodySmall.copy(
                         fontWeight = if (isMemories) FontWeight.SemiBold else FontWeight.Medium,
                         color = memoriesContent
                     ),
