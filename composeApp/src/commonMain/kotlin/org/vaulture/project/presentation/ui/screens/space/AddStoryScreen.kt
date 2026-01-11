@@ -261,7 +261,6 @@ fun AddStoryScreen(
                             }
                         }
 
-                        // --- Visibility Selection Section ---
                         Column(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -277,7 +276,7 @@ fun AddStoryScreen(
                             Row(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .horizontalScroll(rememberScrollState()), // Makes chips scrollable
+                                    .horizontalScroll(rememberScrollState()),
                                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
@@ -319,7 +318,6 @@ fun AddStoryScreen(
                                 }
                             }
 
-                            // Dynamic Description (Ethical/Transparent UI)
                             AnimatedContent(
                                 targetState = selectedVisibility,
                                 transitionSpec = {

@@ -147,6 +147,7 @@ private fun FirebaseUser.toUser() = User(
     displayName = this.displayName,
     email = this.email,
     isAnonymous = this.isAnonymous,
-    photoUrl = this.photoURL
+    photoUrl = this.photoURL,
+    username = this.displayName,
 )
 

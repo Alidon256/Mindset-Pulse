@@ -144,7 +144,7 @@ private fun PortfolioHeader(
             )
         } else {
             Text(
-                text = user.displayName ?: "Pulse Member",
+                text = user.username?: "Pulse Member",
                 style = PoppinsTypography().headlineMedium,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onBackground
