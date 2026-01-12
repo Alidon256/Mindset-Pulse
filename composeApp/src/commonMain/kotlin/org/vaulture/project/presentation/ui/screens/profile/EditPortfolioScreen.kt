@@ -146,11 +146,13 @@ fun EditPortfolioScreen(
 
                     Spacer(Modifier.height(32.dp))
 
+                    val widthModifier = if (isWide) Modifier.width(300.dp) else Modifier.fillMaxWidth()
+
                     OutlinedTextField(
                         value = displayName,
                         onValueChange = { displayName = it },
                         label = { Text("Display Name") },
-                        modifier = Modifier.fillMaxWidth(),
+                        modifier = widthModifier,
                         shape = RoundedCornerShape(16.dp),
                         singleLine = true
                     )

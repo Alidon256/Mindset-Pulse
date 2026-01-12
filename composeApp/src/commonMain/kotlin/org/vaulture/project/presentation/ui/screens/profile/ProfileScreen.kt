@@ -379,7 +379,7 @@ private fun ProfileScreenExpanded(
                         )
                     )
                     Text(
-                        text = "${" "}${user?.displayName?.substringBefore(' ') ?: "..."}",
+                        text ="${" "}${user?.displayName?.substringBefore(' ') ?: user?.username?.substringBefore(' ') ?: "..."}",
                         style = PoppinsTypography().bodyLarge.copy(
                             fontSize = 18.sp,
                             fontWeight = FontWeight.Bold,
@@ -552,7 +552,7 @@ private fun ProfileScreenExpanded(
                         Spacer(Modifier.width(32.dp))
                         Column {
                             Text(
-                                user?.displayName ?: "User",
+                                user?.displayName ?: user?.username?: "Guest User",
                                 style = PoppinsTypography().displaySmall,
                                 fontWeight = FontWeight.Bold,
                                 maxLines = 1,
