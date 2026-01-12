@@ -33,10 +33,10 @@ In Africa's fast-growing tech and professional hubs, "hustle culture" often mask
 ---
 
 ## 🏗️ Technical Architecture
-Mindset Pulse is built using **Clean Architecture** to ensure maximum code reuse (90%+) across Android and Web.
+Mindset Pulse is built using **Clean Architecture** to ensure maximum code reuse (99%+) across Android and Web.
 
 ### Shared Logic (`:composeApp:commonMain`)
-* **Domain Layer** – Rule-based `RiskEngine` and `TrendAnalyzer` written in pure Kotlin.  
+* **Domain Layer** – Rule-based `RiskEngine` written in pure Kotlin.  
 * **Data Layer** – Cloud-first approach using `GitLive Firebase KMP` for Firestore, Auth, and Storage.  
 * **Dependency Injection (DI)** – Settings Factory for platform‑specific configuration, including theme persistence.  
 * **Presentation Layer** – Shared `MVVM` using Moko ViewModels to drive identical UI state on all platforms.  
