@@ -17,6 +17,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Air
@@ -156,6 +157,12 @@ fun SpaceHomeScreenExpandable(
                     modifier = Modifier,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
+                    IconButton(onClick = { navController.navigateUp() }) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = "Back"
+                        )
+                    }
                     Text(
                         text = greeting,
                         style = PoppinsTypography().bodyLarge.copy(
@@ -496,19 +503,36 @@ fun SpacesHomeScreenCompat(
                 )
             }
 
-            Column(modifier = Modifier.background(MaterialTheme.colorScheme.background)) {
-                SearchBar(
-                    query = searchQuery,
-                    onQueryChange = {
-                        searchQuery = it
-                        viewModel.onSearchQueryChanged(it)
-                    },
-                    onSearch = {},
-                    isExpanded = isSearchExpanded,
-                    onToggleExpanded = { isSearchExpanded = !isSearchExpanded },
-                    placeholderText = "Search safe spaces...",
-                    modifier = Modifier.padding(top = 16.dp, bottom = 8.dp)
-                )
+            Column(
+                modifier = Modifier
+                    .background(MaterialTheme.colorScheme.background)
+            ) {
+                Row(
+                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 8.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    IconButton(
+                        onClick = { navController.navigateUp() },
+                        modifier = Modifier.padding(end = 8.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = "Back"
+                        )
+                    }
+                    SearchBar(
+                        query = searchQuery,
+                        onQueryChange = {
+                            searchQuery = it
+                            viewModel.onSearchQueryChanged(it)
+                        },
+                        onSearch = {},
+                        isExpanded = isSearchExpanded,
+                        onToggleExpanded = { isSearchExpanded = !isSearchExpanded },
+                        placeholderText = "Search safe spaces...",
+                        modifier = Modifier.padding(top = 16.dp, bottom = 8.dp)
+                    )
+                }
                 if (!isSearchExpanded) {
                     FilterTabBar(
                         selectedFilter = selectedFilter,

@@ -63,7 +63,7 @@ fun CreateSpaceScreen(
                     title = {
                         Text(
                             "Create Space",
-                            style = PoppinsTypography().titleMedium.copy(fontWeight = FontWeight.Bold)
+                            style = PoppinsTypography().titleLarge.copy(fontWeight = FontWeight.Bold)
                         )
                     },
                     navigationIcon = {
