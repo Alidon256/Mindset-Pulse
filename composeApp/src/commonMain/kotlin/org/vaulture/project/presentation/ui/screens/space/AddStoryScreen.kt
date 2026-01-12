@@ -111,7 +111,7 @@ fun AddStoryScreen(
                     title = {
                         Text(
                             "Share Reflection",
-                            style = PoppinsTypography().titleMedium.copy(fontWeight = FontWeight.Bold)
+                            style = PoppinsTypography().titleLarge.copy(fontWeight = FontWeight.Bold)
                         )
                     },
                     navigationIcon = {

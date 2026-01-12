@@ -73,6 +73,7 @@ kotlin {
             implementation("io.ktor:ktor-serialization-kotlinx-json:3.3.2")
             implementation("io.ktor:ktor-client-logging:3.3.2")
             implementation("com.mikepenz:multiplatform-markdown-renderer-m3:0.27.0")
+            implementation("com.russhwolf:multiplatform-settings:1.1.1")
         }
 
         commonTest.dependencies {

@@ -42,6 +42,7 @@ import androidx.navigation.NavController
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import org.vaulture.project.data.remote.AuthService
+import org.vaulture.project.domain.model.User
 import org.vaulture.project.domain.model.WellnessType
 import org.vaulture.project.presentation.navigation.Routes
 import org.vaulture.project.presentation.theme.PoppinsTypography
@@ -73,9 +74,8 @@ fun SpacesScreen(
     wellnessViewModel: WellnessViewModel,
     navController: NavController,
     onSignOut: () -> Unit,
-    authService: AuthService
-
 ){
+    val user by viewModel.userProfile.collectAsState()
     BoxWithConstraints(modifier = Modifier.fillMaxSize()){
         val isExpanded = maxWidth > 920.dp
 
@@ -96,7 +96,7 @@ fun SpacesScreen(
                     wellnessViewModel = wellnessViewModel,
                     navController = navController,
                     onSignOut = onSignOut,
-                    authService = authService
+                    user = user
                 )
             }else {
                 SpacesScreenCompat(
@@ -126,7 +126,7 @@ fun SpaceScreenExpandable(
     wellnessViewModel: WellnessViewModel,
     navController: NavController,
     onSignOut: () -> Unit,
-    authService: AuthService,
+    user: User?,
 ){
     val activeId by viewModel.activeSpaceId.collectAsState()
     val statsState by wellnessViewModel.uiState.collectAsState()
@@ -135,7 +135,6 @@ fun SpaceScreenExpandable(
     var isSearchExpanded by remember { mutableStateOf(false) }
     val isSearching by viewModel.isSearching.collectAsState()
     val wellnessState by wellnessViewModel.uiState.collectAsState()
-    val user by authService.currentUser.collectAsState(null)
     val currentHour = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).hour
     val greeting = when (currentHour) {
         in 0..11 -> "Good Morning 🌄,"
@@ -169,7 +168,7 @@ fun SpaceScreenExpandable(
                         )
                     )
                     Text(
-                        text = "${" "}${user?.displayName?.substringBefore(' ') ?: "..."}",
+                        text = "${" "}${user?.displayName?.substringBefore(' ') ?: user?.username?.substringBefore(' ') ?: "..."}",
                         style = PoppinsTypography().bodyLarge.copy(
                             fontSize = 18.sp,
                             fontWeight = FontWeight.Bold,

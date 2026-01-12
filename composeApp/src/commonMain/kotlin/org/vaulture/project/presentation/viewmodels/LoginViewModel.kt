@@ -12,14 +12,39 @@ data class LoginUiState(
     val profilePicture: ByteArray? = null,
     val isLoading: Boolean = false,
     val error: String? = null
-)
+) {
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other == null || this::class != other::class) return false
+
+        other as LoginUiState
+
+        if (isLoading != other.isLoading) return false
+        if (email != other.email) return false
+        if (password != other.password) return false
+        if (username != other.username) return false
+        if (!profilePicture.contentEquals(other.profilePicture)) return false
+        if (error != other.error) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = isLoading.hashCode()
+        result = 31 * result + email.hashCode()
+        result = 31 * result + password.hashCode()
+        result = 31 * result + username.hashCode()
+        result = 31 * result + (profilePicture?.contentHashCode() ?: 0)
+        result = 31 * result + (error?.hashCode() ?: 0)
+        return result
+    }
+}
 
 class LoginViewModel(val authService: AuthService) : ViewModel() {
 
     private val _uiState = MutableStateFlow(LoginUiState())
     val uiState: StateFlow<LoginUiState> = _uiState.asStateFlow()
     private val _criticalError = MutableStateFlow<String?>(null)
-    val criticalError: StateFlow<String?> = _criticalError.asStateFlow()
     val isAuthenticated: StateFlow<Boolean> = authService.isAuthenticated
         .stateIn(
             scope = viewModelScope,
@@ -31,8 +56,6 @@ class LoginViewModel(val authService: AuthService) : ViewModel() {
     fun onPasswordChange(password: String) = _uiState.update { it.copy(password = password, error = null) }
     fun onUsernameChange(username: String) = _uiState.update { it.copy(username = username, error = null) }
     fun onProfilePictureChange(bytes: ByteArray?) = _uiState.update { it.copy(profilePicture = bytes, error = null) }
-    fun clearError() = _uiState.update { it.copy(error = null) }
-    fun clearCriticalError() = _criticalError.update { null }
 
     fun onSignInClick() {
         if (_uiState.value.isLoading) return

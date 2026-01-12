@@ -38,6 +38,7 @@ import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import org.vaulture.project.data.remote.AuthService
 import org.vaulture.project.domain.model.Story
+import org.vaulture.project.domain.model.User
 import org.vaulture.project.presentation.viewmodels.WellnessViewModel
 import org.vaulture.project.domain.model.WellnessStats
 import org.vaulture.project.domain.model.WellnessType
@@ -58,7 +59,6 @@ import kotlin.time.Clock
 
 @Composable
 fun ProfileScreen(
-    authService: AuthService,
     wellnessViewModel: WellnessViewModel,
     onSignOut: () -> Unit,
     navController: NavController,
@@ -66,10 +66,11 @@ fun ProfileScreen(
     selectedFilter: ProfileFilter,
     onFilterSelected: (ProfileFilter) -> Unit,
     onCommentClick: (String) -> Unit,
-    onNavigateToSettings: () -> Unit
+    onNavigateToSettings: () -> Unit,
+    onNavigateToEditProfile: () -> Unit
 ) {
     val statsState by wellnessViewModel.uiState.collectAsState()
-    val user by authService.currentUser.collectAsState(null)
+    val user by spaceViewModel.userProfile.collectAsState()
     val currentUserId = user?.uid ?: ""
 
     val myPosts by spaceViewModel.userStories.collectAsState()
@@ -97,7 +98,7 @@ fun ProfileScreen(
         ) { expanded ->
             if (expanded) {
                 ProfileScreenExpanded(
-                    authService = authService,
+                    user = user,
                     stats = statsState.stats,
                     onSignOut = onSignOut,
                     wellnessViewModel = wellnessViewModel,
@@ -108,11 +109,12 @@ fun ProfileScreen(
                     displayedStories = displayedStories,
                     currentUserId = currentUserId,
                     onCommentClick = onCommentClick,
-                    spaceViewModel = spaceViewModel
+                    spaceViewModel = spaceViewModel,
+                    onNavigateToEditProfile = onNavigateToEditProfile
                 )
             } else {
                 ProfileScreenCompact(
-                    authService = authService,
+                    user = user,
                     stats = statsState.stats,
                     spaceViewModel = spaceViewModel,
                     selectedFilter = selectedFilter,
@@ -121,7 +123,8 @@ fun ProfileScreen(
                     displayedStories = displayedStories,
                     currentUserId = currentUserId,
                     onCommentClick = onCommentClick,
-                    onNavigateToSettings = onNavigateToSettings
+                    onNavigateToSettings = onNavigateToSettings,
+                    onNavigateToEditProfile = onNavigateToEditProfile
                 )
             }
         }
@@ -131,7 +134,7 @@ fun ProfileScreen(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun ProfileScreenCompact(
-    authService: AuthService,
+    user: User?,
     stats: WellnessStats,
     onNavigateToSettings: () -> Unit,
     spaceViewModel: SpaceViewModel,
@@ -140,9 +143,10 @@ private fun ProfileScreenCompact(
     selectedFilter: ProfileFilter,
     isLoading: Boolean,
     displayedStories: List<Story>,
-    currentUserId: String
+    currentUserId: String,
+    onNavigateToEditProfile: () -> Unit
 ) {
-    val user by authService.currentUser.collectAsState(null)
+
     val bannerHeight = 200.dp
     val avatarInitialSize = 110.dp
 
@@ -185,10 +189,23 @@ private fun ProfileScreenCompact(
                             .size(110.dp)
                             .align(Alignment.TopCenter)
                     ) {
-                        ProfileAvatar(
-                            user?.photoUrl,
-                            "Profile"
-                        )
+                        Box(contentAlignment = Alignment.BottomEnd) {
+                            ProfileAvatar(
+                                user?.photoUrl,
+                                "User",
+                                Modifier.size(120.dp)
+                            )
+                            FilledIconButton(
+                                onClick = onNavigateToEditProfile,
+                                modifier = Modifier.size(32.dp).offset(x = 4.dp, y = 4.dp),
+                                colors = IconButtonDefaults.filledIconButtonColors(
+                                    containerColor = MaterialTheme.colorScheme.primary,
+                                    contentColor = MaterialTheme.colorScheme.onPrimary
+                                )
+                            ) {
+                                Icon(Icons.Default.Edit, contentDescription = "Edit Profile", modifier = Modifier.size(16.dp))
+                            }
+                        }
                     }
                 }
             }
@@ -200,7 +217,7 @@ private fun ProfileScreenCompact(
                         .padding(top = 8.dp)
                 ) {
                     Text(
-                        user?.displayName ?: "Guest User",
+                        user?.displayName ?: user?.username?: "Guest User",
                         style = PoppinsTypography().headlineSmall,
                         fontWeight = FontWeight.Bold
                     )
@@ -306,7 +323,7 @@ private fun ProfileScreenCompact(
 
 @Composable
 private fun ProfileScreenExpanded(
-    authService: AuthService,
+    user: User?,
     stats: WellnessStats,
     onSignOut: () -> Unit,
     wellnessViewModel: WellnessViewModel,
@@ -317,9 +334,9 @@ private fun ProfileScreenExpanded(
     displayedStories: List<Story>,
     currentUserId: String,
     onCommentClick: (String) -> Unit,
-    spaceViewModel: SpaceViewModel
+    spaceViewModel: SpaceViewModel,
+    onNavigateToEditProfile: () -> Unit
 ) {
-    val user by authService.currentUser.collectAsState(null)
     val wellnessState by wellnessViewModel.uiState.collectAsState()
     var selectedRailItem by remember { mutableStateOf("Profile") }
     val currentHour = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).hour
@@ -507,12 +524,25 @@ private fun ProfileScreenExpanded(
                 item(span = StaggeredGridItemSpan.FullLine) {
                     Row(
                         modifier = Modifier.fillMaxWidth().padding(16.dp),
-                        verticalAlignment = Alignment.CenterVertically) {
-                        ProfileAvatar(
-                            user?.photoUrl,
-                            "User",
-                            Modifier.size(120.dp)
-                        )
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Box(contentAlignment = Alignment.BottomEnd) {
+                            ProfileAvatar(
+                                user?.photoUrl,
+                                "User",
+                                Modifier.size(120.dp)
+                            )
+                            FilledIconButton(
+                                onClick = onNavigateToEditProfile,
+                                modifier = Modifier.size(32.dp).offset(x = 4.dp, y = 4.dp),
+                                colors = IconButtonDefaults.filledIconButtonColors(
+                                    containerColor = MaterialTheme.colorScheme.primary,
+                                    contentColor = MaterialTheme.colorScheme.onPrimary
+                                )
+                            ) {
+                                Icon(Icons.Default.Edit, contentDescription = "Edit Profile", modifier = Modifier.size(16.dp))
+                            }
+                        }
                         Spacer(Modifier.width(32.dp))
                         Column {
                             Text(

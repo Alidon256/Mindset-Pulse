@@ -1,5 +1,6 @@
 package org.vaulture.project.presentation.viewmodels
 
+import androidx.collection.size
 import androidx.compose.animation.core.copy
 import androidx.compose.foundation.gestures.forEach
 import androidx.compose.runtime.mutableStateOf
@@ -12,6 +13,7 @@ import dev.gitlive.firebase.firestore.FieldValue
 import dev.gitlive.firebase.firestore.FirebaseFirestore
 import dev.gitlive.firebase.firestore.Timestamp
 import dev.gitlive.firebase.storage.FirebaseStorage
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.flow.Flow
@@ -22,6 +24,7 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.vaulture.project.domain.model.User
@@ -53,6 +56,7 @@ open class SpaceViewModel(
     private var feedsListenerJob: Job? = null
     private var spacesListenerJob: Job? = null
     private var postsListenerJob: Job? = null
+    private var userProfileListenerJob: Job? = null
 
     private val _uiState = MutableStateFlow(SpaceUiState(isLoading = true))
     val uiState: StateFlow<SpaceUiState> = _uiState.asStateFlow()
@@ -124,16 +128,24 @@ open class SpaceViewModel(
     private val _targetUserProfile = MutableStateFlow<User?>(null)
     val targetUserProfile = _targetUserProfile.asStateFlow()
 
+    private val _isUpdatingProfile = MutableStateFlow(false)
+    val isUpdatingProfile = _isUpdatingProfile.asStateFlow()
+
+    private val _userProfile = MutableStateFlow<User?>(null)
+    val userProfile: StateFlow<User?> = _userProfile.asStateFlow()
+
     init {
         viewModelScope.launch {
             auth.authStateChanged.collect { user ->
                 if (user != null) {
+                    listenToUserProfile(user.uid)
                     loadInitialData()
                     listenForFeeds()
                     fetchSpaces()
                 } else {
                     feedsListenerJob?.cancel()
                     spacesListenerJob?.cancel()
+                    userProfileListenerJob?.cancel()
                     _feeds.value = emptyList()
                     _spaces.value = emptyList()
                     _filteredFeeds.value = emptyList()
@@ -141,6 +153,20 @@ open class SpaceViewModel(
                 }
             }
         }
+    }
+    fun listenToUserProfile(uid: String) {
+        userProfileListenerJob?.cancel()
+        userProfileListenerJob = firestore.collection("users").document(uid)
+            .snapshots
+            .onEach { documentSnapshot ->
+                _userProfile.value = documentSnapshot.data()
+                println("[PROFILE_SYNC] Real-time user profile updated: ${documentSnapshot.data<User>().username}")
+            }
+            .catch { e ->
+                println("Error listening to user profile: ${e.message}")
+                _error.value = "Failed to load user profile."
+            }
+            .launchIn(viewModelScope)
     }
     fun loadProfileData(filter: ProfileFilter) {
         val uid = auth.currentUser?.uid ?: return
@@ -354,9 +380,102 @@ open class SpaceViewModel(
         }
     }
 
-    // Inside SpaceViewModel.kt
+    fun updatePortfolio(
+        newDisplayName: String,
+        newPhotoBytes: ByteArray?,onSuccess: () -> Unit,
+        onError: (String) -> Unit
+    ) {
+        val uid = auth.currentUser?.uid
+        if (uid == null) {
+            onError("User not authenticated.")
+            return
+        }
 
-    fun loadPublicProfile(userId: String) {
+        viewModelScope.launch {
+            _isUpdatingProfile.value = true
+            try {
+                withContext(NonCancellable) {
+                    var finalPhotoUrl = _userProfile.value?.photoUrl
+
+                    if (newPhotoBytes != null) {
+                        println("[PROFILE_SYNC] Step 1: Uploading new profile photo...")
+                        val path = "users/$uid/profile_${Timestamp.now().seconds}.jpg"
+                        finalPhotoUrl = uploadFileToStorage(newPhotoBytes, path)
+                        println("[PROFILE_SYNC] Step 1 Complete: Photo URL is $finalPhotoUrl")
+                    }
+
+                    val contentUpdates = mapOf(
+                        "userName" to newDisplayName,
+                        "userProfileUrl" to finalPhotoUrl
+                    )
+                    val userProfileUpdates = mapOf(
+                        "username" to newDisplayName,
+                        "photoUrl" to finalPhotoUrl
+                    )
+
+                    println("[PROFILE_SYNC] Step 2: Preparing atomic batched write.")
+                    val batch = firestore.batch()
+
+                    val userDocRef = firestore.collection("users").document(uid)
+                    batch.update(userDocRef, userProfileUpdates)
+                    println("[PROFILE_SYNC] Queued update for users/$uid.")
+
+                    val storiesQuery = firestore.collection("stories").where { "userId" equalTo uid }
+                    val storiesSnapshot = storiesQuery.get()
+                    storiesSnapshot.documents.forEach { doc -> batch.update(doc.reference, contentUpdates) }
+                    println("[PROFILE_SYNC] Queued updates for ${storiesSnapshot.documents.size} stories.")
+
+                    val allCommentsQuery = firestore.collectionGroup("comments").where { "userId" equalTo uid }
+                    val allCommentsSnapshot = allCommentsQuery.get()
+                    allCommentsSnapshot.documents.forEach { doc -> batch.update(doc.reference, contentUpdates) }
+                    println("[PROFILE_SYNC] Queued updates for ${allCommentsSnapshot.documents.size} comments across all collections.")
+
+
+                    val postsQuery =
+                        firestore.collectionGroup("posts").where { "userId" equalTo uid }
+                    val postsSnapshot = postsQuery.get()
+
+                    for (postDoc in postsSnapshot.documents) {
+                        batch.update(postDoc.reference, contentUpdates)
+
+                        val postCommentsQuery = postDoc.reference.collection("comments").where { "userId" equalTo uid }
+                        val postCommentsSnapshot = postCommentsQuery.get()
+                        for (commentDoc in postCommentsSnapshot.documents) {
+                            batch.update(commentDoc.reference, contentUpdates)
+                        }
+                    }
+                    println("[PROFILE_SYNC] Queued updates for space posts and their nested comments.")
+
+                    batch.commit()
+                    println("[PROFILE_SYNC] Step 3 Complete: Batched write successful.")
+
+                    withContext(Dispatchers.Main) {
+                        _userProfile.update { currentUserProfile ->
+                            currentUserProfile?.copy(
+                                username = newDisplayName,
+                                photoUrl = finalPhotoUrl
+                            )
+                        }
+                        println("[PROFILE_SYNC] UI State Synced.")
+                        onSuccess()
+                    }
+                }
+            } catch (e: Exception) {
+                val errorMsg = e.message ?: "Failed to update identity and related data."
+                println("[PROFILE_SYNC] CRITICAL ERROR: $errorMsg")
+                e.printStackTrace()
+                withContext(Dispatchers.Main) {
+                    onError(errorMsg)
+                }
+            } finally {
+                withContext(Dispatchers.Main) {
+                    _isUpdatingProfile.value = false
+                }
+            }
+        }
+    }
+
+        fun loadPublicProfile(userId: String) {
 
         _targetUserProfile.value = null
         _isLoadingProfileData.value = true
@@ -390,8 +509,6 @@ open class SpaceViewModel(
             }
         }
     }
-
-
 
     fun createSpace(coverImageBytes: ByteArray?, onSuccess: (String) -> Unit, onError: (String) -> Unit) {
         viewModelScope.launch {
@@ -433,22 +550,26 @@ open class SpaceViewModel(
             }
         }
     }
+
     private suspend fun uploadFileToStorage(fileBytes: ByteArray, storagePath: String): String {
+        println("[STORAGE] Uploading to: $storagePath")
         val storageRef = storage.reference(storagePath)
         storageRef.upload(fileBytes)
-        return storageRef.getDownloadUrl()
+        val downloadUrl = storageRef.getDownloadUrl()
+        println("[STORAGE] Upload complete. URL: $downloadUrl")
+        return downloadUrl
     }
+
     fun onSearchQueryChanged(query: String) {
         viewModelScope.launch {
             _isSearching.value = true
             val lowercaseQuery = query.lowercase().trim()
 
             if (lowercaseQuery.isBlank()) {
-                // Reset to full lists immediately
                 _filteredSpaces.value = _spaces.value
                 _filteredFeeds.value = _feeds.value
             } else {
-                // Filter locally for instant response
+
                 _filteredFeeds.value = _feeds.value.filter {
                     it.textContent?.lowercase()?.contains(lowercaseQuery) == true ||
                             it.userName.lowercase().contains(lowercaseQuery)
@@ -673,34 +794,52 @@ open class SpaceViewModel(
             }
         }
     }
+
     fun addComment(storyId: String, text: String) {
-        val user = auth.currentUser ?: return
+        val authUser = auth.currentUser
+        if (authUser == null) {
+            println("Comment Error: User not authenticated.")
+            return
+        }
         if (text.isBlank()) return
+
+        val currentProfile = _userProfile.value
+        if (currentProfile == null) {
+            println("Comment Error: User profile data not loaded yet.")
+        }
 
         viewModelScope.launch {
             try {
-                val commentId = "comm_${user.uid}_${Timestamp.now().seconds}"
+                val commentId = "comm_${authUser.uid}_${Timestamp.now().seconds}"
+
                 val newComment = Story.Comment(
                     commentId = commentId,
                     storyId = storyId,
-                    userId = user.uid,
-                    userName = user.displayName ?: "User",
-                    userProfileUrl = user.photoURL,
+                    userId = authUser.uid,
+                    userName = currentProfile?.username ?: authUser.displayName ?: "User",
+                    userProfileUrl = currentProfile?.photoUrl ?: authUser.photoURL,
                     text = text,
                     timestamp = Timestamp.now()
                 )
 
-                firestore.collection("stories").document(storyId)
-                    .collection("comments").document(commentId).set(newComment)
+                val batch = firestore.batch()
 
-                firestore.collection("stories").document(storyId).update(
-                    "commentCount" to FieldValue.increment(1)
-                )
+                val commentRef = firestore.collection("stories").document(storyId)
+                    .collection("comments").document(commentId)
+                batch.set(commentRef, newComment)
+
+                val storyRef = firestore.collection("stories").document(storyId)
+                batch.update(storyRef, "commentCount" to FieldValue.increment(1))
+
+                batch.commit()
+
             } catch (e: Exception) {
                 println("Comment Error: ${e.message}")
+                _error.value = "Failed to post comment."
             }
         }
     }
+
     fun toggleLikeSpace(story: Story, spaceId: String) {
         val uid = auth.currentUser?.uid ?: return
         val postRef = firestore.collection("spaces").document(spaceId).collection("posts").document(story.storyId)
@@ -724,35 +863,54 @@ open class SpaceViewModel(
             }
         }
     }
+
     fun addCommentSpace(spaceId: String, postId: String, text: String) {
-        val user = auth.currentUser ?: return
+        val authUser = auth.currentUser
+        if (authUser == null) {
+            println("Comment Error: User not authenticated.")
+            return
+        }
         if (text.isBlank()) return
+
+        val currentProfile = _userProfile.value
+        if (currentProfile == null) {
+            println("Comment Error: User profile data not loaded yet. Using fallback.")
+        }
 
         viewModelScope.launch {
             try {
-                val commentId = "comm_${user.uid}_${Timestamp.now().seconds}"
+                val commentId = "comm_${authUser.uid}_${Timestamp.now().seconds}"
+
                 val newComment = Story.Comment(
                     commentId = commentId,
                     storyId = postId,
-                    userId = user.uid,
-                    userName = user.displayName ?: "User",
-                    userProfileUrl = user.photoURL,
+                    userId = authUser.uid,
+                    userName = currentProfile?.username ?: authUser.displayName ?: "User",
+                    userProfileUrl = currentProfile?.photoUrl ?: authUser.photoURL,
                     text = text,
                     timestamp = Timestamp.now()
                 )
 
-                firestore.collection("spaces").document(spaceId)
-                    .collection("posts").document(postId)
-                    .collection("comments").document(commentId).set(newComment)
+                val batch = firestore.batch()
 
-                firestore.collection("spaces").document(spaceId)
+                val commentRef = firestore.collection("spaces").document(spaceId)
                     .collection("posts").document(postId)
-                    .update("commentCount" to FieldValue.increment(1))
+                    .collection("comments").document(commentId)
+                batch.set(commentRef, newComment)
+
+                val postRef = firestore.collection("spaces").document(spaceId)
+                    .collection("posts").document(postId)
+                batch.update(postRef, "commentCount" to FieldValue.increment(1))
+
+                batch.commit()
+
             } catch (e: Exception) {
-                println("Comment Error: ${e.message}")
+                println("Space Comment Error: ${e.message}")
+                _error.value = "Failed to post comment in space."
             }
         }
     }
+
     fun toggleBookmarkSpace(story: Story, spaceId: String) {
         val uid = auth.currentUser?.uid ?: return
         val postRef = firestore.collection("spaces").document(spaceId).collection("posts").document(story.storyId)

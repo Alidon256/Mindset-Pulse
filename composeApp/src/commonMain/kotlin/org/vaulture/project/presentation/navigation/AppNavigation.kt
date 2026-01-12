@@ -35,6 +35,7 @@ import kotlinx.serialization.Serializable
 import org.vaulture.project.presentation.utils.AuthServiceImpl
 import org.vaulture.project.presentation.viewmodels.LoginViewModel
 import org.vaulture.project.data.local.OnboardingManager
+import org.vaulture.project.di.getSettingsViewModel
 import org.vaulture.project.presentation.theme.AppTheme
 import org.vaulture.project.presentation.ui.components.MiniPlayer
 import org.vaulture.project.presentation.ui.screens.home.AnalyticsScreen
@@ -50,6 +51,7 @@ import org.vaulture.project.presentation.ui.screens.onboarding.OnboardingScreenO
 import org.vaulture.project.presentation.ui.screens.onboarding.OnboardingScreenTwo
 import org.vaulture.project.presentation.ui.screens.onboarding.SplashScreen
 import org.vaulture.project.presentation.ui.screens.onboarding.WelcomeScreen
+import org.vaulture.project.presentation.ui.screens.profile.EditPortfolioScreen
 import org.vaulture.project.presentation.ui.screens.profile.MindsetPortfolioScreen
 import org.vaulture.project.presentation.ui.screens.profile.ProfileScreen
 import org.vaulture.project.presentation.ui.screens.profile.SettingsScreen
@@ -64,7 +66,6 @@ import org.vaulture.project.presentation.viewmodels.AnalyticsViewModel
 import org.vaulture.project.presentation.viewmodels.CBTViewModel
 import org.vaulture.project.presentation.viewmodels.ProfileFilter
 import org.vaulture.project.presentation.viewmodels.RhythmViewModel
-import org.vaulture.project.presentation.viewmodels.SettingsViewModel
 import org.vaulture.project.presentation.viewmodels.SpaceViewModel
 import org.vaulture.project.presentation.viewmodels.WellnessViewModel
 import org.vaulture.project.ui.screens.SpaceDetailScreen
@@ -94,15 +95,15 @@ object Routes {
     @Serializable data object ADD_STORY : NavDestination { override val routePattern: String = "ADD_STORY" }
     @Serializable data object CHECK_IN: NavDestination { override val routePattern: String = "CHECK_IN" }
     @Serializable data object ANALYTICS: NavDestination { override val routePattern: String = "ANALYTICS" }
-    @Serializable data object RHYTHM_HOME: NavDestination { override val routePattern: String = "AUDIO" }
+    @Serializable data object MELODIES: NavDestination { override val routePattern: String = "AUDIO" }
     @Serializable data class RHYTHM_PLAYER(val trackId: String) : NavDestination { override val routePattern: String = "RHYTHM_PLAYER" }
     @Serializable data object WELLNESS_TIMER: NavDestination { override val routePattern: String = "WELLNESS_TIMER" }
-    @Serializable data object SPACES_HOME: NavDestination { override val routePattern: String = "COMMUNITY" }
+    @Serializable data object COMMUNITY: NavDestination { override val routePattern: String = "COMMUNITY" }
     @Serializable data object SETTINGS : NavDestination { override val routePattern: String = "SETTINGS" }
-    @Serializable data class PORTFOLIO(val userId: String) : NavDestination {
-        override val routePattern: String = "PORTFOLIO"
-    }
+    @Serializable data class PORTFOLIO(val userId: String) : NavDestination { override val routePattern: String = "PORTFOLIO" }
     @Serializable data object CREATE_SPACE : NavDestination { override val routePattern: String = "CREATE_SPACE" }
+    @Serializable data object EDIT_USER_INFO : NavDestination { override val routePattern: String = "EDIT_USER_INFO" }
+
 }
 
 data class BottomNavItem(
@@ -130,8 +131,7 @@ fun AppNavigation(
     val rhythmViewModel = remember { RhythmViewModel(kmpAudioPlayer) }
     val wellnessViewModel = remember { WellnessViewModel() }
     val cbtViewModel: CBTViewModel = remember { CBTViewModel() }
-    val settingsViewModel = remember { SettingsViewModel() }
-
+    val settingsViewModel = getSettingsViewModel()
     val authState by loginViewModel.isAuthenticated.collectAsState(initial = null)
     val isFirstRun = remember { !OnboardingManager.hasCompletedOnboarding }
     val playerState by rhythmViewModel.uiState.collectAsState()
@@ -157,6 +157,8 @@ fun AppNavigation(
         val routeName = it.route ?: ""
         bottomBarRoutePatterns.any { pattern -> routeName.contains(pattern, ignoreCase = true) }
     } == true
+
+
 
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     var selectedStoryIdForComments by remember { mutableStateOf<String?>(null) }
@@ -374,6 +376,13 @@ fun AppNavigation(
                             MindsetPortfolioScreen(
                                 userId = args.userId,
                                 viewModel = spaceViewModel,
+                                onBack = { navController.popBackStack() },
+                                onEditClick = { navController.navigate(Routes.EDIT_USER_INFO) }
+                            )
+                        }
+                        composable<Routes.EDIT_USER_INFO> {
+                            EditPortfolioScreen(
+                                viewModel = spaceViewModel,
                                 onBack = { navController.popBackStack() }
                             )
                         }
@@ -414,10 +423,8 @@ fun AppNavigation(
                         }
 
                         composable<Routes.HOME> {
-                            val authService = loginViewModel.authService
                             HomeScreen(
                                 onNavigateToCheckIn = { navController.navigate(Routes.CHECK_IN) },
-                                authService = authService,
                                 navController = navController,
                                 wellnessViewModel = wellnessViewModel,
                                 onSignOut = {
@@ -427,7 +434,8 @@ fun AppNavigation(
                                             popUpTo(0)
                                         }
                                     }
-                                }
+                                },
+                                spaceViewModel = spaceViewModel
                             )
                         }
                         composable<Routes.CHECK_IN> {
@@ -451,7 +459,7 @@ fun AppNavigation(
                             )
                         }
 
-                        composable<Routes.RHYTHM_HOME> {
+                        composable<Routes.MELODIES> {
                             RhythmHomeScreen(
                                 navController = navController,
                                 viewModel = rhythmViewModel
@@ -485,7 +493,6 @@ fun AppNavigation(
                         }
                         composable<Routes.SPACES> {
                             var selectedFilter by rememberSaveable { mutableStateOf(SpaceFilter.Spaces) }
-                            val authService = loginViewModel.authService
                             SpacesScreen(
                                 selectedFilter = selectedFilter,
                                 onFilterSelected = { filter -> selectedFilter = filter },
@@ -512,14 +519,12 @@ fun AppNavigation(
                                             popUpTo(0)
                                         }
                                     }
-                                },
-                                authService = authService,
+                                }
                             )
 
                         }
-                        composable<Routes.SPACES_HOME> {
+                        composable<Routes.COMMUNITY> {
                             var selectedFilter by rememberSaveable { mutableStateOf(SpaceFilter.Spaces) }
-                            val authService = loginViewModel.authService
                             SpacesHomeScreen(
                                 selectedFilter = selectedFilter,
                                 onFilterSelected = { filter -> selectedFilter = filter },
@@ -546,8 +551,7 @@ fun AppNavigation(
                                             popUpTo(0)
                                         }
                                     }
-                                },
-                                authService = authService,
+                                }
                             )
 
                         }
@@ -589,7 +593,6 @@ fun AppNavigation(
                         }
                         composable<Routes.PROFILE> {
                             ProfileScreen(
-                                authService = loginViewModel.authService,
                                 wellnessViewModel = wellnessViewModel,
                                 onSignOut = {
                                     scope.launch {
@@ -607,7 +610,8 @@ fun AppNavigation(
                                         storyId
                                 },
                                 selectedFilter = selectedFilter,
-                                onNavigateToSettings = {navController.navigate(Routes.SETTINGS)}
+                                onNavigateToSettings = {navController.navigate(Routes.SETTINGS)},
+                                onNavigateToEditProfile = {navController.navigate(Routes.EDIT_USER_INFO)}
                             )
                         }
 

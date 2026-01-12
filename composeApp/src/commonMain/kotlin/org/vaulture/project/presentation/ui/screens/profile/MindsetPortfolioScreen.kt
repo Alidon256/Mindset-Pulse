@@ -27,68 +27,138 @@ import org.vaulture.project.presentation.viewmodels.SpaceViewModel
 fun MindsetPortfolioScreen(
     userId: String,
     viewModel: SpaceViewModel,
-    onBack: () -> Unit
+    onBack: () -> Unit,
+    onEditClick: () -> Unit
 ) {
     val userProfile by viewModel.targetUserProfile.collectAsState()
     val stories by viewModel.userStories.collectAsState()
     val isLoading by viewModel.isLoadingProfileData.collectAsState()
     val followingMap by viewModel.isFollowing.collectAsState()
     val isFollowing = followingMap[userId] ?: false
+    val currentUser by viewModel.auth.authStateChanged.collectAsState(initial = null)
+    val currentUserId = currentUser?.uid ?: ""
+    val isOwnProfile = userId == currentUserId
 
     LaunchedEffect(userId) {
         viewModel.loadPublicProfile(userId)
     }
 
-    Scaffold(
-        containerColor = MaterialTheme.colorScheme.background,
-        topBar = {
-            TopAppBar(
-                title = { Text("Portfolio", style = PoppinsTypography().titleMedium) },
-                navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, null)
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent)
-            )
-        }
-    ) { padding ->
-        if (isLoading) {
-            Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                CircularProgressIndicator()
+    BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
+        val isWideScreen = maxWidth > 920.dp
+
+        Scaffold(
+            containerColor = MaterialTheme.colorScheme.background,
+            topBar = {
+                CenterAlignedTopAppBar(
+                    title = { Text("Mindset Portfolio", style = PoppinsTypography().titleLarge) },
+                    navigationIcon = {
+                        IconButton(onClick = onBack) {
+                            Icon(Icons.AutoMirrored.Filled.ArrowBack, null)
+                        }
+                    },
+                    colors = TopAppBarDefaults.centerAlignedTopAppBarColors(containerColor = Color.Transparent)
+                )
             }
-        } else {
-            LazyVerticalStaggeredGrid(
-                columns = StaggeredGridCells.Fixed(2),
-                modifier = Modifier.fillMaxSize().padding(padding),
-                contentPadding = PaddingValues(16.dp),
-                horizontalArrangement = Arrangement.spacedBy(12.dp),
-                verticalItemSpacing = 12.dp
-            ) {
-                item(span = StaggeredGridItemSpan.FullLine) {
-                    PortfolioHeader(
-                        user = userProfile,
-                        isFollowing = isFollowing,
-                        onConnectClick = { viewModel.toggleFollow(userId) }
-                    )
+        ) { padding ->
+            if (isLoading && userProfile == null) {
+                Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    CircularProgressIndicator(strokeWidth = 3.dp)
                 }
+            } else {
+                if (isWideScreen) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(padding)
+                            .padding(horizontal = 48.dp)
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .weight(0.35f)
+                                .fillMaxHeight()
+                                .padding(top = 24.dp),
+                            contentAlignment = Alignment.TopCenter
+                        ) {
+                            Card(
+                                shape = RoundedCornerShape(32.dp),
+                                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)),
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                PortfolioHeader(
+                                    user = userProfile,
+                                    isFollowing = isFollowing,
+                                    isOwnProfile = isOwnProfile,
+                                    onConnectClick = { viewModel.toggleFollow(userId) },
+                                    onEditClick = onEditClick
+                                )
+                            }
+                        }
 
-                item(span = StaggeredGridItemSpan.FullLine) {
-                    Text(
-                        "Public Reflections",
-                        style = PoppinsTypography().titleSmall,
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier.padding(vertical = 8.dp)
-                    )
-                }
+                        Spacer(modifier = Modifier.width(48.dp))
 
-                items(stories) { story ->
-                    StaggeredStoryItem(
-                        story = story,
-                        currentUserId = viewModel.auth.currentUser?.uid ?: "",
-                        onLikeClick = { viewModel.toggleLike(story) },
-                        onClick = { /* Navigate to detail */ }
-                    )
+                        Column(modifier = Modifier.weight(0.65f)) {
+                            Text(
+                                "Public Reflections",
+                                style = PoppinsTypography().headlineMedium,
+                                fontWeight = FontWeight.Bold,
+                                modifier = Modifier.padding(vertical = 24.dp)
+                            )
+                            LazyVerticalStaggeredGrid(
+                                columns = StaggeredGridCells.Fixed(3),
+                                modifier = Modifier.fillMaxSize(),
+                                contentPadding = PaddingValues(bottom = 32.dp),
+                                horizontalArrangement = Arrangement.spacedBy(16.dp),
+                                verticalItemSpacing = 16.dp
+                            ) {
+                                items(stories) { story ->
+                                    StaggeredStoryItem(
+                                        story = story,
+                                        currentUserId = currentUserId,
+                                        onLikeClick = { viewModel.toggleLike(story) },
+                                        onClick = { /* Detail logic */ }
+                                    )
+                                }
+                            }
+                        }
+                    }
+                } else {
+                    LazyVerticalStaggeredGrid(
+                        columns = StaggeredGridCells.Fixed(2),
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(padding),
+                        contentPadding = PaddingValues(16.dp),
+                        horizontalArrangement = Arrangement.spacedBy(12.dp),
+                        verticalItemSpacing = 12.dp
+                    ) {
+                        item(span = StaggeredGridItemSpan.FullLine) {
+                            PortfolioHeader(
+                                user = userProfile,
+                                isFollowing = isFollowing,
+                                isOwnProfile = isOwnProfile,
+                                onConnectClick = { viewModel.toggleFollow(userId) },
+                                onEditClick = onEditClick
+                            )
+                        }
+
+                        item(span = StaggeredGridItemSpan.FullLine) {
+                            Text(
+                                "Public Reflections",
+                                style = PoppinsTypography().titleLarge,
+                                fontWeight = FontWeight.Bold,
+                                modifier = Modifier.padding(vertical = 16.dp, horizontal = 8.dp)
+                            )
+                        }
+
+                        items(stories) { story ->
+                            StaggeredStoryItem(
+                                story = story,
+                                currentUserId = currentUserId,
+                                onLikeClick = { viewModel.toggleLike(story) },
+                                onClick = { /* Navigate to detail */ }
+                            )
+                        }
+                    }
                 }
             }
         }
@@ -99,12 +169,14 @@ fun MindsetPortfolioScreen(
 private fun PortfolioHeader(
     user: User?,
     isFollowing: Boolean,
-    onConnectClick: () -> Unit
+    isOwnProfile: Boolean,
+    onConnectClick: () -> Unit,
+    onEditClick: () -> Unit
 ) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(bottom = 24.dp),
+            .padding(24.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Box(contentAlignment = Alignment.BottomEnd) {
@@ -143,38 +215,52 @@ private fun PortfolioHeader(
                     .background(MaterialTheme.colorScheme.surfaceVariant)
             )
         } else {
-            Text(
-                text = user.username?: "Pulse Member",
-                style = PoppinsTypography().headlineMedium,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onBackground
-            )
+            user.username?.let {
+                Text(
+                    text = it,
+                    style = PoppinsTypography().headlineMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onBackground
+                )
+            }
         }
 
         Text(
-            "Community Member",
+            text = if (isOwnProfile) "Your Mindset Journey" else "Community Member",
             style = PoppinsTypography().bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
 
         Spacer(Modifier.height(24.dp))
 
-        Button(
-            onClick = onConnectClick,
-            shape = RoundedCornerShape(12.dp),
-            colors = ButtonDefaults.buttonColors(
-                containerColor = if (isFollowing) MaterialTheme.colorScheme.surfaceVariant
-                else MaterialTheme.colorScheme.primary
-            ),
-            modifier = Modifier.fillMaxWidth(0.6f).height(48.dp)
-        ) {
-            Icon(
-                if (isFollowing) Icons.Default.Check else Icons.Default.Add,
-                null,
-                modifier = Modifier.size(18.dp)
-            )
-            Spacer(Modifier.width(8.dp))
-            Text(if (isFollowing) "Connected" else "Connect")
+        if (!isOwnProfile) {
+            Button(
+                onClick = onConnectClick,
+                shape = RoundedCornerShape(12.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = if (isFollowing) MaterialTheme.colorScheme.surfaceVariant
+                    else MaterialTheme.colorScheme.primary
+                ),
+                modifier = Modifier.fillMaxWidth().height(48.dp)
+            ) {
+                Icon(
+                    if (isFollowing) Icons.Default.Check else Icons.Default.Add,
+                    null,
+                    modifier = Modifier.size(18.dp)
+                )
+                Spacer(Modifier.width(8.dp))
+                Text(if (isFollowing) "Connected" else "Connect")
+            }
+        } else {
+            OutlinedButton(
+                onClick = onEditClick,
+                shape = RoundedCornerShape(12.dp),
+                modifier = Modifier.fillMaxWidth().height(48.dp)
+            ) {
+                Icon(Icons.Default.Edit, null, modifier = Modifier.size(18.dp))
+                Spacer(Modifier.width(8.dp))
+                Text("Edit Identity")
+            }
         }
     }
 }

@@ -15,7 +15,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.*
-import androidx.compose.material.icons.outlined.Groups
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -36,6 +35,7 @@ import org.vaulture.project.data.remote.AuthService
 import org.vaulture.project.domain.model.RhythmTrack
 import org.vaulture.project.domain.model.WellnessType
 import org.vaulture.project.domain.engine.CheckInResult
+import org.vaulture.project.domain.model.User
 import org.vaulture.project.presentation.navigation.Routes
 import org.vaulture.project.presentation.theme.PoppinsTypography
 import org.vaulture.project.presentation.ui.components.AIPrivacyCard
@@ -54,6 +54,7 @@ import org.vaulture.project.presentation.ui.components.WellnessStatsRow
 import org.vaulture.project.presentation.utils.rememberKmpAudioPlayer
 import org.vaulture.project.presentation.viewmodels.CheckInViewModel
 import org.vaulture.project.presentation.viewmodels.RhythmViewModel
+import org.vaulture.project.presentation.viewmodels.SpaceViewModel
 import org.vaulture.project.presentation.viewmodels.WellnessViewModel
 import kotlin.time.Clock
 
@@ -65,10 +66,10 @@ val ColorBurnout = Color(0xFFD32F2F)      // Red
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
-    authService: AuthService,
     onNavigateToCheckIn: () -> Unit,
     navController: NavController,
     wellnessViewModel: WellnessViewModel,
+    spaceViewModel: SpaceViewModel,
     onSignOut: () -> Unit
 ) {
     val checkInViewModel = remember { CheckInViewModel() }
@@ -79,6 +80,7 @@ fun HomeScreen(
     var showCheckInModal by remember { mutableStateOf(false) }
     val checkInState by checkInViewModel.uiState.collectAsState()
     val latestPersistentResult by checkInViewModel.latestResult.collectAsState()
+    val user by spaceViewModel.userProfile.collectAsState()
 
     val displayResult = latestPersistentResult ?: checkInState.result
     val hasResult = displayResult != null
@@ -141,7 +143,7 @@ fun HomeScreen(
                             viewModel = rhythmViewModel,
                             wellnessViewModel = wellnessViewModel,
                             onSignOut = onSignOut,
-                            authService = authService
+                            user = user
                         )
                     } else {
                         DashboardMobileLayout(
@@ -150,7 +152,7 @@ fun HomeScreen(
                             navController = navController,
                             viewModel = rhythmViewModel,
                             wellnessViewModel = wellnessViewModel,
-                            authService = authService
+                            user = user
                         )
                     }
                 }
@@ -195,7 +197,7 @@ private fun PopularSection(
                     color = MaterialTheme.colorScheme.primary
                 ),
                 modifier = Modifier
-                    .clickable { navController.navigate(Routes.RHYTHM_HOME) }
+                    .clickable { navController.navigate(Routes.MELODIES) }
             )
         }
         if (isLoading || tracks.isEmpty()) {
@@ -331,7 +333,7 @@ private fun RecommendedSection(
                     color = MaterialTheme.colorScheme.primary
                 ),
                 modifier = Modifier
-                    .clickable { navController.navigate(Routes.RHYTHM_HOME) }
+                    .clickable { navController.navigate(Routes.MELODIES) }
             )
         }
 
@@ -379,16 +381,15 @@ private fun RecommendedSection(
 
 @Composable
 fun DashboardMobileLayout(
+    user: User?,
     latestResult: CheckInResult?,
     onStartCheckIn: () -> Unit,
     navController: NavController,
     viewModel: RhythmViewModel,
     wellnessViewModel: WellnessViewModel,
-    authService: AuthService
 ) {
     val wellnessState by wellnessViewModel.uiState.collectAsState()
     val rhythmState by viewModel.uiState.collectAsState()
-    val user by authService.currentUser.collectAsState(null)
     val currentHour = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).hour
     val greeting = when (currentHour) {
         in 0..11 -> "Good Morning 🌄,"
@@ -415,7 +416,7 @@ fun DashboardMobileLayout(
                     )
                 )
                 Text(
-                    text = "${" "}${user?.displayName?.substringBefore(' ') ?: "..."}",
+                    text = "${" "}${user?.displayName?.substringBefore(' ') ?: user?.username?.substringBefore(' ') ?: "..."}",
                     style = PoppinsTypography().bodyLarge.copy(
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Bold,
@@ -540,12 +541,11 @@ fun DashboardWebLayout(
     viewModel: RhythmViewModel,
     wellnessViewModel: WellnessViewModel,
     onSignOut: () -> Unit,
-    authService: AuthService
+    user: User?
 ) {
     val state by viewModel.uiState.collectAsState()
     val wellnessState by wellnessViewModel.uiState.collectAsState()
     var selectedRailItem by remember { mutableStateOf("Home") }
-    val user by authService.currentUser.collectAsState(null)
     val currentHour = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).hour
     val greeting = when (currentHour) {
         in 0..11 -> "Good Morning 🌄,"
@@ -581,7 +581,7 @@ fun DashboardWebLayout(
                         )
                     )
                     Text(
-                        text = "${" "}${user?.displayName?.substringBefore(' ') ?: "..."}",
+                        text = "${" "}${user?.displayName?.substringBefore(' ') ?: user?.username?.substringBefore(' ') ?: "..."}",
                         style = PoppinsTypography().bodyLarge.copy(
                             fontSize = 18.sp,
                             fontWeight = FontWeight.Bold,

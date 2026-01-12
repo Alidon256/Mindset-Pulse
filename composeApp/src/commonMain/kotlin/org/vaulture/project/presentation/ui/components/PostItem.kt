@@ -157,10 +157,11 @@ fun PostItem(
             Spacer(modifier = Modifier.height(12.dp))
         }
 
+
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f))
+                .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.07f))
         ) {
             when (post.contentType) {
                 Story.ContentType.PHOTO -> if (!post.contentUrl.isNullOrEmpty()) {

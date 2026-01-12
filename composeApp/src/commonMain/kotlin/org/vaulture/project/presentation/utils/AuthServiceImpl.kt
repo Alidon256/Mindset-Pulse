@@ -118,9 +118,6 @@ class AuthServiceImpl(
                 println("[COMMON] AuthService: Firestore Profile Created Successfully.")
                 true
             } else {
-                if (firebaseUser.photoURL != null) {
-                    userDocRef.update("photoUrl" to firebaseUser.photoURL)
-                }
                 println("[COMMON] AuthService: Profile synced for existing user.")
                 false
             }

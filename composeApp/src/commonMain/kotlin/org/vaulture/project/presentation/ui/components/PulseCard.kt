@@ -4,7 +4,6 @@ import androidx.compose.animation.*
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -71,7 +70,7 @@ fun CardCarousel(
                 backgroundColor = bgChat,
                 contentColor = cColorChat,
                 icon = Icons.AutoMirrored.Filled.Chat,
-                route = Routes.SPACES_HOME
+                route = Routes.COMMUNITY
             ),
             PulseActionItem(
                 title = "Focus Sounds",
@@ -80,7 +79,7 @@ fun CardCarousel(
                 backgroundColor = bgRhythm,
                 contentColor = cColorRhythm,
                 icon = Icons.Default.MusicNote,
-                route = Routes.RHYTHM_HOME
+                route = Routes.MELODIES
             )
         )
     }
