@@ -1,4 +1,4 @@
-# Mindset Pulse 🧠✨
+# Mindset Pulse 
 **Kotlin Multiplatform | Compose Multiplatform | Google Gemini AI**
 
 > **Mindset Pulse**  
@@ -11,7 +11,7 @@
 
 ---
 
-## 🌍 The Problem: The Hidden Burnout Epidemic
+## 🌍 The Problem
 In Africa's fast-growing tech and professional hubs, "hustle culture" often masks a serious mental health crisis. Burnout is frequently ignored until it results in severe clinical exhaustion. **Mindset Pulse** uses Kotlin Multiplatform to deliver an accessible, low-friction tool that acts as a mental health "check-engine" light.
 
 ---
@@ -26,6 +26,9 @@ In Africa's fast-growing tech and professional hubs, "hustle culture" often mask
 * **Settings & Personalization** – Switch between Dark/Light themes, choose immersive color schemes (Nature, Ocean, etc.), and manage account preferences including Sign Out.  
 * **Gamified Growth** – 20 levels of "Mindset Progression" (from Initiate to Pulse Master) to reward consistent mental health maintenance.  
 * **Responsive Master-Detail UI** – A high-performance web dashboard layout that adapts seamlessly to mobile devices.  
+* **Profile Editing & Connections** – Users can edit profiles, update avatars, and connect with people sharing meaningful content.  
+* **Theme Persistence** – Implemented via **local storage on Web (JS)** and **SharedPreferences on Android** using multiplatform settings.
+* **99%+ Shared UI & Logic** – Compose Multiplatform + MVVM ensures near‑total code reuse across Android and Web.  
 
 ---
 
@@ -35,7 +38,7 @@ Mindset Pulse is built using **Clean Architecture** to ensure maximum code reuse
 ### Shared Logic (`:composeApp:commonMain`)
 * **Domain Layer** – Rule-based `RiskEngine` and `TrendAnalyzer` written in pure Kotlin.  
 * **Data Layer** – Cloud-first approach using `GitLive Firebase KMP` for Firestore, Auth, and Storage.  
-* **Service Layer** – `GeminiService` using Ktor for high-speed, structured AI analysis.  
+* **Dependency Injection (DI)** – Settings Factory for platform‑specific configuration, including theme persistence.  
 * **Presentation Layer** – Shared `MVVM` using Moko ViewModels to drive identical UI state on all platforms.  
 
 ---
@@ -95,10 +98,9 @@ Mindset Pulse is built using **Clean Architecture** to ensure maximum code reuse
 Watch the full demo of **Mindset Pulse** in action:  
 [▶️ Click here to view the demo](https://firebasestorage.googleapis.com/v0/b/tija-a7b75.firebasestorage.app/o/My%20videos%2FMindset%20Pulse%20Video.mp4?alt=media&token=ddb883f7-2374-4436-8199-a1ca996d2fa2)
 
-Or embed a thumbnail:
-
 [![Watch the Demo](https://firebasestorage.googleapis.com/v0/b/tija-a7b75.firebasestorage.app/o/My%20videos%2FScreenshot%20(1362).png?alt=media&token=f3dd592c-8b1d-4f83-8046-ca4df4545e41)](https://firebasestorage.googleapis.com/v0/b/tija-a7b75.firebasestorage.app/o/My%20videos%2FMindset%20Pulse%20Video.mp4?alt=media&token=ddb883f7-2374-4436-8199-a1ca996d2fa2)
 
+*(Additional screenshots included in `/screenshots` folder for Spaces, Analytics, and Mindful Actions.)*
 **Disclaimer:** The Windows recorder could not capture the **image picker** during recording. This feature **works correctly in the app**, even though it is not visible in the demo video. 
 ---
 
@@ -129,6 +131,7 @@ Mindset Pulse leverages a rich ecosystem of libraries for cross-platform develop
 - **Firebase (Auth, Firestore, Storage, Database)** – Cloud-first data handling. - **Kotlinx Serialization Core + Datetime** – Data modeling and time utilities.
 - **Ktor (Core, Content Negotiation, JSON, Logging)** – Networking + structured API calls.
 - **Multiplatform Markdown Renderer (M3)** – Rich text rendering for analytics reports.
+- **Multiplatform Settings** – Persistent theme and preference storage across platforms. 
   
 ### 🔹 Testing 
 - **Kotlin Test** – Unit testing across platforms.
