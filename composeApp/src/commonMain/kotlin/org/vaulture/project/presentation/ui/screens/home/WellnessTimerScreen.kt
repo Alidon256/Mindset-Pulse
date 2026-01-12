@@ -170,7 +170,7 @@ private fun SetupContent(modifier: Modifier, viewModel: WellnessViewModel, onBac
                 ) {
                     Text(
                         "$mins min",
-                        style = PoppinsTypography().titleMedium,
+                        style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.SemiBold
                     )
                 }

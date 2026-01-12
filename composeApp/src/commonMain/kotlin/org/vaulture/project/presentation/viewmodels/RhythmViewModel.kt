@@ -30,7 +30,6 @@ class RhythmViewModel(
 ) : ViewModel() {
 
     private val firestore = Firebase.firestore
-    private val auth = Firebase.auth
 
     private val _uiState = MutableStateFlow(RhythmUiState())
     val uiState: StateFlow<RhythmUiState> = _uiState.asStateFlow()
@@ -127,7 +126,7 @@ class RhythmViewModel(
             println("RHYTHM: No valid URL found for track ${track.title}")
         }
     }
-    fun incrementListenerCount(trackId: String) {
+   /* fun incrementListenerCount(trackId: String) {
         viewModelScope.launch{
             try {
                 firestore.collection("tracks").document(trackId).update(
@@ -138,14 +137,14 @@ class RhythmViewModel(
                 println("Failed to increment listener count: ${e.message}")
             }
         }
-    }
+    }*/
 
     private fun loadTracks() {
         viewModelScope.launch {
             _uiState.update { it.copy(isTracksLoading = true) }
             try {
                 firestore.collection("tracks")
-                    .orderBy("listenerCount", Direction.DESCENDING)
+                    //.orderBy("listenerCount", Direction.DESCENDING)
                     .snapshots()
                     .collect { snapshot ->
                         val tracks = snapshot.documents.map { doc ->
@@ -155,7 +154,7 @@ class RhythmViewModel(
                         println("RHYTHM LOG: Received ${tracks.size} tracks from Firestore")
 
                         _uiState.update { it.copy(
-                            tracks = tracks,
+                            tracks = tracks.shuffled(),
                             isTracksLoading = false,
                             error = null
                         ) }
@@ -171,9 +170,6 @@ class RhythmViewModel(
         if (audioPlayer.isPlaying.value) audioPlayer.pause() else audioPlayer.resume()
     }
 
-
-    fun pauseTrack() = audioPlayer.pause()
-    fun resumeTrack() = audioPlayer.resume()
     fun seekTo(pos: Long) = audioPlayer.seekTo(pos)
 
     override fun onCleared() {

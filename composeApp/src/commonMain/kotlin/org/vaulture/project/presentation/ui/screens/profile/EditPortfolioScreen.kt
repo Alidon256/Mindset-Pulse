@@ -115,6 +115,7 @@ fun EditPortfolioScreen(
                     Box(
                         modifier = Modifier
                             .size(120.dp)
+                            .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),CircleShape)
                             .clickable { showImagePicker = true },
                         contentAlignment = Alignment.BottomEnd
                     ) {

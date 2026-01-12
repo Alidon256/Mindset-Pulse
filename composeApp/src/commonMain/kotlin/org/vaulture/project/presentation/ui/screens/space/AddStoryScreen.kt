@@ -233,32 +233,6 @@ fun AddStoryScreen(
                                     )
                                 }
                             }
-
-                            Surface(
-                                onClick = { },
-                                enabled = false,
-                                modifier = Modifier.weight(1f),
-                                shape = RoundedCornerShape(16.dp),
-                                color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
-                            ) {
-                                Row(
-                                    modifier = Modifier.padding(16.dp),
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    horizontalArrangement = Arrangement.Center
-                                ) {
-                                    Icon(
-                                        Icons.Default.Videocam,
-                                        null,
-                                        modifier = Modifier.alpha(0.5f)
-                                    )
-                                    Spacer(Modifier.width(12.dp))
-                                    Text(
-                                        "Add Video",
-                                        style = PoppinsTypography().labelLarge,
-                                        modifier = Modifier.alpha(0.5f)
-                                    )
-                                }
-                            }
                         }
 
                         Column(

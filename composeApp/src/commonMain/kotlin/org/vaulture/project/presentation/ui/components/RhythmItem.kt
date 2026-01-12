@@ -52,7 +52,6 @@ fun RhythmItem(
         val screenWidthDp = maxWidth
         val isLargeScreen = screenWidthDp >= 920.dp
         val size = if (isLargeScreen) androidx.compose.ui.unit.DpSize(220.dp, 160.dp) else androidx.compose.ui.unit.DpSize(190.dp, 140.dp)
-        val horizontalPadding = 8.dp
         val width = if (isLargeScreen) 230.dp else 210.dp
 
         Column(
@@ -72,7 +71,7 @@ fun RhythmItem(
                     modifier = Modifier
                         .fillMaxWidth()
                         .size(size.width, size.height)
-                        .background(cardColor.copy(alpha = 0.07f))
+                        .background(cardColor.copy(alpha = 0.1f))
                         .clip(RoundedCornerShape(8.dp))
                 ) {
                     AsyncImage(
@@ -123,11 +122,11 @@ fun RhythmItem(
                 Spacer(modifier = Modifier.height(4.dp))
 
                 val artistText = track.artist.takeIf { it.isNotEmpty() } ?: "Unknown Artist"
-                val listenerText = "${formatCount(track.listenerCount.toLong())} listeners"
-                val fullArtistListenerString = "$artistText • $listenerText"
-                println("Item ID ${track.id} - About to render Artist/Listeners: '$fullArtistListenerString' with color: $subTextColor")
+                //val listenerText = "${formatCount(track.listenerCount.toLong())} listeners"
+                //val fullArtistListenerString = "$artistText • $listenerText"
+               // println("Item ID ${track.id} - About to render Artist/Listeners: '$fullArtistListenerString' with color: $subTextColor")
                 Text(
-                    text = fullArtistListenerString,
+                    text = artistText,
                     style = PoppinsTypography().bodySmall.copy(
                         fontSize = 14.sp,
                         color = subTextColor

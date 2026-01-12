@@ -77,7 +77,7 @@ fun SpaceListItem(
                 modifier = Modifier
                     .size(60.dp)
                     .clip(RoundedCornerShape(16.dp))
-                    .background(MaterialTheme.colorScheme.primaryContainer)
+                    .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f))
             ) {
                 if (!space.coverImageUrl.isNullOrBlank()) {
                     AsyncImage(

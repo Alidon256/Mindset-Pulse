@@ -12,6 +12,7 @@ import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridItemSpan
 import androidx.compose.foundation.lazy.staggeredgrid.items
 import androidx.compose.foundation.lazy.staggeredgrid.rememberLazyStaggeredGridState
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -189,7 +190,12 @@ private fun ProfileScreenCompact(
                             .size(110.dp)
                             .align(Alignment.TopCenter)
                     ) {
-                        Box(contentAlignment = Alignment.BottomEnd) {
+                        Box(
+                            contentAlignment = Alignment.BottomEnd,
+                            modifier = Modifier.background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+                                CircleShape
+                            )
+                        ) {
                             ProfileAvatar(
                                 user?.photoUrl,
                                 "User",

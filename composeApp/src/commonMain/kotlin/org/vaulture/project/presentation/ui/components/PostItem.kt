@@ -102,13 +102,13 @@ fun PostItem(
                 }
             }
 
-            IconButton(onClick = { onOptionClick(post.storyId) }) {
+            /*IconButton(onClick = { onOptionClick(post.storyId) }) {
                 Icon(
                     Icons.Default.MoreVert,
                     contentDescription = "Options",
                     tint = MaterialTheme.colorScheme.onSurfaceVariant
                 )
-            }
+            }*/
         }
 
         Spacer(modifier = Modifier.height(8.dp))
@@ -180,7 +180,7 @@ fun PostItem(
                         thumbnailUrl = post.thumbnailUrl,
                         aspectRatio = post.aspectRatio ?: (16f / 9f)
                     )
-                }
+                }// To be implemented
                 else -> {}
             }
         }

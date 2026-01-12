@@ -58,14 +58,7 @@ fun RhythmHomeScreen(
         Column(
             modifier = modifier
                 .fillMaxSize()
-                .background(
-                    Brush.verticalGradient(
-                        colors = listOf(
-                            MaterialTheme.colorScheme.background,
-                            MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.2f)
-                        )
-                    )
-                )
+                .background(MaterialTheme.colorScheme.background)
         ) {
 
             Row(
