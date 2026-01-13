@@ -4,8 +4,8 @@
 > **Mindset Pulse**  
 > An intelligent, empathetic early-warning system designed to combat burnout and stress, with a specific focus on the unique pressures facing the African youth and professional workforce.
 
-[![Kotlin](https://img.shields.io/badge/Kotlin-1.9.23-blue.svg?style=flat&logo=kotlin)](https://kotlinlang.org/)  
-[![Compose Multiplatform](https://img.shields.io/badge/Compose%20Multiplatform-1.6.1-purple.svg?style=flat&logo=jetpackcompose)](https://www.jetbrains.com/lp/compose-multiplatform/)  
+[![Kotlin](https://img.shields.io/badge/Kotlin-2.3.0-blue.svg?style=flat&logo=kotlin)](https://kotlinlang.org/)  
+[![Compose Multiplatform](https://img.shields.io/badge/Compose%20Multiplatform-1.9.3-purple.svg?style=flat&logo=jetpackcompose)](https://www.jetbrains.com/lp/compose-multiplatform/)  
 [![Firebase](https://img.shields.io/badge/Backend-Firebase-orange.svg?style=flat&logo=firebase)](https://firebase.google.com/)  
 [![Gemini AI](https://img.shields.io/badge/AI-Google%20Gemini-red.svg?style=flat&logo=google-gemini)](https://deepmind.google/technologies/gemini/)
 
